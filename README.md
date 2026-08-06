@@ -18,7 +18,7 @@
 
 1. リポジトリの **Settings > Pages** を開く
 2. Source を **Deploy from a branch**、Branch を **main / (root)** にして Save
-3. 数分後に `https://kensei329.github.io/Chikuho.Shimin.Univ/` で公開されます
+3. 数分後に `https://chikuho-shimin-univ.vercel.app/` で公開されます
 
 ## 年間予定の更新
 
@@ -71,3 +71,41 @@ var CONFIG = {
 - 会員は70代が中心のため、本文18px・行間1.95・タップ領域を大きめに設計しています。縮小しないでください
 - 配色はロゴから採っています（深緑 `#033D20` / 緑 `#1E6B27` / オレンジ `#E07A05`）
 - 明るい背景ではオレンジをそのまま置くと読みにくいため、濃いオレンジ `#9E4E03` を使い分けています
+
+## 検索エンジンへの掲載
+
+GitHub Pages は検索エンジンをブロックしていないので、公開すれば Google にインデックスされます。
+掲載を早め、検索結果やSNSでの見え方を整えるために、以下を入れています。
+
+- `index.html` の `<head>` に canonical・OGP・Twitterカード・構造化データ（JSON-LD / EducationalOrganization）
+- `robots.txt`（全許可 + サイトマップの場所）
+- `sitemap.xml`
+
+**独自ドメインに変える場合や、公開URLが変わる場合**は、次の5か所を新しいURLに書き換えてください。
+
+1. `index.html` の `<link rel="canonical">`
+2. `index.html` の `og:url`
+3. `index.html` の `og:image`
+4. `index.html` の JSON-LD 内の `url` と `logo`
+5. `robots.txt` と `sitemap.xml` の URL
+
+公開したら **Google Search Console** にサイトを登録し、サイトマップを送信すると、
+数日〜数週間かかる初回のインデックスが早まります。
+
+なお、年間予定は JavaScript でスプレッドシートから読み込んでいるため、
+検索結果に予定の中身まで載るとは限りません。団体名・理念・四つの会・受講料といった
+本文の情報は HTML に直接書いてあるので、そちらは通常どおり拾われます。
+
+## Google Search Console の所有権確認
+
+`google5c7353c4e11c838d.html` はSearch Consoleの所有権確認ファイルです。
+**確認が済んだあとも削除しないでください。**消すと所有権が外れます。
+
+`vercel.json` で `cleanUrls` を false にしています。これを true にすると
+`/google5c7353c4e11c838d.html` が `/google5c7353c4e11c838d` に転送され、
+所有権の確認に失敗します。
+
+## ホスティング
+
+Vercel で公開しています（`https://chikuho-shimin-univ.vercel.app/`）。
+mainブランチに push すると自動でデプロイされます。

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chikuho-shimin-univ.vercel.app/sitemap.xml
