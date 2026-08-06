@@ -22,8 +22,8 @@
   "@type": "EducationalOrganization",
   "name": "筑豊市民大学",
   "alternateName": "Chikuho Civic College",
-  "slogan": "あなたが変われば地域が変わる",
-  "description": "福岡県田川市の生涯学習団体。行政の補助を受けず、会員の受講料だけで運営する独立・非営利の学びの場。歴史をたどる会・ヘルシー・教養講座・低山の四つの会が月に一度の日曜日にひらかれます。",
+  "slogan": "わたしが変われば周りが変わる。周りが変われば、地域が変わる。地域が変われば社会が変わる。",
+  "description": "福岡県田川市の生涯学習団体。地域づくり人づくりの最小単位は個・わたし自身という理念のもと、行政の補助を受けず、会員の受講料だけで運営する独立・非営利の学びの場。歴史をたどる会・ヘルシー・教養講座・低山の四つの会が月に一度の日曜日にひらかれます。",
   "url": "https://chikuho-shimin-univ.vercel.app/",
   "logo": "https://chikuho-shimin-univ.vercel.app/logo.png",
   "foundingDate": "2000",
@@ -93,7 +93,7 @@ p:last-child{margin-bottom:0;}
 .nav a:hover,.nav a:focus-visible{color:var(--green-deep);background:var(--paper-2);}
 .nav .nav-cta{background:var(--green-deep);color:#fff;}
 .nav .nav-cta:hover,.nav .nav-cta:focus-visible{background:var(--green);color:#fff;}
-@media (max-width:980px){.nav{display:none;}}
+@media (max-width:1080px){.nav{display:none;}}
 
 /* ヒーロー */
 .hero{padding:clamp(48px,7vw,84px) 0 clamp(56px,8vw,88px);background:radial-gradient(120% 80% at 100% 0%,rgba(61,138,42,.10) 0%,rgba(61,138,42,0) 60%),var(--paper);}
@@ -135,6 +135,34 @@ p:last-child{margin-bottom:0;}
   .creed{grid-column:1;grid-row:1;writing-mode:horizontal-tb;height:auto;letter-spacing:.06em;line-height:1.5;margin-bottom:8px;}
   .cal-grid{grid-template-columns:1fr;}
   .cal-sun{min-height:0;}
+}
+
+.rinen{background:var(--paper-2);}
+.rinen .eyebrow{margin-bottom:clamp(28px,4vw,40px);}
+.cascade{margin:0 0 clamp(36px,5vw,52px);}
+.cascade p{
+  font-family:var(--display);font-weight:600;color:var(--green-deep);
+  margin:0 0 .35em;line-height:1.75;letter-spacing:.03em;
+}
+.cascade p:nth-child(1){font-size:clamp(1.3rem,3vw,2rem);}
+.cascade p:nth-child(2){font-size:clamp(1.45rem,3.4vw,2.3rem);padding-left:1.1em;}
+.cascade p:nth-child(3){font-size:clamp(1.6rem,3.9vw,2.65rem);padding-left:2.2em;}
+.cascade b{font-weight:600;color:var(--orange-ink);}
+.rinen-pillar{
+  font-family:var(--display);font-size:clamp(1.05rem,1.9vw,1.35rem);
+  line-height:2;color:var(--ink);margin:0 0 clamp(36px,5vw,52px);
+  border-left:3px solid var(--orange);padding:2px 0 2px 20px;
+}
+.rinen-body{max-width:40em;}
+.rinen-body p{font-size:1.02rem;line-height:2.15;color:var(--ink-soft);margin-bottom:1.6em;}
+.rinen-body p:last-of-type{margin-bottom:0;color:var(--ink);}
+.rinen-sign{
+  margin-top:clamp(36px,5vw,52px);padding-top:22px;border-top:1px solid var(--line);
+  font-family:var(--num);font-size:.95rem;letter-spacing:.2em;color:var(--green);
+}
+@media (max-width:640px){
+  .cascade p:nth-child(2){padding-left:.6em;}
+  .cascade p:nth-child(3){padding-left:1.2em;}
 }
 
 /* セクション共通 */
@@ -329,6 +357,7 @@ section[id],article[id]{scroll-margin-top:92px;}
       <span class="name">筑豊市民大学</span>
     </a>
     <nav class="nav" aria-label="メインメニュー">
+      <a href="#rinen">設立理念</a>
       <a href="#kai">四つの会</a>
       <a href="#schedule">年間予定</a>
       <a href="#talk">公開講演会</a>
@@ -357,7 +386,7 @@ section[id],article[id]{scroll-margin-top:92px;}
         </ul>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#join">入会を申し込む</a>
-          <a class="btn btn-outline" href="#kai">四つの会を見る</a>
+          <a class="btn btn-outline" href="#rinen">設立理念を読む</a>
         </div>
       </div>
     </div>
@@ -385,6 +414,28 @@ section[id],article[id]{scroll-margin-top:92px;}
         </a>
         <span class="cal-sun rest"><span class="ord">第 5 日曜</span><span class="name">おやすみ</span></span>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- 設立理念 -->
+<section class="section rinen" id="rinen">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="eyebrow">設立理念</p>
+      <div class="cascade">
+        <p>わたしが変われば<b>周り</b>が変わる。</p>
+        <p>周りが変われば、<b>地域</b>が変わる。</p>
+        <p>地域が変われば<b>社会</b>が変わる。</p>
+      </div>
+      <p class="rinen-pillar">地域づくり人づくり<br>すべての最小単位は個・わたし自身。</p>
+      <div class="rinen-body">
+        <p>自分を見つめ直し変革するため、知を得、仲間を得、お互いの違いを認め刺激し合える学びの場を創りたいと考えました。</p>
+        <p>人生の先達から、次の社会を担う子供たちまで、自ら求める、すべての人々の共同のひろば。それぞれがそれぞれの立場で学び、考え、発言し得る、常に開かれた自由な場でありたいと思います。</p>
+        <p>与えられるのではなく、自ら創りあげるこの場は、関わる者一人ひとりの意欲と責任を元にしてのみ成り立つのです。</p>
+        <p>一人ひとりの輝きが、友を呼び、仲間をつくり、多くのつながりを芽生えさせ、未来に繋がっていくことを願ってこの大学を開設します。</p>
+      </div>
+      <p class="rinen-sign">筑豊市民大学 設立理念</p>
     </div>
   </div>
 </section>
@@ -562,7 +613,7 @@ section[id],article[id]{scroll-margin-top:92px;}
       <div><h3>筑豊市民大学</h3><p>あなたが変われば地域が変わる。<br>市民の受講料だけで運営する、独立・非営利の学びの場です。</p></div>
       <div><h3>会場</h3><p>福岡県立大学　教室<br>福岡県田川市伊田</p></div>
       <div><h3>お申し込み・お問い合わせ</h3><p>お電話とメールでの受け付けは行っておりません。<br><a href="#join" style="text-decoration:underline;">申し込みフォーム</a>からお願いします。</p></div>
-      <div><h3>ページ内の案内</h3><p><a href="#kai" style="text-decoration:none;">四つの会</a>　<a href="#schedule" style="text-decoration:none;">年間予定</a><br><a href="#talk" style="text-decoration:none;">公開講演会</a><br><a href="#access" style="text-decoration:none;">会場</a>　<a href="#join" style="text-decoration:none;">受講料と入会</a></p></div>
+      <div><h3>ページ内の案内</h3><p><a href="#rinen" style="text-decoration:none;">設立理念</a>　<a href="#kai" style="text-decoration:none;">四つの会</a><br><a href="#schedule" style="text-decoration:none;">年間予定</a><br><a href="#talk" style="text-decoration:none;">公開講演会</a><br><a href="#access" style="text-decoration:none;">会場</a>　<a href="#join" style="text-decoration:none;">受講料と入会</a></p></div>
     </div>
     <p class="copyright">© 筑豊市民大学</p>
   </div>
