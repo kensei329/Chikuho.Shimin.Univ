@@ -147,9 +147,9 @@
     sending = false;
     sendBtn.disabled = false;
     sendBtn.textContent = 'もう一度送る';
-    alertBox.innerHTML =
-      '送信できませんでした。恐れ入りますが、もう一度お試しください。' +
-      'それでも送れないときは、下の「元のフォーム」からお願いします。';
+    alertBox.textContent =
+      '送信できませんでした。入力はそのまま残してあります。' +
+      '恐れ入りますが、もう一度「送る」を押してください。';
     alertBox.hidden = false;
     alertBox.scrollIntoView({ block: 'center' });
   }

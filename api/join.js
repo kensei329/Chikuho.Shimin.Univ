@@ -61,24 +61,57 @@ function readBody(req) {
   });
 }
 
+/* JS 経由なら JSON、<form> が素で来たなら読める画面を返す */
+function reply(res, asForm, code, payload) {
+  if (!asForm) return res.status(code).json(payload);
+
+  const done = payload.ok;
+  const head = done ? 'お申し込みを受け付けました。' : '送信できませんでした。';
+  const body = done
+    ? '事務局に届きしだい、担当者からご連絡し、お支払いの方法をご案内します。'
+    : '恐れ入りますが、前の画面に戻って、もう一度お試しください。';
+
+  res.setHeader('content-type', 'text/html; charset=utf-8');
+  return res.status(code).send(
+    '<!doctype html><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + head + '</title>' +
+    '<style>body{margin:0;padding:56px 24px;background:#F4F5EE;color:#20301F;' +
+    'font:17px/1.9 system-ui,"Hiragino Sans","Noto Sans JP",sans-serif}' +
+    'div{max-width:34em;margin:0 auto}h1{font-size:22px;line-height:1.6;margin:0 0 12px}' +
+    'a{display:inline-block;margin-top:24px;color:#1C3D24;font-weight:700}</style>' +
+    '<div><h1>' + head + '</h1><p>' + body + '</p>' +
+    '<a href="/#join">筑豊市民大学のページへもどる</a></div>'
+  );
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ ok: false, reason: 'method' });
   }
 
+
+  /* ふだんは画面の JS が JSON で渡してくる。
+     JS が動かない場合は <form> がそのまま来るので、どちらも受ける。 */
+  const asForm = !String(req.headers?.['content-type'] || '').includes('json');
+  const raw = typeof req.body === 'string' ? req.body : await readBody(req);
+
   /* 同じ欄が何度も出る（希望する会、確認事項）ので、
      連想配列ではなく組の並びで受け取る。 */
   let fields;
-  try {
-    const raw = typeof req.body === 'string' ? req.body : await readBody(req);
-    const parsed = JSON.parse(raw || '{}');
-    fields = Array.isArray(parsed.fields) ? parsed.fields : null;
-  } catch (e) {
-    return res.status(400).json({ ok: false, reason: 'bad-json' });
+  if (asForm) {
+    fields = [...new URLSearchParams(raw)];
+  } else {
+    try {
+      const parsed = JSON.parse(raw || '{}');
+      fields = Array.isArray(parsed.fields) ? parsed.fields : null;
+    } catch (e) {
+      return reply(res, asForm, 400, { ok: false, reason: 'bad-json' });
+    }
   }
   if (!fields || !fields.length || fields.length > MAX_FIELDS) {
-    return res.status(400).json({ ok: false, reason: 'bad-fields' });
+    return reply(res, asForm, 400, { ok: false, reason: 'bad-fields' });
   }
 
   const form = new URLSearchParams();
@@ -92,7 +125,7 @@ export default async function handler(req, res) {
     form.append(name, value.slice(0, MAX_LEN));
   }
   if (!form.has('entry.458126145') || !form.has('entry.939298798')) {
-    return res.status(400).json({ ok: false, reason: 'missing-required' });
+    return reply(res, asForm, 400, { ok: false, reason: 'missing-required' });
   }
 
   let upstream;
@@ -111,14 +144,14 @@ export default async function handler(req, res) {
       redirect: 'follow',
     });
   } catch (e) {
-    return res.status(502).json({ ok: false, reason: 'unreachable' });
+    return reply(res, asForm, 502, { ok: false, reason: 'unreachable' });
   }
 
   const html = await upstream.text().catch(() => '');
   const recorded = SUCCESS_MARKS.some((m) => html.includes(m));
 
   if (upstream.ok && recorded) {
-    return res.status(200).json({ ok: true });
+    return reply(res, asForm, 200, { ok: true });
   }
 
   /* 届いていない。何が起きたかは残す。画面には出さないが、
@@ -129,7 +162,7 @@ export default async function handler(req, res) {
     head: html.slice(0, 400).replace(/\s+/g, ' '),
   });
 
-  return res.status(502).json({
+  return reply(res, asForm, 502, {
     ok: false,
     reason: upstream.ok ? 'rejected' : 'status-' + upstream.status,
   });

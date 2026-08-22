@@ -277,8 +277,6 @@
 }
 .jform__send { width: 100%; min-height: 60px; font-size: 18px; }
 .jform__send[disabled] { opacity: .6; }
-.jform__foot { text-align: center; }
-.jform__foot a { color: var(--gold-ink); font-weight: 700; }
 
 /* 送信の受け皿。見せない */
 

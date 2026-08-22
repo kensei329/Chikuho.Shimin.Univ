@@ -188,7 +188,7 @@
     <h2 class="sect__h">このフォームから。</h2>
     <p class="sect__text">受け付けはこのフォームのみです。事務局に届きしだい、担当者からご連絡し、お支払いの方法をご案内します。</p>
 
-    <form class="jform" id="jform" action="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/formResponse" method="post" novalidate>
+    <form class="jform" id="jform" action="/api/join" method="post" novalidate>
       <!-- Google フォーム側が見ている印。単ページなのでどちらも固定でよい -->
       <input type="hidden" name="fvv" value="1">
       <input type="hidden" name="pageHistory" value="0">
@@ -277,13 +277,12 @@
 
       <p class="jform__alert" id="jf-alert" role="alert" hidden></p>
       <button class="btn btn--primary jform__send" type="submit" id="jf-send">この内容で申し込む</button>
-      <p class="jf__hint jform__foot">送信できないときは、<a href="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/viewform" target="_blank" rel="noopener">元のフォーム</a>からもお申し込みいただけます。</p>
     </form>
 
 
     <div class="jdone" id="jdone" role="status" hidden>
       <p class="jdone__h">お申し込みを受け付けました。</p>
-      <p class="jdone__text">事務局に届きしだい、担当者からご連絡し、お支払いの方法をご案内します。数日たっても連絡が届かないときは、お手数ですが<a href="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/viewform" target="_blank" rel="noopener">元のフォーム</a>からもう一度お送りください。</p>
+      <p class="jdone__text">事務局に届きしだい、担当者からご連絡し、お支払いの方法をご案内します。</p>
     </div>
   </section>
 
