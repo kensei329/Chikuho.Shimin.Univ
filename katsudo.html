@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>活動｜筑豊市民大学</title>
+<meta name="description" content="筑豊市民大学がこれまでお招きしてきた方々。作家の村田喜代子さん、医師の中村哲さん、登山家の今井通子さん、そしてJAXA。上下にスワイプしてご覧ください。">
+<meta name="theme-color" content="#033D20">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<link rel="canonical" href="https://chikuho-shimin-univ.vercel.app/katsudo.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="筑豊市民大学">
+<meta property="og:title" content="活動｜筑豊市民大学">
+<meta property="og:description" content="筑豊市民大学がこれまでお招きしてきた方々。作家の村田喜代子さん、医師の中村哲さん、登山家の今井通子さん、そしてJAXA。上下にスワイプしてご覧ください。">
+<meta property="og:url" content="https://chikuho-shimin-univ.vercel.app/katsudo.html">
+<!-- X・LINE などに貼ったときの絵。1200x630。中身は真ん中に寄せてあるので、
+     正方形に切られる置き場でもロゴが欠けない。透過のままだと黒地で潰れるため、
+     紙色を敷いたものを別に用意している（ロゴそのものは透過）。 -->
+<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="筑豊市民大学のロゴ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="活動｜筑豊市民大学">
+<meta name="twitter:description" content="筑豊市民大学がこれまでお招きしてきた方々。作家の村田喜代子さん、医師の中村哲さん、登山家の今井通子さん、そしてJAXA。上下にスワイプしてご覧ください。">
+<meta name="twitter:image" content="https://chikuho-shimin-univ.vercel.app/og.png">
+<meta name="twitter:image:alt" content="筑豊市民大学のロゴ">
+<!-- ファビコン。データURIで埋め込んではいけない（Googleはクロールできる
+     実ファイルのURLしか読まないため、埋め込むと検索結果に出ない）。
+     Google は 48 の倍数を薦めているので 48/96/192 を置いてある。 -->
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 書体は Google から取り寄せている。描画待ちに入れると、向こうが遅い回線では
+     そのあいだ真っ白になる。media="print" で取り寄せだけ先に始め、届いた時点で
+     本文へ適用する。JavaScript が無い環境には noscript の控えを置く。 -->
+<link id="webfont" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/reel.css">
+<script>
+(function () {
+  var f = document.getElementById('webfont');
+  if (!f) return;
+  var on = function () { f.media = 'all'; };
+  if (f.sheet) on(); else f.addEventListener('load', on);
+})();
+</script>
+<script src="js/site.js" defer></script>
+<script src="js/reel.js" defer></script>
+</head>
+<body data-page="katsudo">
+<div class="column">
+<a class="skip" href="#main">本文へ移動</a>
+
+<header class="head">
+  <a class="head__home" href="index.html" aria-label="ホームへ">
+    <img class="head__mark" src="logo-mark.png" alt="" width="44" height="32" decoding="async" fetchpriority="high">
+    <span class="head__name">筑豊市民大学</span>
+  </a>
+</header>
+
+  <!-- 左端の進み具合。カード5枚ぶんの目盛り -->
+  <div class="reelBar" id="reelBar" role="progressbar" aria-label="カードの進み具合"
+       aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+    <i></i><i></i><i></i><i></i><i></i>
+  </div>
+
+  <main class="reel" id="reel" aria-label="これまでお招きした方（上下にスワイプして送る）">
+
+    <!-- ─────────── 01 murata ─────────── -->
+    <article class="card" id="murata" data-title="村田喜代子" style="--tint:#14512a">
+      <p class="card__who"><b>村田 喜代子</b><span>作家</span></p>
+      <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRhYBAABXRUJQVlA4IAoBAADwBQCdASoUAB4APulep00pJSOiMAgBIB0JaACdG0dtuYu92S9oUIle15hb9TXDhtQsWKAU9vsaAADf8dbEG/iv/WRxGQrCKD/BuZmkuuioHWzjQRhaIUbIucIoRS59FsVw80SCk4RtY5W9tyCP4yoZFV/mcDNWcZW0sogAyVcYk3TbG0J5vTcAoBlWKqxK8BOk/LzrmfB0vlYFgvpnfiaptjacR6kFRdALi+faqVPtTgISNA8eX4akwG0FRgpLsY7Z9IgVpORE6r1MVVFutBIR3plkEOy4+56516iqHBaacUkFi+gQkkEv3IwAUzMpse86Tu7UXaWdY3U/V4FI2IlmyseRRa1V+pAAAA==)">
+        <img src="assets/talk/01-murata.webp" alt="本棚の前に腰かける村田喜代子さん" decoding="async" fetchpriority="high" style="object-position:48% 26%"
+             onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
+      </div>
+      <div class="card__main">
+        <p class="card__eyebrow">GUEST 01</p>
+        <h2 class="card__h">鉄工所で働きながら、<br>芥川賞まで書いた人。</h2>
+        <p class="card__lead">中学を出て就職。暮らしの合間に原稿を書きつづけ、42歳で芥川賞。八幡に生まれた作家の言葉は、この土地の日々からできている。</p>
+        
+      </div>
+      <div class="card__id">
+        <a class="card__user" href="index.html">
+          <img src="logo-mark.png" alt="" width="26" height="19" decoding="async">
+          <b>@筑豊市民大学</b>
+        </a>
+        <p class="card__caption">これまでお招きした方 <em>#村田喜代子</em></p>
+      </div>
+      <nav class="card__rail" aria-label="村田喜代子への操作">
+        <button type="button" class="rail rail--like" data-count="0" aria-pressed="false" aria-label="いいねする（現在 0件）"><span class="tip" aria-hidden="true">ありがとうございます！</span><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 20.6 4.3 13a4.7 4.7 0 0 1 6.6-6.6l1.1 1.1 1.1-1.1A4.7 4.7 0 0 1 19.7 13z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></span><b>0</b></button>
+        <button type="button" class="rail rail--comment" aria-label="村田喜代子の解説を見る"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3.6c-4.8 0-8.6 3.2-8.6 7.2 0 2.3 1.3 4.4 3.3 5.7l-.8 3.6 3.9-2a10 10 0 0 0 2.2.2c4.8 0 8.6-3.2 8.6-7.2S16.8 3.6 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b>解説</b></button>
+        <button type="button" class="rail rail--share" aria-label="このページを共有する"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12v6.4A1.6 1.6 0 0 0 6.6 20h10.8a1.6 1.6 0 0 0 1.6-1.6V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4.2M8.2 7.8 12 4l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>シェア</b></button>
+      </nav>
+      <!-- 開いた直後だけ出す案内。指で送れることが伝わらないという声があるので、
+           1 枚目にいるあいだだけ 3.5 秒ほど出し、触ったらその時点で消す。 -->
+      <div class="swipeGuide" id="swipeGuide" aria-hidden="true">
+        <span class="swipeGuide__pill swipeGuide__pill--up">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          上にスワイプ
+        </span>
+        <span class="swipeGuide__pill swipeGuide__pill--down">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          下にスワイプ
+        </span>
+        <span class="swipeGuide__rail">
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M7 12h9M12.5 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          いいね・解説・シェアも押せます
+        </span>
+      </div>
+      <div class="card__sheet">
+        <div class="note">
+          <img class="note__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
+          <div>
+            <p class="note__who">筑豊市民大学</p>
+            <p class="note__q">村田喜代子さんという人。</p>
+            <p class="note__text">1945年、福岡県八幡市（現在の北九州市八幡西区）生まれ。中学卒業後に就職し、働きながら書きつづけた。1977年「水中の声」で九州芸術祭文学賞最優秀作、1987年「鍋の中」で第97回芥川賞。以後も女流文学賞、川端康成文学賞、芸術選奨文部大臣賞、野間文芸賞、読売文学賞などを受けている。</p>
+          </div>
+        </div>
+        <p class="note__src">出典：新潮社・潮出版社の著者紹介、各文学賞の記録</p>
+      </div>
+    </article>
+    <!-- ─────────── 02 nakamura ─────────── -->
+    <article class="card" id="nakamura" data-title="中村哲" style="--tint:#155330">
+      <p class="card__who"><b>中村 哲</b><span>医師</span></p>
+      <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRsQAAABXRUJQVlA4ILgAAAAQBQCdASoUABsAPt1apE0opSOiMAwBEBuJaACo9ywTnokUkr4kKAzC1oIuzFoNLzwAANejg0mjIDh3ul+wnmGthELXdTAAkNXuhu8l/3Fm6x05neLfiBal4IoNx0c+pefqdjgHnHow/tlH/JF0GKdhuyx2ZbT/hwuEsDZ2vELzVtBx5u6Uogb5IIKzkLYI9ZLJ0/THqO4WXvjiXrLnzCRtMoPlvHYWTPeGeJevmmXLxbWMHIjfAAAA)">
+        <img src="assets/talk/02-nakamura.webp" alt="青空を背にした中村哲さん" decoding="async" loading="lazy" style="object-position:40% 22%"
+             onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
+      </div>
+      <div class="card__main">
+        <p class="card__eyebrow">GUEST 02</p>
+        <h2 class="card__h">聴診器を置いて、<br>用水路を掘った。</h2>
+        <p class="card__lead">福岡に生まれ、九州大学で医学を学び、パキスタンへ。診療所だけでは救えない命があると知って、乾いたアフガニスタンの大地に水を引いた。</p>
+        
+      </div>
+      <div class="card__id">
+        <a class="card__user" href="index.html">
+          <img src="logo-mark.png" alt="" width="26" height="19" decoding="async">
+          <b>@筑豊市民大学</b>
+        </a>
+        <p class="card__caption">これまでお招きした方 <em>#中村哲</em></p>
+      </div>
+      <nav class="card__rail" aria-label="中村哲への操作">
+        <button type="button" class="rail rail--like" data-count="0" aria-pressed="false" aria-label="いいねする（現在 0件）"><span class="tip" aria-hidden="true">ありがとうございます！</span><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 20.6 4.3 13a4.7 4.7 0 0 1 6.6-6.6l1.1 1.1 1.1-1.1A4.7 4.7 0 0 1 19.7 13z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></span><b>0</b></button>
+        <button type="button" class="rail rail--comment" aria-label="中村哲の解説を見る"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3.6c-4.8 0-8.6 3.2-8.6 7.2 0 2.3 1.3 4.4 3.3 5.7l-.8 3.6 3.9-2a10 10 0 0 0 2.2.2c4.8 0 8.6-3.2 8.6-7.2S16.8 3.6 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b>解説</b></button>
+        <button type="button" class="rail rail--share" aria-label="このページを共有する"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12v6.4A1.6 1.6 0 0 0 6.6 20h10.8a1.6 1.6 0 0 0 1.6-1.6V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4.2M8.2 7.8 12 4l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>シェア</b></button>
+      </nav>
+      <div class="card__sheet">
+        <div class="note">
+          <img class="note__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
+          <div>
+            <p class="note__who">筑豊市民大学</p>
+            <p class="note__q">中村哲さんという人。</p>
+            <p class="note__text">1946年、福岡県生まれ。九州大学医学部卒。1984年にパキスタン・ペシャワールのミッション病院ハンセン病棟へ赴任し、1989年からはアフガニスタン国内へ活動を広げた。2000年の大干ばつを機に飲料水と灌漑用の井戸を掘りはじめ、2003年からは大規模な水利事業に取り組んだ。2019年12月、活動先のアフガニスタンで凶弾に倒れた。同月、日本政府は旭日小綬章の追贈を決めている。</p>
+          </div>
+        </div>
+        <p class="note__src">出典：ペシャワール会／PMS、福岡アジア文化賞の受賞者紹介</p>
+      </div>
+    </article>
+    <!-- ─────────── 03 imai ─────────── -->
+    <article class="card" id="imai" data-title="今井通子" style="--tint:#0a4a28">
+      <p class="card__who"><b>今井 通子</b><span>登山家・医師</span></p>
+      <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRtQAAABXRUJQVlA4IMgAAAAQBQCdASoUABsAPulkqk8pJaOiMBgIASAdCUATpmMEuWDvl2WJtVn1U0CwUduyQ+AAAP68ImdIb+VkYwAkJ99fd/OkQi2l9ut031/znbvC5u+pgsqf3VnJlbkzqcuOsnX+yP90Vrhwqf3U4xv8WX2XEGCN9g+8XmluXbmJDSdghHVoRR1yOnOrzUMmA6TgnRkzp6kw2XiT4pqwFX4xdAvY8fpc8OxSDLQ0zFKODGXsAHoV2tgPVK0HI4C5Po1w4jpvMik3B8lgAA==)">
+        <img src="assets/talk/03-imai.webp" alt="滝を背にした今井通子さん" decoding="async" loading="lazy" style="object-position:12% 30%"
+             onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
+      </div>
+      <div class="card__main">
+        <p class="card__eyebrow">GUEST 03</p>
+        <h2 class="card__h">三大北壁を、<br>女性で世界初。</h2>
+        <p class="card__lead">マッターホルン、アイガー、グランドジョラス。三つの北壁をはじめて登りきった女性は、白衣も着ていた。</p>
+        
+      </div>
+      <div class="card__id">
+        <a class="card__user" href="index.html">
+          <img src="logo-mark.png" alt="" width="26" height="19" decoding="async">
+          <b>@筑豊市民大学</b>
+        </a>
+        <p class="card__caption">これまでお招きした方 <em>#今井通子</em></p>
+      </div>
+      <nav class="card__rail" aria-label="今井通子への操作">
+        <button type="button" class="rail rail--like" data-count="0" aria-pressed="false" aria-label="いいねする（現在 0件）"><span class="tip" aria-hidden="true">ありがとうございます！</span><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 20.6 4.3 13a4.7 4.7 0 0 1 6.6-6.6l1.1 1.1 1.1-1.1A4.7 4.7 0 0 1 19.7 13z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></span><b>0</b></button>
+        <button type="button" class="rail rail--comment" aria-label="今井通子の解説を見る"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3.6c-4.8 0-8.6 3.2-8.6 7.2 0 2.3 1.3 4.4 3.3 5.7l-.8 3.6 3.9-2a10 10 0 0 0 2.2.2c4.8 0 8.6-3.2 8.6-7.2S16.8 3.6 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b>解説</b></button>
+        <button type="button" class="rail rail--share" aria-label="このページを共有する"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12v6.4A1.6 1.6 0 0 0 6.6 20h10.8a1.6 1.6 0 0 0 1.6-1.6V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4.2M8.2 7.8 12 4l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>シェア</b></button>
+      </nav>
+      <div class="card__sheet">
+        <div class="note">
+          <img class="note__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
+          <div>
+            <p class="note__who">筑豊市民大学</p>
+            <p class="note__q">今井通子さんという人。</p>
+            <p class="note__text">1942年、東京生まれ。東京女子医科大学を卒業した医師（泌尿器科）。1967年、女性だけのパーティの隊長としてマッターホルン北壁を登攀。1969年アイガー北壁、1971年グランドジョラス北壁と続け、女性として世界ではじめてヨーロッパ三大北壁を完登した。1979年にはネパール・ヒマラヤのダウラギリ II・III・V 峰の縦走登山隊長を務めている。</p>
+          </div>
+        </div>
+        <p class="note__src">出典：ラジオNIKKEI 出演者紹介、各講演事務所の講師紹介</p>
+      </div>
+    </article>
+    <!-- ─────────── 04 jaxa ─────────── -->
+    <article class="card" id="jaxa" data-title="JAXA" style="--tint:#12406f">
+      <p class="card__who"><b>JAXA</b><span>宇宙航空研究開発機構</span></p>
+      <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAACwBQCdASoUABsAPuliq08pJSOiMBgIASAdCUAWHYIiP901FJd6aZWI2/vnICG8Vf2t2jjhu6AA+GK8vis/bws1lln16oeBD+bCz+Pb5dHznHRc4vX9XhvPd3PGfjgeVnToTazOeawpC7er3+QI/TEJM8TdQryBcmfWTrA8Gcn8df/AAhqISJIfd9yTAEGOPKO+RjnGIfAJ+bVGfFzYf98791HPXeqOPo/CzXo3d02jPZBgqtFQ0bxJ4zQEc+KK6zAiIMi8Ntd1hFP38NGEAAAA)">
+        <img src="assets/talk/04-jaxa.webp" alt="JAXA の関係者の集合写真" decoding="async" loading="lazy" style="object-position:50% 42%"
+             onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
+      </div>
+      <div class="card__main">
+        <p class="card__eyebrow">GUEST 04</p>
+        <h2 class="card__h">田川の教室が、<br>いちばん遠い場所と。</h2>
+        <p class="card__lead">宇宙航空研究開発機構（JAXA）の関係者をお招きしました。探査機のこと、人が宇宙で暮らすこと。教養講座は、こういう日があるから面白い。</p>
+        <p class="card__note">写真提供：JAXA</p>
+      </div>
+      <div class="card__id">
+        <a class="card__user" href="index.html">
+          <img src="logo-mark.png" alt="" width="26" height="19" decoding="async">
+          <b>@筑豊市民大学</b>
+        </a>
+        <p class="card__caption">これまでお招きした方 <em>#JAXA</em></p>
+      </div>
+      <nav class="card__rail" aria-label="JAXAへの操作">
+        <button type="button" class="rail rail--like" data-count="0" aria-pressed="false" aria-label="いいねする（現在 0件）"><span class="tip" aria-hidden="true">ありがとうございます！</span><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 20.6 4.3 13a4.7 4.7 0 0 1 6.6-6.6l1.1 1.1 1.1-1.1A4.7 4.7 0 0 1 19.7 13z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></span><b>0</b></button>
+        <button type="button" class="rail rail--comment" aria-label="JAXAの解説を見る"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3.6c-4.8 0-8.6 3.2-8.6 7.2 0 2.3 1.3 4.4 3.3 5.7l-.8 3.6 3.9-2a10 10 0 0 0 2.2.2c4.8 0 8.6-3.2 8.6-7.2S16.8 3.6 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b>解説</b></button>
+        <button type="button" class="rail rail--share" aria-label="このページを共有する"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12v6.4A1.6 1.6 0 0 0 6.6 20h10.8a1.6 1.6 0 0 0 1.6-1.6V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4.2M8.2 7.8 12 4l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>シェア</b></button>
+      </nav>
+      <div class="card__sheet">
+        <div class="note">
+          <img class="note__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
+          <div>
+            <p class="note__who">筑豊市民大学</p>
+            <p class="note__q">JAXA（宇宙航空研究開発機構）。</p>
+            <p class="note__text">2003年に宇宙科学研究所・航空宇宙技術研究所・宇宙開発事業団が統合して発足した、日本の宇宙機関。小惑星探査機「はやぶさ」「はやぶさ2」、国際宇宙ステーションの日本実験棟「きぼう」、H-IIA・H3 ロケットなどを手がけている。</p>
+          </div>
+        </div>
+        <p class="note__src">写真提供：JAXA</p>
+      </div>
+    </article>
+    <!-- ─────────── 05 これから ─────────── -->
+    <article class="card card--last" id="kotoshi" data-title="本年度の公開講演会" style="--tint:#0a4a28">
+      <p class="card__who"><b>公開講演会</b><span>年に一度・どなたでも無料</span></p>
+      <div class="card__photo is-blank"></div>
+      <div class="card__main">
+        <p class="card__eyebrow">これから</p>
+        <h2 class="card__h">本年度も、<br>魅力ある方を。</h2>
+        <p class="card__lead">作家、医師、登山家、そして宇宙。分野はばらばらでも、共通しているのは自分の足で確かめてきた人だということ。本年度も、そうした方をお招きする予定です。</p>
+        <p class="card__lead">公開講演会は年に一度。会員でなくても、どなたでも無料でお聞きいただけます。</p>
+        <nav class="card__go" aria-label="ほかのページを見る">
+          <a class="card__goBtn" href="index.html#join">入会のお申し込み<span aria-hidden="true">›</span></a>
+          <a class="card__goBtn card__goBtn--sub" href="bunkakai.html">四つの会を見る<span aria-hidden="true">›</span></a>
+        </nav>
+      </div>
+      <div class="card__id">
+        <a class="card__user" href="index.html">
+          <img src="logo-mark.png" alt="" width="26" height="19" decoding="async">
+          <b>@筑豊市民大学</b>
+        </a>
+        <p class="card__caption">これまでお招きした方 <em>#公開講演会</em></p>
+      </div>
+      <nav class="card__rail" aria-label="本年度の公開講演会への操作">
+        <button type="button" class="rail rail--like" data-count="0" aria-pressed="false" aria-label="いいねする（現在 0件）"><span class="tip" aria-hidden="true">ありがとうございます！</span><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 20.6 4.3 13a4.7 4.7 0 0 1 6.6-6.6l1.1 1.1 1.1-1.1A4.7 4.7 0 0 1 19.7 13z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></span><b>0</b></button>
+        <button type="button" class="rail rail--comment" aria-label="本年度の公開講演会の解説を見る"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3.6c-4.8 0-8.6 3.2-8.6 7.2 0 2.3 1.3 4.4 3.3 5.7l-.8 3.6 3.9-2a10 10 0 0 0 2.2.2c4.8 0 8.6-3.2 8.6-7.2S16.8 3.6 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b>解説</b></button>
+        <button type="button" class="rail rail--share" aria-label="このページを共有する"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12v6.4A1.6 1.6 0 0 0 6.6 20h10.8a1.6 1.6 0 0 0 1.6-1.6V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4.2M8.2 7.8 12 4l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>シェア</b></button>
+      </nav>
+      <div class="card__sheet">
+        <div class="note">
+          <img class="note__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
+          <div>
+            <p class="note__who">筑豊市民大学</p>
+            <p class="note__q">公開講演会について。</p>
+            <p class="note__text">年に一度、会員以外の方にも開いている講演会です。参加費はいただいていません。次回の日程が決まりしだい、このページと年間予定でお知らせします。</p>
+          </div>
+        </div>
+        <p class="note__src">お問い合わせはお申し込みフォームから承ります</p>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- 解説を開くシート。中身はカードごとに差し替える -->
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="解説" hidden>
+    <div class="sheet__veil"></div>
+    <div class="sheet__panel">
+      <div class="sheet__grip" aria-hidden="true"></div>
+      <div class="sheet__head">
+        <h2>解説</h2>
+        <span class="sheet__count"></span>
+      </div>
+      <div class="sheet__body"></div>
+      <div class="sheet__foot">
+        <button type="button" class="sheet__close">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reelHelp">
+    <button type="button" class="reelHelp__btn" id="reelPrev" aria-label="前のカードへ">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <p class="reelHelp__text">↑ ↓ キーでも<br>移動できます</p>
+    <button type="button" class="reelHelp__btn" id="reelNext" aria-label="次のカードへ">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+<nav class="nav" aria-label="サイト内メニュー">
+  <a class="nav__link is-active" href="katsudo.html" aria-current="page"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.4 12a8.6 8.6 0 1 0 2.5-6.1"/><path d="M3.1 4.2v4.1h4.1"/><path d="M12 7.7V12l3 1.8"/></svg><span class="nav__label">活動</span></a>
+  <a class="nav__link" href="rinen.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4v-7.6"/><path d="M12 12.8C12 9.4 9.4 6.8 6 6.8c0 3.4 2.6 6 6 6Z"/><path d="M12 12.8c0-4 3-7 7-7 0 4-3 7-7 7Z"/></svg><span class="nav__label">理念</span></a>
+  <a class="nav__link nav__link--center" href="index.html"><span class="nav__badge"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M5.9 9.7V20h12.2V9.7"/><path d="M10 20v-4.7h4V20"/></svg></span><span class="nav__label">ホーム</span></a>
+  <a class="nav__link" href="bunkakai.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.1" cy="8.5" r="2.9"/><path d="M3.5 19.1a5.6 5.6 0 0 1 11.2 0"/><path d="M16.3 6.3a2.7 2.7 0 0 1 0 5.2"/><path d="M17.5 13.7a5 5 0 0 1 3.1 4.6"/></svg><span class="nav__label">分科会</span></a>
+  <a class="nav__link" href="nenkan.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="5" width="17.2" height="15.6" rx="2.4"/><path d="M3.4 9.8h17.2"/><path d="M8.2 3.2v3.4"/><path d="M15.8 3.2v3.4"/><path d="M7.6 13.6h3"/><path d="M7.6 17h6.8"/></svg><span class="nav__label">年間予定</span></a>
+</nav>
+</div>
+</body>
+</html>

@@ -1,0 +1,1288 @@
+/* =========================================================================
+   実績ページ — 縦スワイプのカードフィード
+   =========================================================================
+   リールや TikTok と同じ「1 画面 1 枚・上下スワイプ」の見せ方。
+
+   ■ 送りは CSS だけで作る
+     scroll-snap-type: y mandatory を使う。指の慣性も、ホイールも、
+     キーボードも、ブラウザ本来のスクロールがそのまま効くので、
+     JavaScript で位置を計算するより滑らかで、途中で引っかからない。
+     JS は「いま何枚目か」を読むだけ。
+
+   ■ 高さの取り方
+     カードの入れ物を position: fixed の top / bottom で留めている。
+     ヘッダーとタブバーのあいだが、そのまま高さになる。
+     100dvh から引き算する書き方だと、iOS でアドレスバーが伸び縮み
+     するたびに数字がずれてスナップが暴れるが、この置き方なら
+     ブラウザが勝手に合わせてくれる。
+   ========================================================================= */
+
+body[data-page="katsudo"] {
+  /* ページ自体は動かさない。動くのは .reel の中だけ */
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.reel {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--column);
+  top: var(--header-h);
+  bottom: var(--nav-h);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  background: #eef2e9;
+  /* スクロールバーは出さない（見た目が動画アプリらしくなくなる） */
+  scrollbar-width: none;
+}
+
+.reel::-webkit-scrollbar { display: none; }
+
+/* --- 1 枚のカード ------------------------------------------------------ */
+
+.card {
+  position: relative;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;   /* 勢いよく払っても 1 枚ずつ止まる */
+  overflow: hidden;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+/* 背景写真。まだ無いカードは色だけで成立するようにしてある。
+   img 要素で置いているのは、custom property の中に書いた url() が
+   「その変数を使っている側のスタイルシート」を基準に解決されてしまい、
+   css/assets/... を取りにいって 404 になるため。あわせて、
+   1 枚目以外は loading="lazy" で後回しにできる。 */
+/* 写真が届くまでのあいだ、ここには HTML に埋め込んだ
+   20px のぼかし（下地）が敷かれている。真っ白のまま文字だけが
+   浮くのを防ぐためのもの。本物が乗ると自然に隠れる。 */
+.card__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background-size: cover;
+  background-position: 50% 45%;
+  background-repeat: no-repeat;
+}
+
+.card__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  transform: scale(1.04);
+  /* 明るい写真が前に出てきて数字と competing しないよう、少し落ち着かせる */
+  filter: saturate(1.1) brightness(1.05);
+}
+
+.card__photo::after {
+  /* 文字を読ませるための膜。上下を濃く、真ん中はやや薄く。
+     真ん中を .55 まで薄くしていたときは、白い背景の写真
+     （市債残高の表彰状、放置自転車のスマホ画面など）で数字が
+     沈んで読めなくなった。写真が見える程度に留めつつ .72 まで濃くしてある。 */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, .88) 0%,
+      rgba(255, 255, 255, .48) 22%,
+      rgba(255, 255, 255, .34) 48%,
+      rgba(255, 255, 255, .58) 76%,
+      rgba(255, 255, 255, .88) 100%);
+}
+
+/* 写真が無いカードの下地。カードごとに色相をずらす */
+.card {
+  background:
+    radial-gradient(120% 70% at 12% 0%, color-mix(in srgb, var(--tint, #14512a) 16%, transparent) 0%, transparent 62%),
+    radial-gradient(90% 60% at 92% 100%, rgba(240, 146, 28, .28) 0%, transparent 60%),
+    linear-gradient(168deg, #ffffff 0%, #edf2e8 58%, #e6eee2 100%);
+}
+
+.card__main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(6px, 1.6vh, 14px);
+  padding: clamp(12px, 2.4vh, 24px) 76px clamp(4px, 1vh, 10px) clamp(16px, 5vw, 22px);
+  min-height: 0;
+  /* ここは絶対にスクロールさせない。
+     以前は「入りきらないとき用の逃げ道」として overflow-y: auto を
+     付けていたが、表紙の中身が 1 画面に収まらない端末では内側が
+     スクロールできる状態になり、上へのスワイプがそこで吸われて
+     次のカードに届かなかった（1 枚目だけ送れないという不具合）。
+     入りきらない場合は、下の高さ別の指定で文字と余白を詰める。 */
+  overflow: hidden;
+}
+
+/* --- 見出しまわり ------------------------------------------------------ */
+
+.card__eyebrow {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  /* 行を字面より低くすると、下の見出しの白フチと噛み合う */
+  line-height: 1.5;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: var(--gold-ink);
+}
+
+.card__eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(176, 106, 30, .6), transparent);
+}
+
+/* --- 飾り文字（写真の上に直接置く文字） ----------------------------------
+   写真をはっきり見せるため幕を薄くしてあるので、文字は白い縁取りで
+   浮かせる。paint-order で縁取りを下に敷くので、字の形は太らない。
+   白い面の中にある文字（年・チップ・棒グラフ・1 位の帯・解説シート）
+   には掛けない。地がすでに白いので、縁取りは邪魔になるだけ。      */
+.card__eyebrow,
+.card__h,
+.card__lead,
+.card__from,
+.card__arrow,
+.card__big,
+.card__note,
+.card__axis span,
+.card__caption,
+.card__trail,
+.card__user b,
+.rail b {
+  paint-order: stroke fill;
+  -webkit-text-stroke: 3px #fff;
+  text-shadow: var(--edge);
+}
+
+.card__h { -webkit-text-stroke-width: 5.5px; }
+.card__big { -webkit-text-stroke-width: 7.5px; }
+
+/* 写真の柄に負けないよう、本文と注記を少し太らせる */
+.card__lead { font-weight: 600; }
+.card__note { font-weight: 600; }
+
+.card__h {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(20px, 5.4vw, 26px);
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: .01em;
+  text-shadow: 0 2px 16px rgba(255, 255, 255, .95);
+}
+
+.card__lead {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: clamp(13.5px, 3.6vw, 14.5px);
+  font-weight: 500;
+  line-height: 1.8;
+  text-wrap: pretty;
+  text-shadow: var(--halo);
+}
+
+/* --- 次のページへ ------------------------------------------------------- */
+
+/* 最後のカードは下に余白が残る。そこから政策とプロフィールへ
+   ひと跳びできるようにして、読み終わりを行き止まりにしない。 */
+.card__go {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: clamp(4px, 1.2vh, 10px);
+}
+
+.card__goBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  /* 指で押すものなので、画面が低くても 44px は割らせない */
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: clamp(10px, 1.5vh, 13px) 18px;
+  border-radius: 999px;
+  background: #0a3d20;
+  color: #ffffff;
+  /* いちばん小さい端末でも 10pt（13.34px）を割らない */
+  font-size: clamp(13.5px, 3.6vw, 15px);
+  font-weight: 900;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(5, 42, 23, .22);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+/* 2 つ並ぶので、片方は白地にして主従をつける */
+.card__goBtn--sub {
+  background: rgba(255, 255, 255, .95);
+  color: var(--ink);
+  border: 1.5px solid rgba(10, 61, 32, .24);
+  box-shadow: 0 4px 14px rgba(5, 42, 23, .14);
+}
+
+.card__goBtn span { opacity: .75; font-weight: 700; }
+.card__goBtn.is-pressed { transform: scale(.975); box-shadow: 0 2px 8px rgba(5, 42, 23, .18); }
+
+/* --- 主役の数字 -------------------------------------------------------- */
+
+.card__figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: clamp(2px, .8vh, 8px);
+}
+
+.card__from {
+  font-size: clamp(13.5px, 3.6vw, 15px);
+  font-weight: 700;
+  /* 写真の明るいところに重なると 4.25:1 まで落ちて AA を割っていたので、
+     元の #9bb59a から一段明るくしてある */
+  color: var(--ink-3);
+}
+
+.card__arrow { color: var(--gold-ink); font-weight: 900; }
+
+.card__big {
+  font-size: clamp(30px, 9.6vw, 46px);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--ink);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 18px rgba(255, 255, 255, .95);
+}
+
+.card__big i { font-style: normal; font-size: max(13.5px, .44em); font-weight: 800; margin-left: 2px; }
+
+.card__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: clamp(13.5px, 3.4vw, 14px);
+  font-weight: 800;
+  background: var(--gold-pale);
+  color: #7a3d02;
+  border: 1px solid rgba(176, 106, 30, .5);
+}
+
+.card__delta.is-down {
+  background: #ddebd8;
+  color: #155330;
+  border-color: rgba(30, 107, 39, .38);
+}
+
+/* --- ホームから持ってきた「効かせる一行」------------------------------- */
+
+.card__rank {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 9px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  /* 写真が透けると、中の小さい文字が沈む。ここは地をほぼ不透明にする */
+  background: linear-gradient(100deg, rgba(255, 247, 235, .95), rgba(250, 226, 190, .92));
+  border: 1px solid rgba(176, 106, 30, .5);
+  box-shadow: var(--card-lift);
+}
+
+.card__rank span { font-size: 13.5px; font-weight: 800; color: #7a3d02; letter-spacing: .04em; }
+
+.card__rank b {
+  font-size: clamp(19px, 5.6vw, 25px);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.card__rank b i { font-style: normal; font-size: 1.32em; color: var(--gold-ink); }
+
+.card__rank em {
+  flex-basis: 100%;
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+/* 市債残高だけは「減った額」を主役にする */
+.card__figure--minus { margin-top: 2px; }
+
+.card__big--minus { color: #b32b17; }
+
+.card__trail {
+  /* すぐ上の数字は行の高さを詰めたうえに白フチを 7.5px 巻いている。
+     margin 0 だと、そのフチがこの行の頭を削って読めなくなる。 */
+  margin: clamp(8px, 2.2vw, 12px) 0 0;
+  font-size: clamp(13.5px, 3.6vw, 14.5px);
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.card__trail b { color: var(--ink); font-weight: 900; }
+
+.card__trail span { color: var(--gold-ink); margin: 0 3px; }
+
+/* --- グラフ ------------------------------------------------------------ */
+
+.card__chart {
+  position: relative;
+  height: clamp(84px, 22vh, 190px);
+  min-height: 66px;
+  border-bottom: 1px solid rgba(5, 42, 23, .18);
+}
+
+.card__chart svg { display: block; overflow: visible; }
+
+.card__dot {
+  position: absolute;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  box-sizing: border-box;
+  transform: translate(50%, -50%);
+  box-shadow: 0 2px 8px rgba(5, 42, 23, .35);
+}
+
+.card__axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.card__note {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-4);
+}
+
+/* --- 年ごとの順位や KPI の小箱 ----------------------------------------- */
+
+/* 年の並び。1fr のままだと桁の幅より狭くなれず、文字を大きくした
+   とたんに右のボタン列へはみ出す。縮める余地を与えたうえで、
+   それでも入らない狭い画面では 2 段に折り返す。 */
+.card__years {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+@media (max-width: 409px) {
+  .card__years {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 8 年ぶん並ぶカードは、1 行だと 430px でも桁が潰れる。
+   もう少し広い画面から 4 列 2 段にして、年をきちんと読ませる。 */
+@media (max-width: 479px) {
+  .card__years:has(> :nth-child(7)) {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.card__year {
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  box-shadow: var(--card-lift);
+  border-radius: 9px;
+  padding: 7px 1px;
+  text-align: center;
+}
+
+.card__year b { display: block; font-size: clamp(13.5px, 3.6vw, 15px); font-weight: 900; color: var(--ink); }
+.card__year span { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink-3); }
+.card__year.is-top { background: var(--gold-pale); border-color: rgba(176, 106, 30, .5); }
+.card__year.is-top b { color: #4e2802; }
+.card__year.is-top span { color: #7a3d02; }
+
+/* 文字を 10pt 以上にしたぶん、狭い画面では 3 つ横並びが入らない。
+   入るときは 3 列、入らないときは折り返す。 */
+.card__chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card__chips li {
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  box-shadow: var(--card-lift);
+  border-radius: 10px;
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.card__chips b { display: block; font-size: clamp(13.5px, 3.8vw, 16px); font-weight: 900; color: var(--ink); }
+.card__chips b i { font-style: normal; font-size: max(13.5px, .62em); }
+.card__chips span { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink-3); line-height: 1.5; margin-top: 2px; }
+
+/* --- 得票数のような横棒 ------------------------------------------------ */
+
+.card__bars { display: flex; flex-direction: column; gap: 6px; }
+
+.card__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, .92);
+  border-radius: 9px;
+  padding: 7px 10px;
+}
+
+.card__bar > span:first-child { font-size: 13.5px; font-weight: 700; color: var(--ink-3); width: 40px; flex: none; }
+.card__bar b { font-size: clamp(13.5px, 3.8vw, 15px); font-weight: 900; color: var(--ink); width: 56px; flex: none; }
+.card__bar b i { font-style: normal; font-size: max(13.5px, .7em); }
+.card__bar u { flex: 1; height: 8px; border-radius: 4px; background: rgba(5, 42, 23, .14); overflow: hidden; text-decoration: none; }
+.card__bar u > i { display: block; height: 100%; background: #1e6b27; border-radius: 4px; }
+.card__bar em { font-style: normal; font-size: 13.5px; font-weight: 700; color: var(--ink-3); flex: none; }
+.card__bar.is-latest { background: rgba(250, 226, 190, .94); }
+.card__bar.is-latest u > i { background: #9e4e03; }
+.card__bar.is-latest em { color: #7a3d02; font-weight: 900; }
+
+/* --- カバー（1 枚目）--------------------------------------------------- */
+
+.card--cover .card__main { justify-content: center; gap: clamp(8px, 2vh, 16px); }
+
+.card--cover .card__h {
+  font-size: clamp(26px, 8.4vw, 38px);
+  line-height: 1.34;
+}
+
+.card__kpis {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card__kpis li {
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  box-shadow: var(--card-lift);
+  border-radius: 11px;
+  padding: 8px 10px;
+}
+
+/* 日本語は文の切れ目で折り返す。「…全国1／位」のように 1 文字だけ
+   次の行に落ちるのを防ぐ（対応しないブラウザでは今までどおり）。 */
+.card__kpis span, .card__kpis em, .card__chips span, .card__year span,
+.card__caption, .card__note, .card__lead, .card__trail, .note__text, .note__src {
+  word-break: auto-phrase;
+}
+
+.card__kpis span { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink-3); }
+.card__kpis b { display: block; font-size: clamp(16px, 4.6vw, 20px); font-weight: 900; color: var(--ink); margin-top: 5px; }
+.card__kpis b i { font-style: normal; font-size: max(13.5px, .58em); }
+.card__kpis em { display: block; font-style: normal; font-size: 13.5px; font-weight: 700; color: var(--gold-ink); margin-top: 5px; }
+
+
+
+@keyframes swipeHint {
+  0%, 100% { transform: translateY(0); opacity: .65; }
+  50%      { transform: translateY(-5px); opacity: 1; }
+}
+
+/* --- 左下の名義と題名 --------------------------------------------------- */
+
+.card__id {
+  position: relative;
+  z-index: 1;
+  padding: 0 76px clamp(12px, 2.4vh, 20px) clamp(16px, 5vw, 22px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.card__user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 999px;
+  padding: 2px 10px 2px 2px;
+  background: rgba(255, 255, 255, .82);
+  border: 1px solid rgba(5, 42, 23, .16);
+  touch-action: manipulation;
+  transition: transform .26s cubic-bezier(.2, .8, .3, 1), background-color .3s ease;
+}
+
+.card__user.is-pressed,
+.card__user:active {
+  transform: scale(.95);
+  background: rgba(255, 255, 255, .95);
+  transition-duration: 0s;
+}
+
+@media (hover: hover) {
+  .card__user:hover { background: rgba(255, 255, 255, .95); }
+}
+
+.card__user img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  flex: none;
+}
+
+.card__user b { font-size: 13.5px; font-weight: 900; color: var(--ink); white-space: nowrap; }
+
+.card__caption {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  line-height: 1.6;
+  text-shadow: var(--halo);
+}
+
+.card__caption em { font-style: normal; color: var(--gold-ink); font-weight: 800; }
+
+/* --- 右側のボタン列 ----------------------------------------------------- */
+
+.card__rail {
+  position: absolute;
+  right: clamp(6px, 2.4vw, 12px);
+  bottom: clamp(14px, 3vh, 26px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2.2vh, 18px);
+}
+
+.rail {
+  position: relative;          /* お礼の吹き出しの基準 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 54px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rail__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, .84);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(5, 42, 23, .16);
+  transition: transform .3s cubic-bezier(.2, .8, .3, 1), background-color .3s ease;
+}
+
+.rail__icon svg { width: 23px; height: 23px; display: block; }
+
+.rail b {
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  text-shadow: var(--halo);
+  font-variant-numeric: tabular-nums;
+}
+
+.rail.is-pressed .rail__icon,
+.rail:active .rail__icon {
+  transform: scale(.86);
+  background: #fff;
+  transition-duration: 0s;
+}
+
+@media (hover: hover) {
+  .rail:hover .rail__icon { background: #fff; }
+}
+
+/* いいね済み */
+.rail--like.is-on .rail__icon { background: #ffe3de; border-color: rgba(179, 43, 23, .55); }
+.rail--like.is-on svg { color: #d93a20; }
+.rail--like.is-on b { color: #b32b17; }
+
+/* 押した瞬間だけ跳ねる */
+.rail--like.is-burst svg { animation: likePop .42s cubic-bezier(.2, 1.5, .4, 1); }
+
+@keyframes likePop {
+  0%   { transform: scale(1); }
+  38%  { transform: scale(1.32); }
+  100% { transform: scale(1); }
+}
+
+
+/* --- いいねを押したときのお礼の吹き出し ---------------------------------
+   ボタンの真上に出す。押したときだけで、取り消したときは出さない。 */
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  right: 0;
+  z-index: 5;
+  white-space: nowrap;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #052a17;
+  border: 1px solid rgba(240, 146, 28, .5);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+  opacity: 0;
+  transform: translateY(6px) scale(.92);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .28s cubic-bezier(.2, 1.4, .4, 1);
+}
+
+/* 吹き出しの尻尾 */
+.tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 18px;
+  border: 5px solid transparent;
+  border-top-color: #052a17;
+}
+
+.is-thanking .tip { opacity: 1; transform: translateY(0) scale(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tip { transition: opacity .2s ease; transform: none; }
+  .is-thanking .tip { transform: none; }
+}
+
+/* --- 進み具合（左端の縦の目盛り）---------------------------------------- */
+
+.reelBar {
+  position: fixed;
+  left: 50%;
+  margin-left: calc(var(--column) / -2 + 5px);
+  top: calc(var(--header-h) + 14px);
+  bottom: calc(var(--nav-h) + 14px);
+  z-index: 61;
+  width: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: none;
+}
+
+@media (max-width: 520px) { .reelBar { margin-left: calc(50vw * -1 + 5px); } }
+
+.reelBar i {
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(5, 42, 23, .2);
+  transition: background-color .3s ease;
+}
+
+.reelBar i.is-on { background: var(--gold-ink); }
+
+/* --- 開いた直後の案内（表紙だけ）----------------------------------------
+   指で送れることが伝わらないという声があったので、最初の 2 秒だけ
+   カードを軽く上下に揺らし、あわせて何ができるかを出す。
+   一度でも触ったらすぐ引っ込める。 */
+
+.swipeGuide {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(255, 255, 255, .5);
+  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.5px);
+  transition: opacity .45s ease;
+}
+
+.card.is-hinting .swipeGuide { opacity: 1; }
+
+.swipeGuide__pill,
+.swipeGuide__rail {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(4, 36, 20, .82);
+  border: 1px solid rgba(240, 146, 28, .45);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .5);
+}
+
+.swipeGuide__rail {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #f4ac4e;
+  border-color: rgba(240, 146, 28, .3);
+  margin-top: 4px;
+}
+
+.swipeGuide__pill svg { width: 17px; height: 17px; color: #f0921c; }
+.swipeGuide__rail svg { width: 15px; height: 15px; }
+
+.card.is-hinting .swipeGuide__pill--up   { animation: guideUp 1.5s ease-in-out 2; }
+.card.is-hinting .swipeGuide__pill--down { animation: guideDown 1.5s ease-in-out 2; }
+
+@keyframes guideUp {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(-9px); }
+}
+
+@keyframes guideDown {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(9px); }
+}
+
+/* カードそのものを軽く上下に揺らす。送れる向きを体で分からせる */
+.card.is-hinting .card__main,
+.card.is-hinting .card__id {
+  animation: cardNudge 1.5s ease-in-out 2;
+}
+
+@keyframes cardNudge {
+  0%, 100% { transform: translateY(0); }
+  28%      { transform: translateY(-13px); }
+  62%      { transform: translateY(7px); }
+}
+
+/* 右のボタン列にも目を向けてもらう */
+.card.is-hinting .card__rail { animation: railGlow 1.5s ease-in-out 2; }
+
+@keyframes railGlow {
+  0%, 100% { transform: scale(1); }
+  45%      { transform: scale(1.08); }
+}
+
+/* --- PC 向けの案内と前後ボタン ------------------------------------------
+   カラム（520px）の外側に置くので、カードの中身には掛からない。
+   幅が足りない画面では出さない（指で送れるので不要）。 */
+
+.reelHelp {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: calc(var(--column) / 2 + 26px);
+  transform: translateY(-50%);
+  z-index: 61;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 900px) and (pointer: fine) {
+  .reelHelp { display: flex; }
+}
+
+.reelHelp__btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 146, 28, .38);
+  background: rgba(4, 36, 20, .8);
+  color: var(--gold-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .26s cubic-bezier(.2, .8, .3, 1), background-color .3s ease;
+}
+
+.reelHelp__btn svg { width: 21px; height: 21px; }
+
+.reelHelp__btn:hover { background: rgba(240, 146, 28, .22); }
+.reelHelp__btn:active { transform: scale(.9); transition-duration: 0s; }
+
+/* 文字だけを背景の上に浮かせると、カラムの外の地色に頼ることになる。
+   自前の下地を敷いて、どこに置かれても読める状態にしておく。 */
+.reelHelp__text {
+  margin: 0;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.6;
+  color: #dce6d6;
+  white-space: nowrap;
+  background: #052a17;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 10px;
+  padding: 7px 11px;
+}
+
+/* 端まで来て反対の端へ回すあいだだけ、軽く伏せる */
+.reel.is-wrapping { opacity: 0; transition: opacity .16s ease; }
+.reel { transition: opacity .2s ease; }
+
+/* --- コメント（解説）のシート ------------------------------------------- */
+
+.sheet {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--column);
+  top: var(--header-h);
+  bottom: var(--nav-h);
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.sheet[hidden] { display: none; }
+
+.sheet__veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 42, 23, .42);
+  opacity: 0;
+  transition: opacity .28s ease;
+}
+
+.sheet__panel {
+  position: relative;
+  max-height: 78%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  border-top: 1px solid rgba(240, 146, 28, .35);
+  box-shadow: 0 -14px 40px rgba(5, 42, 23, .3);
+  transform: translateY(100%);
+  transition: transform .34s cubic-bezier(.2, .8, .25, 1);
+}
+
+.sheet.is-open { pointer-events: auto; }
+.sheet.is-open .sheet__veil { opacity: 1; }
+.sheet.is-open .sheet__panel { transform: translateY(0); }
+
+.sheet__grip {
+  width: 38px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(5, 42, 23, .26);
+  margin: 9px auto 0;
+  flex: none;
+}
+
+.sheet__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 10px;
+  border-bottom: 1px solid rgba(5, 42, 23, .12);
+  flex: none;
+}
+
+.sheet__head h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.sheet__count { font-size: 11.5px; font-weight: 700; color: var(--ink-4); }
+
+/* 閉じるボタンはシートの下端に置く。上端の隅にあると、片手で持った
+   ときに親指が届かない。横幅いっぱいの帯にして、狙わなくても押せる。 */
+.sheet__foot {
+  flex: none;
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(5, 42, 23, .12);
+  background: #fff;
+}
+
+.sheet__close {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 12px;
+  border: 0;
+  background: rgba(5, 42, 23, .08);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.sheet__close:active { background: rgba(5, 42, 23, .16); }
+
+.sheet__close svg { width: 15px; height: 15px; flex: none; }
+
+.sheet__body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 14px 16px 16px;
+}
+
+/* シートの中身（各カードの解説をそのまま持ってくる）*/
+.note { display: flex; gap: 10px; }
+
+.note + .note { margin-top: 14px; }
+
+.note__face {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  flex: none;
+}
+
+.note__who {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #f0921c;
+}
+
+.note__q {
+  margin: 3px 0 0;
+  font-size: 14.5px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.note__text {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.95;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.note__src {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink-4);
+}
+
+/* カードの中に置いてある解説の元データは画面に出さない */
+.card__sheet { display: none; }
+
+/* --- 動きを抑える設定 --------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .card__swipe svg,
+  .rail--like.is-burst svg,
+  .card.is-hinting .card__main,
+  .card.is-hinting .card__id,
+  .card.is-hinting .card__rail,
+  .card.is-hinting .swipeGuide__pill--up,
+  .card.is-hinting .swipeGuide__pill--down { animation: none; }
+  .sheet__panel, .sheet__veil { transition: none; }
+  .reel { scroll-behavior: auto; }
+}
+
+/* --- JavaScript が無効なとき --------------------------------------------
+   スナップは CSS だけで動くので送りは効く。押せないボタンと、
+   出しようのないシートだけ引っ込め、解説は本文として並べる。 */
+
+.no-js .card__rail { display: none; }
+.no-js .card__sheet { display: block; }
+.no-js .card__main { padding-right: clamp(16px, 5vw, 22px); }
+.no-js .card__id { padding-right: clamp(16px, 5vw, 22px); }
+.no-js .card { height: auto; min-height: 100%; }
+.no-js .reel { scroll-snap-type: none; }
+
+/* --- 画面が低い端末むけの調整 ---------------------------------------------
+   ここは必ずファイルの終わりに置く。基本の指定より前にあると、
+   同じ強さの指定は後ろ勝ちなので、書いたつもりの調整が効かない
+   （実際に長いあいだ効いていなかった）。 */
+
+/* 画面が低い端末（iPhone SE の横幅 320px・高さ 568px など）では、
+   ヘッダーとタブバーを引くとカードが 352px しか残らない。
+   そのままでは中身が入らないので、ここだけ一段詰める。 */
+@media (max-height: 780px) {
+  .card__main { gap: 5px; padding-top: 12px; }
+  .card__chart { height: clamp(70px, 19vh, 150px); }
+  .card__rank { padding: 6px 11px; }
+  .card__rank b { font-size: clamp(17px, 5vw, 22px); }
+  /* 文字を小さくする代わりに、まわりの余白と行の高さで高さを作る。
+     要約は 2 行までにとどめ、続きはコメントのシートで読んでもらう。 */
+  .card__lead {
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+  .card__note { line-height: 1.5; }
+  .card__kpis li { padding: 7px 9px; }
+  .card__kpis span, .card__kpis em { line-height: 1.4; }
+  .card__bars { gap: 5px; }
+  .card__bar { padding: 5px 9px; }
+  .card__chips li { padding: 6px 5px; }
+  .card__trail { margin-top: 7px; }
+}
+
+/* 低い画面でも文字は 10pt（13.34px）を割らない。足りない高さは
+   余白と行の高さ、そして二の次の要素を落とすことで作る。 */
+@media (max-height: 700px) {
+  .card__main { gap: 5px; padding-top: 10px; }
+  .card__h { font-size: clamp(16px, 4.6vw, 20px); line-height: 1.3; }
+  /* ここから下は、要約をカード本体から落とす。全文はコメントのシートにある。
+     文字を 10pt より小さくして詰め込むより、読める大きさを守るほうを採る。 */
+  .card__lead { display: none; }
+  .card__big { font-size: clamp(24px, 7.6vw, 34px); }
+  .card__chart { height: clamp(62px, 17vh, 120px); }
+  .card__note { line-height: 1.4; }
+  .card__year { padding: 4px 2px; }
+  .card__chips li { padding: 5px 4px; }
+  .card__bar { padding: 4px 8px; }
+  .card--cover .card__h { font-size: clamp(21px, 6.6vw, 28px); }
+  .card__kpis { gap: 5px; }
+  .card__kpis li { padding: 4px 8px; }
+  .card__kpis span, .card__kpis em { line-height: 1.3; }
+  .card__bars { gap: 3px; }
+  .card__bar { padding: 3px 8px; }
+  .card__rank { padding: 5px 9px; }
+  .card__rank em { line-height: 1.35; }
+  .card__swipe { margin-top: 4px; }
+  .card__id { padding-bottom: 10px; }
+}
+
+/* 320x568 のようにとりわけ低い画面では、表紙の説明文と案内を省いて
+   数字だけ見せる。カード内で送らなくても全部入る高さに収める。 */
+@media (max-height: 620px) {
+  .card__swipe { display: none; }
+  /* 行の高さが本文の 1.9 のままだと、1 枚 80px も取ってしまう。
+     詰めて 3 行ぶんを 352px の枠に収める。 */
+  .card__kpis { gap: 3px; }
+  .card__kpis li { padding: 3px 8px; }
+  .card__kpis b { font-size: 15px; line-height: 1.15; margin-top: 0; }
+  .card__kpis span, .card__kpis em { line-height: 1.25; }
+  .card__kpis b { margin-top: 4px; }
+  .card__kpis em { margin-top: 4px; }
+  .card__bar { padding: 3px 8px; }
+  .card__bars { gap: 4px; }
+
+  .card__main { gap: 5px; padding-top: 8px; padding-bottom: 2px; }
+  .card__chart { height: clamp(56px, 15vh, 100px); }
+  .card__rank { padding: 5px 9px; }
+  .card__rank b { font-size: 16px; }
+  .card__rank em { display: none; }
+  .card__note { display: none; }
+  .card__id { padding-bottom: 8px; gap: 3px; }
+  .card__user { padding: 1px 8px 1px 1px; }
+  .card__user img { width: 22px; height: 22px; }
+  .card__caption { line-height: 1.4; }
+  .card__chips li { padding: 3px 3px; }
+  .card__chips span { line-height: 1.25; }
+  .card__bars { gap: 2px; }
+  .card__bar { padding: 2px 8px; }
+  .card__year { padding: 3px 1px; }
+  .card__bar b { width: 52px; }
+  .card__big { font-size: 22px; }
+  .card__trail { margin-top: 6px; }
+  /* いちばん低い画面では、変化の前後を「前 → 後」ではなく数字だけにする */
+  .card__from, .card__arrow { display: none; }
+}
+
+/* --- 写真がまだ無いカード ------------------------------------------------
+   写真は後から差し替える。届くまでのあいだ、白い膜だけが残って
+   ぼんやりしないよう、下地の色をそのまま見せる。 */
+.card__photo.is-blank { background: none; }
+.card__photo.is-blank::after {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, .55) 0%,
+      rgba(255, 255, 255, .10) 26%,
+      rgba(255, 255, 255, 0) 52%,
+      rgba(255, 255, 255, .18) 78%,
+      rgba(255, 255, 255, .62) 100%);
+}
+
+/* 写真がまだ届いていないカードは、下地の色をはっきり出す。
+   薄いままだと「これで完成」に見えてしまう。 */
+.card:has(.card__photo.is-blank) {
+  background:
+    radial-gradient(122% 78% at 14% 0%, color-mix(in srgb, var(--tint, #14512a) 34%, transparent) 0%, transparent 66%),
+    radial-gradient(96% 64% at 92% 100%, rgba(240, 146, 28, .34) 0%, transparent 62%),
+    linear-gradient(168deg, #ffffff 0%, #eaf0e4 54%, #dde8d6 100%);
+}
+
+/* --- 文字は下へ沈める ---------------------------------------------------
+   もとは縦中央（justify-content: center）だった。数字やグラフのカードでは
+   それでよかったが、このサイトのカードは人物写真が主役で、顔はどれも
+   写真の 37〜55% あたりにある。中央に置くと、見出しがちょうど顔の上に
+   重なって、お招きした方の顔が読めなくなった。
+
+   下に沈めると、上の 2/3 が写真のために空く。リールらしい見え方にも近い。
+   写真を切り詰めて顔を上げる手もあるが、そのぶん拡大率が上がって
+   画質が落ちるので、こちらを採った。 */
+.card__main { justify-content: flex-end; }
+
+/* 沈めたぶん、名前の行との間が詰まりすぎないようにする */
+.card__main + .card__id { padding-top: 4px; }
+
+/* =========================================================================
+   お招きした方の名前
+   もとはカード下端のハッシュタグだけだった。会員は 70 代が中心で、
+   小さな文字を目で追うのがつらい。名前はいちばん先に読めるところ
+   ——写真のいちばん上、顔にかからない位置に置く。
+   左端 5px の目盛りと、右の操作列（76px）を避けた幅にしてある。
+   ========================================================================= */
+
+.card__who {
+  position: absolute;
+  top: 12px;
+  left: clamp(16px, 5vw, 22px);
+  right: 76px;
+  z-index: 2;
+  width: -moz-max-content;
+  width: max-content;
+  max-width: calc(100% - 76px - clamp(16px, 5vw, 22px));
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin: 0;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(5, 42, 23, .16);
+  box-shadow: 0 4px 16px rgba(5, 42, 23, .16);
+}
+
+.card__who b {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: .04em;
+  color: var(--green-800);
+}
+
+.card__who span { font-size: 16px; font-weight: 700; color: var(--gold-ink); }
+
+/* 案内が出ているあいだは、名前も一緒に沈める */
+.card.is-hinting .card__who { opacity: .35; transition: opacity .3s ease; }
+
+/* =========================================================================
+   文字は 12pt（16px）を下回らせない
+
+   もとの実装は 10pt（13.34px）を下限にしていた。このサイトは会員の
+   多くが 70 代なので、活動ページはもう一段上げて 12pt を下限にする。
+   解説のシートも同じ。
+
+   高さが足りないぶんは、文字を小さくするのではなく、要約の行数を
+   絞ってシートへ送ることで作る（もとの実装と同じ考え方）。
+   ここはファイルの終わりに置く。画面の高さ別の指定より後ろでないと、
+   同じ強さの指定は後ろ勝ちなので効かない。
+   ========================================================================= */
+
+.card__eyebrow  { font-size: 16px; }
+.card__h        { font-size: clamp(23px, 6vw, 29px); }
+.card__lead     { font-size: clamp(16px, 4.3vw, 18px); line-height: 1.85; }
+.card__note     { font-size: 16px; line-height: 1.7; }
+.card__goBtn    { font-size: clamp(16px, 4.2vw, 17px); }
+.card__user b   { font-size: 16px; }
+.card__caption  { font-size: 16px; }
+.rail b         { font-size: 16px; }
+.tip            { font-size: 16px; }
+.reelHelp__text { font-size: 16px; }
+.swipeGuide__pill { font-size: 16px; }
+.swipeGuide__rail { font-size: 16px; }
+
+.sheet__head h2 { font-size: 19px; }
+.sheet__count   { font-size: 16px; }
+.sheet__close   { font-size: 16px; }   /* 押す言葉なので、ここも下回らせない */
+.note__who      { font-size: 16px; }
+.note__q        { font-size: 19px; }
+.note__text     { font-size: 17px; line-height: 1.95; }
+.note__src      { font-size: 16px; }
+
+/* 画面が低い端末では、要約の行数だけを絞る。
+   もとの指定は 700px 以下で要約を丸ごと消していたが、12pt なら
+   4 行までは入るので出しておく。全文はいつでもシートで読める。 */
+@media (max-height: 780px) {
+  .card__lead {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+}
+@media (max-height: 700px) {
+  .card__lead {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+  }
+  .card__who { top: 8px; padding: 7px 14px; }
+  .card__who b { font-size: 18px; }
+}
+@media (max-height: 620px) {
+  .card__lead { -webkit-line-clamp: 2; }
+  .card__note { display: none; }
+}
