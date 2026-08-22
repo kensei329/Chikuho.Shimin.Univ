@@ -357,7 +357,6 @@ a { color: var(--gold-ink); }
   color: #7E9078;
   margin-top: 1px;
 }
-.tree__item--main { margin-bottom: 9px; padding-bottom: 9px; border-bottom: 1px solid rgba(255, 255, 255, .10); }
 
 /* 枝。縦の一本線と、項目ごとの短い横線で木に見せる */
 .tree__sub { margin: 2px 0 6px 13px; padding-left: 11px; border-left: 1px solid rgba(255, 255, 255, .14); }
@@ -372,6 +371,23 @@ a { color: var(--gold-ink); }
   background: rgba(255, 255, 255, .18);
 }
 .tree__sub a { font-size: 12px; font-weight: 600; color: #A3B39D; padding: 4px 7px; }
+
+/* 月は11個ある。縦に並べると帯が長くなりすぎるので、3つずつ横に置く。
+   縦の一本線は残してあるので、木のつづきに見える。 */
+.tree__sub--months {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px 3px;
+}
+.tree__sub--months li::before { display: none; }
+.tree__sub--months a {
+  text-align: center;
+  padding: 4px 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 理念はこの大学の芯。上のホームとのあいだに、区切りの線を一本 */
+.tree__item--main { border-top: 1px solid rgba(255, 255, 255, .10); padding-top: 9px; margin-top: 7px; }
 
 /* --- 右：案内とお申し込み ------------------------------------------------ */
 
