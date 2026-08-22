@@ -380,7 +380,53 @@
   pointer-events: none;
 }
 
-.kaiPick__text { position: relative; display: grid; gap: 2px; min-width: 0; }
+/* 札の地に敷く、ストーリー1枚目と同じ写真。
+   名前を読む前に「どんな会か」が目に入るようにするためのもの。
+   写真そのものは薄くしない。薄くすると白い字が写真の明るいところに
+   沈む。かわりに深緑の幕を重ねて落とし、文字が乗る左側をとりわけ濃く
+   してある。会員は70代が中心なので、絵より字の読みやすさを先に取る。 */
+.kaiPick__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(96deg,
+      rgba(5, 42, 23, .93) 0%,
+      rgba(5, 42, 23, .84) 32%,
+      rgba(5, 42, 23, .46) 62%,
+      rgba(5, 42, 23, .26) 100%),
+    var(--kai-photo);
+  background-size: cover, cover;
+  background-position: center, 50% 50%;
+  background-repeat: no-repeat, no-repeat;
+  pointer-events: none;
+}
+
+/* 字と矢印は、写真より前に置く */
+.kaiPick__text, .kaiPick__wave { z-index: 1; }
+
+/* 押したときだけ、写真をすこし明るくする */
+.kaiPick__item.is-pressed .kaiPick__bg, .kaiPick__item:active .kaiPick__bg {
+  background-image:
+    linear-gradient(96deg,
+      rgba(5, 42, 23, .86) 0%,
+      rgba(5, 42, 23, .74) 32%,
+      rgba(5, 42, 23, .34) 62%,
+      rgba(5, 42, 23, .16) 100%),
+    var(--kai-photo);
+}
+
+/* 写真が届かない・切っている環境でも、これまでどおり深緑の札になる */
+@media (prefers-reduced-data: reduce) {
+  .kaiPick__bg { background-image: none; }
+}
+
+.kaiPick__text {
+  position: relative; display: grid; gap: 2px; min-width: 0;
+  /* 写真の明るいところに白い字が乗っても沈まないように */
+  text-shadow: 0 1px 5px rgba(5, 42, 23, .92), 0 0 16px rgba(5, 42, 23, .62);
+}
 
 .kaiPick__name {
   font-family: 'Shippori Mincho B1', serif;

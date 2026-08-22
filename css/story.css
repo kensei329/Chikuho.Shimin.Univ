@@ -1445,24 +1445,56 @@ body[data-page="kai"] {
 }
 
 /* --- 1枚目（お預かりした写真） ------------------------------------------
-   写真は画面いっぱい。その上に会の名前と回数を置く。
-   会員は70代が中心なので、文字が乗る帯だけベールを濃くして、
-   写真の明るいところ・こまかいところに文字が沈まないようにする。 */
+   写真は画面いっぱい。会の様子が伝わることを第一にして、ベールはごく薄く
+   （写真は7〜8割はっきり見える）。そのぶん字は写真に直接載せず、
+   下に紙のカードを敷いてその上に置く。各回のカードと同じ作りなので、
+   横に送っても見え方が変わらない。
+
+   上ぶちと下ぶちだけベールを濃くしてある。ストーリーの名前と、
+   下の「お申し込み・お問い合わせ」の帯が、そこに乗るため。 */
 .slide--hero .slide__photo::after {
   background: linear-gradient(180deg,
-    rgba(255, 255, 255, .88) 0%,
-    rgba(255, 255, 255, .50) 13%,
-    rgba(255, 255, 255, .40) 26%,
-    rgba(255, 255, 255, .74) 34%,
-    rgba(255, 255, 255, .76) 60%,
-    rgba(255, 255, 255, .44) 70%,
-    rgba(255, 255, 255, .86) 100%);
+    rgba(255, 255, 255, .62) 0%,
+    rgba(255, 255, 255, .17) 12%,
+    rgba(255, 255, 255, .06) 34%,
+    rgba(255, 255, 255, .06) 62%,
+    rgba(255, 255, 255, .20) 82%,
+    rgba(255, 255, 255, .60) 100%);
 }
 
-/* 添え書きは、写真の上だと沈みやすい。濃さと白いふちを足す */
-.slide--hero .slide__big span,
-.slide--hero .slide__lead {
-  color: var(--ink-2);
-  text-shadow: 0 1px 3px rgba(255, 255, 255, .98), 0 0 14px rgba(255, 255, 255, .92);
+/* 字は下に寄せる。写真の上半分は、そのまま見せる */
+.slide--hero .slide__body { justify-content: flex-end; }
+
+.heroCard {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 1.2vh, 9px);
+  padding: clamp(15px, 4vw, 21px);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .93);
+  border: 1px solid rgba(10, 61, 32, .16);
+  box-shadow: 0 14px 36px rgba(5, 42, 23, .26);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
-.slide--hero .slide__big span { font-weight: 800; }
+
+/* カードの中では、写真の上に置くための白いふちは要らない */
+.heroCard .slide__h,
+.heroCard .slide__big b,
+.heroCard .slide__big i,
+.heroCard .slide__big span,
+.heroCard .slide__lead { text-shadow: none; }
+.heroCard .slide__big span { font-weight: 700; color: var(--ink-3); }
+.heroCard .slide__big::before { display: none; }
+
+.slide[aria-hidden="false"] .heroCard {
+  animation: cardIn .5s cubic-bezier(.2, .8, .3, 1) .04s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide[aria-hidden="false"] .heroCard { animation: none; }
+}
+
+/* 画面が低い端末では、カードを詰める */
+@media (max-height: 660px) {
+  .heroCard { gap: 4px; padding: 13px 15px; border-radius: 16px; }
+}
