@@ -235,9 +235,9 @@
             <span class="pick__text"><b>歴史をたどる会</b><em>第1日曜 9:30 – 11:30</em></span>
           </label>
           <label class="pick">
-            <input type="checkbox" name="entry.939298798" value="ヘルシー">
+            <input type="checkbox" name="entry.939298798" value="ヘルシー健康講座">
             <span class="pick__box" aria-hidden="true"></span>
-            <span class="pick__text"><b>ヘルシー</b><em>第1日曜 13:00 – 15:00</em></span>
+            <span class="pick__text"><b>ヘルシー健康講座</b><em>第1日曜 13:00 – 15:00</em></span>
           </label>
           <label class="pick">
             <input type="checkbox" name="entry.939298798" value="教養講座">
@@ -245,9 +245,9 @@
             <span class="pick__text"><b>教養講座</b><em>第3日曜 13:30 – 15:30</em></span>
           </label>
           <label class="pick">
-            <input type="checkbox" name="entry.939298798" value="低山">
+            <input type="checkbox" name="entry.939298798" value="低山山登り">
             <span class="pick__box" aria-hidden="true"></span>
-            <span class="pick__text"><b>低山</b><em>第4日曜 8:30 集合</em></span>
+            <span class="pick__text"><b>低山山登り</b><em>第4日曜 8:30 集合</em></span>
           </label>
         </div>
         <p class="jf__err" id="jf-kai-err" hidden></p>
@@ -265,9 +265,11 @@
 
       <div class="jf">
         <label class="jagree">
-          <input type="checkbox" id="jf-agree" name="entry.1335746439" value="入力した内容を確認し、筑豊市民大学に入会申し込みます。個人情報の取り扱いに同意いたします" required>
+          <input type="checkbox" id="jf-agree" name="entry.1335746439" value="入力した内容を確認し、筑豊市民大学への入会を申し込みます。" required>
+          <!-- フォーム側は2つの選択肢に分かれているので、送るときだけ分ける -->
+          <input type="hidden" id="jf-agree2" name="entry.1335746439" value="個人情報の取り扱いに同意します。" disabled>
           <span class="jagree__box" aria-hidden="true"></span>
-          <span class="jagree__text">入力した内容を確認し、筑豊市民大学に入会申し込みます。個人情報の取り扱いに同意いたします<span class="jf__req">必須</span></span>
+          <span class="jagree__text">入力した内容を確認し、筑豊市民大学への入会を申し込みます。個人情報の取り扱いに同意します。<span class="jf__req">必須</span></span>
         </label>
         <p class="jf__err" id="jf-agree-err" hidden></p>
       </div>

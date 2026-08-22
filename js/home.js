@@ -40,7 +40,8 @@
   var mail  = document.getElementById('jf-mail');
   var mail2 = document.getElementById('jf-mail2');
   var tel   = document.getElementById('jf-tel');
-  var agree = document.getElementById('jf-agree');
+  var agree  = document.getElementById('jf-agree');
+  var agree2 = document.getElementById('jf-agree2');
 
   var alertBox = document.getElementById('jf-alert');
   var sendBtn  = document.getElementById('jf-send');
@@ -122,7 +123,12 @@
       if (p[0].getAttribute('aria-invalid') === 'true') { p[1](); sweep(); }
     });
   });
-  agree.addEventListener('change', function () { checkAgree(); sweep(); });
+  /* 確認事項は、フォーム側では2つの選択肢に分かれている。
+     画面では1つのチェックにまとめてあるので、送るときだけ2つに戻す。
+     外した項目は disabled にしておけば、送信の中身に入らない。 */
+  function syncAgree() { agree2.disabled = !agree.checked; }
+
+  agree.addEventListener('change', function () { syncAgree(); checkAgree(); sweep(); });
   kais.forEach(function (b) { b.addEventListener('change', function () { checkKai(); sweep(); }); });
 
   /* ── 送信 ───────────────────────────────────────────────────────── */
@@ -138,6 +144,7 @@
   form.addEventListener('submit', function (e) {
     /* メールは、フォーム側の設問にも同じ値を送る */
     mail2.value = mail.value.trim();
+    syncAgree();
     paintFee();
 
     var ok = [checkName(), checkMail(), checkTel(), checkKai(), checkAgree()]
@@ -171,5 +178,6 @@
   sink.addEventListener('load', finish);
   form.addEventListener('submit', function () { window.setTimeout(finish, 8000); });
 
+  syncAgree();
   paintFee();
 })();
