@@ -1183,3 +1183,106 @@ body[data-page="katsudo"] {
 
 /* 沈めたぶん、名前の行との間が詰まりすぎないようにする */
 .card__main + .card__id { padding-top: 4px; }
+
+/* =========================================================================
+   お招きした方の名前
+   もとはカード下端のハッシュタグだけだった。会員は 70 代が中心で、
+   小さな文字を目で追うのがつらい。名前はいちばん先に読めるところ
+   ——写真のいちばん上、顔にかからない位置に置く。
+   左端 5px の目盛りと、右の操作列（76px）を避けた幅にしてある。
+   ========================================================================= */
+
+.card__who {
+  position: absolute;
+  top: 12px;
+  left: clamp(16px, 5vw, 22px);
+  right: 76px;
+  z-index: 2;
+  width: -moz-max-content;
+  width: max-content;
+  max-width: calc(100% - 76px - clamp(16px, 5vw, 22px));
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin: 0;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(5, 42, 23, .16);
+  box-shadow: 0 4px 16px rgba(5, 42, 23, .16);
+}
+
+.card__who b {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: .04em;
+  color: var(--green-800);
+}
+
+.card__who span { font-size: 16px; font-weight: 700; color: var(--gold-ink); }
+
+/* 案内が出ているあいだは、名前も一緒に沈める */
+.card.is-hinting .card__who { opacity: .35; transition: opacity .3s ease; }
+
+/* =========================================================================
+   文字は 12pt（16px）を下回らせない
+
+   もとの実装は 10pt（13.34px）を下限にしていた。このサイトは会員の
+   多くが 70 代なので、活動ページはもう一段上げて 12pt を下限にする。
+   解説のシートも同じ。
+
+   高さが足りないぶんは、文字を小さくするのではなく、要約の行数を
+   絞ってシートへ送ることで作る（もとの実装と同じ考え方）。
+   ここはファイルの終わりに置く。画面の高さ別の指定より後ろでないと、
+   同じ強さの指定は後ろ勝ちなので効かない。
+   ========================================================================= */
+
+.card__eyebrow  { font-size: 16px; }
+.card__h        { font-size: clamp(23px, 6vw, 29px); }
+.card__lead     { font-size: clamp(16px, 4.3vw, 18px); line-height: 1.85; }
+.card__note     { font-size: 16px; line-height: 1.7; }
+.card__goBtn    { font-size: clamp(16px, 4.2vw, 17px); }
+.card__user b   { font-size: 16px; }
+.card__caption  { font-size: 16px; }
+.rail b         { font-size: 16px; }
+.tip            { font-size: 16px; }
+.reelHelp__text { font-size: 16px; }
+.swipeGuide__pill { font-size: 16px; }
+.swipeGuide__rail { font-size: 16px; }
+
+.sheet__head h2 { font-size: 19px; }
+.sheet__count   { font-size: 16px; }
+.sheet__close   { font-size: 16px; }   /* 押す言葉なので、ここも下回らせない */
+.note__who      { font-size: 16px; }
+.note__q        { font-size: 19px; }
+.note__text     { font-size: 17px; line-height: 1.95; }
+.note__src      { font-size: 16px; }
+
+/* 画面が低い端末では、要約の行数だけを絞る。
+   もとの指定は 700px 以下で要約を丸ごと消していたが、12pt なら
+   4 行までは入るので出しておく。全文はいつでもシートで読める。 */
+@media (max-height: 780px) {
+  .card__lead {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+}
+@media (max-height: 700px) {
+  .card__lead {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+  }
+  .card__who { top: 8px; padding: 7px 14px; }
+  .card__who b { font-size: 18px; }
+}
+@media (max-height: 620px) {
+  .card__lead { -webkit-line-clamp: 2; }
+  .card__note { display: none; }
+}

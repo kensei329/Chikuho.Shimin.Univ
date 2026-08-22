@@ -59,12 +59,13 @@
 
     <!-- ─────────── 01 murata ─────────── -->
     <article class="card" id="murata" data-title="村田喜代子" style="--tint:#14512a">
+      <p class="card__who"><b>村田 喜代子</b><span>作家</span></p>
       <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRhYBAABXRUJQVlA4IAoBAADwBQCdASoUAB4APulep00pJSOiMAgBIB0JaACdG0dtuYu92S9oUIle15hb9TXDhtQsWKAU9vsaAADf8dbEG/iv/WRxGQrCKD/BuZmkuuioHWzjQRhaIUbIucIoRS59FsVw80SCk4RtY5W9tyCP4yoZFV/mcDNWcZW0sogAyVcYk3TbG0J5vTcAoBlWKqxK8BOk/LzrmfB0vlYFgvpnfiaptjacR6kFRdALi+faqVPtTgISNA8eX4akwG0FRgpLsY7Z9IgVpORE6r1MVVFutBIR3plkEOy4+56516iqHBaacUkFi+gQkkEv3IwAUzMpse86Tu7UXaWdY3U/V4FI2IlmyseRRa1V+pAAAA==)">
         <img src="assets/talk/01-murata.webp" alt="本棚の前に腰かける村田喜代子さん" decoding="async" fetchpriority="high" style="object-position:48% 26%"
              onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
       </div>
       <div class="card__main">
-        <p class="card__eyebrow">GUEST 01 ／ 作家</p>
+        <p class="card__eyebrow">GUEST 01</p>
         <h2 class="card__h">鉄工所で働きながら、<br>芥川賞まで書いた人。</h2>
         <p class="card__lead">中学を出て就職。暮らしの合間に原稿を書きつづけ、42歳で芥川賞。八幡に生まれた作家の言葉は、この土地の日々からできている。</p>
         
@@ -81,6 +82,22 @@
         <button type="button" class="rail rail--comment" aria-label="村田喜代子の解説を見る"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3.6c-4.8 0-8.6 3.2-8.6 7.2 0 2.3 1.3 4.4 3.3 5.7l-.8 3.6 3.9-2a10 10 0 0 0 2.2.2c4.8 0 8.6-3.2 8.6-7.2S16.8 3.6 12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><b>解説</b></button>
         <button type="button" class="rail rail--share" aria-label="このページを共有する"><span class="rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12v6.4A1.6 1.6 0 0 0 6.6 20h10.8a1.6 1.6 0 0 0 1.6-1.6V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4.2M8.2 7.8 12 4l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>シェア</b></button>
       </nav>
+      <!-- 開いた直後だけ出す案内。指で送れることが伝わらないという声があるので、
+           1 枚目にいるあいだだけ 3.5 秒ほど出し、触ったらその時点で消す。 -->
+      <div class="swipeGuide" id="swipeGuide" aria-hidden="true">
+        <span class="swipeGuide__pill swipeGuide__pill--up">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          上にスワイプ
+        </span>
+        <span class="swipeGuide__pill swipeGuide__pill--down">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          下にスワイプ
+        </span>
+        <span class="swipeGuide__rail">
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M7 12h9M12.5 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          いいね・解説・シェアも押せます
+        </span>
+      </div>
       <div class="card__sheet">
         <div class="note">
           <img class="note__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
@@ -95,12 +112,13 @@
     </article>
     <!-- ─────────── 02 nakamura ─────────── -->
     <article class="card" id="nakamura" data-title="中村哲" style="--tint:#155330">
+      <p class="card__who"><b>中村 哲</b><span>医師</span></p>
       <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRsQAAABXRUJQVlA4ILgAAAAQBQCdASoUABsAPt1apE0opSOiMAwBEBuJaACo9ywTnokUkr4kKAzC1oIuzFoNLzwAANejg0mjIDh3ul+wnmGthELXdTAAkNXuhu8l/3Fm6x05neLfiBal4IoNx0c+pefqdjgHnHow/tlH/JF0GKdhuyx2ZbT/hwuEsDZ2vELzVtBx5u6Uogb5IIKzkLYI9ZLJ0/THqO4WXvjiXrLnzCRtMoPlvHYWTPeGeJevmmXLxbWMHIjfAAAA)">
         <img src="assets/talk/02-nakamura.webp" alt="青空を背にした中村哲さん" decoding="async" loading="lazy" style="object-position:40% 22%"
              onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
       </div>
       <div class="card__main">
-        <p class="card__eyebrow">GUEST 02 ／ 医師</p>
+        <p class="card__eyebrow">GUEST 02</p>
         <h2 class="card__h">聴診器を置いて、<br>用水路を掘った。</h2>
         <p class="card__lead">福岡に生まれ、九州大学で医学を学び、パキスタンへ。診療所だけでは救えない命があると知って、乾いたアフガニスタンの大地に水を引いた。</p>
         
@@ -131,14 +149,15 @@
     </article>
     <!-- ─────────── 03 imai ─────────── -->
     <article class="card" id="imai" data-title="今井通子" style="--tint:#0a4a28">
+      <p class="card__who"><b>今井 通子</b><span>登山家・医師</span></p>
       <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRtQAAABXRUJQVlA4IMgAAAAQBQCdASoUABsAPulkqk8pJaOiMBgIASAdCUATpmMEuWDvl2WJtVn1U0CwUduyQ+AAAP68ImdIb+VkYwAkJ99fd/OkQi2l9ut031/znbvC5u+pgsqf3VnJlbkzqcuOsnX+yP90Vrhwqf3U4xv8WX2XEGCN9g+8XmluXbmJDSdghHVoRR1yOnOrzUMmA6TgnRkzp6kw2XiT4pqwFX4xdAvY8fpc8OxSDLQ0zFKODGXsAHoV2tgPVK0HI4C5Po1w4jpvMik3B8lgAA==)">
         <img src="assets/talk/03-imai.webp" alt="滝を背にした今井通子さん" decoding="async" loading="lazy" style="object-position:12% 30%"
              onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
       </div>
       <div class="card__main">
-        <p class="card__eyebrow">GUEST 03 ／ 登山家・医師</p>
+        <p class="card__eyebrow">GUEST 03</p>
         <h2 class="card__h">三大北壁を、<br>女性で世界初。</h2>
-        <p class="card__lead">マッターホルン、アイガー、グランドジョラス。ヨーロッパアルプスの三つの北壁をはじめて登りきった女性は、白衣も着ていた。</p>
+        <p class="card__lead">マッターホルン、アイガー、グランドジョラス。三つの北壁をはじめて登りきった女性は、白衣も着ていた。</p>
         
       </div>
       <div class="card__id">
@@ -167,12 +186,13 @@
     </article>
     <!-- ─────────── 04 jaxa ─────────── -->
     <article class="card" id="jaxa" data-title="JAXA" style="--tint:#12406f">
+      <p class="card__who"><b>JAXA</b><span>宇宙航空研究開発機構</span></p>
       <div class="card__photo" style="background-image:url(data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAACwBQCdASoUABsAPuliq08pJSOiMBgIASAdCUAWHYIiP901FJd6aZWI2/vnICG8Vf2t2jjhu6AA+GK8vis/bws1lln16oeBD+bCz+Pb5dHznHRc4vX9XhvPd3PGfjgeVnToTazOeawpC7er3+QI/TEJM8TdQryBcmfWTrA8Gcn8df/AAhqISJIfd9yTAEGOPKO+RjnGIfAJ+bVGfFzYf98791HPXeqOPo/CzXo3d02jPZBgqtFQ0bxJ4zQEc+KK6zAiIMi8Ntd1hFP38NGEAAAA)">
         <img src="assets/talk/04-jaxa.webp" alt="JAXA の関係者の集合写真" decoding="async" loading="lazy" style="object-position:50% 42%"
              onerror="this.closest('.card__photo').classList.add('is-blank');this.remove()">
       </div>
       <div class="card__main">
-        <p class="card__eyebrow">GUEST 04 ／ 宇宙開発</p>
+        <p class="card__eyebrow">GUEST 04</p>
         <h2 class="card__h">田川の教室が、<br>いちばん遠い場所と。</h2>
         <p class="card__lead">宇宙航空研究開発機構（JAXA）の関係者をお招きしました。探査機のこと、人が宇宙で暮らすこと。教養講座は、こういう日があるから面白い。</p>
         <p class="card__note">写真提供：JAXA</p>
@@ -203,6 +223,7 @@
     </article>
     <!-- ─────────── 05 これから ─────────── -->
     <article class="card card--last" id="kotoshi" data-title="本年度の公開講演会" style="--tint:#0a4a28">
+      <p class="card__who"><b>公開講演会</b><span>年に一度・どなたでも無料</span></p>
       <div class="card__photo is-blank"></div>
       <div class="card__main">
         <p class="card__eyebrow">これから</p>
