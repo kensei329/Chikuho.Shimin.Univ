@@ -281,7 +281,6 @@
 .jform__foot a { color: var(--gold-ink); font-weight: 700; }
 
 /* 送信の受け皿。見せない */
-#jsink { position: absolute; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; }
 
 /* 受け付けたあと */
 .jdone {

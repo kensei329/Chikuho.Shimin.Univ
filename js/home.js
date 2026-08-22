@@ -1,24 +1,21 @@
 /**
  * ホーム — 入会申し込みフォーム
  * ------------------------------------------------------------------------
- * 見た目は自前、送り先は Google フォーム。
- * 入力欄の name に Google フォームの entry ID をそのまま付けてあるので、
- * 隠した iframe を宛先にして、ふつうの <form> として送るだけで届く。
+ * 見た目は自前。送り先は Google フォームだが、直接は投げない。
+ * いったん同じサイトの /api/join に渡し、そこから Google へ送ってもらう。
  *
- * ■ 送信の結果は、こちらからは分からない
- *   Google は /formResponse に CORS のヘッダを返さない。仕様上の制約で、
- *   回避する手立てはない。つまり Google 側で弾かれても、画面には
- *   「受け付けました」と出てしまう。
+ * ■ なぜ間に一枚はさむのか
+ *   ブラウザから Google へじかに投げる方式は、中身が一字一句正しくても
+ *   受け取ってもらえなかった。しかも Google は別ドメインからの読み取りを
+ *   許さないので、弾かれたことすら分からず、画面には「受け付けました」と
+ *   出てしまう。会員の多くは 70 代で、申し込んだつもりで届いていない事態が
+ *   いちばん困る。
  *
- *   会員の多くは 70 代で、申し込んだつもりで届いていない事態は避けたい。
- *   そこで
- *     ・送る前にこちらで入力を確かめ、不備のまま送らせない
- *     ・必須の項目は Google フォーム側とそろえる
- *     ・受付の画面にも、元のフォームへの道を残す
- *   の三つで受けている。
+ *   サーバー同士のやりとりならブラウザの制限がかからず、Google の返事も
+ *   読める。届いたと確かめてから、はじめて受付の画面を出す。
  *
  * ■ 選択肢の文字は、一字一句そろえる必要がある
- *   ラジオやチェックボックスは、フォームに無い文字列を送ると弾かれる。
+ *   チェックボックスは、フォームに無い文字列を送ると弾かれる。
  *   HTML の value を書き換えるときは、必ずフォーム側と見比べること。
  */
 (function () {
@@ -45,7 +42,6 @@
 
   var alertBox = document.getElementById('jf-alert');
   var sendBtn  = document.getElementById('jf-send');
-  var sink     = document.getElementById('jsink');
   var done     = document.getElementById('jdone');
 
   function comma(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
@@ -135,13 +131,34 @@
 
   var sending = false;
 
+  /* 同じ欄が何度も出る（希望する会、確認事項）ので、組の並びのまま渡す */
+  function collect() {
+    var out = [];
+    new FormData(form).forEach(function (v, k) { out.push([k, String(v)]); });
+    return out;
+  }
+
   function showDone() {
     form.hidden = true;
     done.hidden = false;
     done.scrollIntoView({ block: 'center' });
   }
 
+  function showFailed() {
+    sending = false;
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'もう一度送る';
+    alertBox.innerHTML =
+      '送信できませんでした。恐れ入りますが、もう一度お試しください。' +
+      'それでも送れないときは、下の「元のフォーム」からお願いします。';
+    alertBox.hidden = false;
+    alertBox.scrollIntoView({ block: 'center' });
+  }
+
   form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (sending) return;
+
     /* メールは、フォーム側の設問にも同じ値を送る */
     mail2.value = mail.value.trim();
     syncAgree();
@@ -151,32 +168,27 @@
              .every(function (v) { return v; });
 
     if (!ok) {
-      e.preventDefault();
       alertBox.textContent = '未入力または確認が必要な項目があります。赤い印のところをご覧ください。';
       alertBox.hidden = false;
       var bad = form.querySelector('[aria-invalid="true"], .jf__err:not([hidden])');
       if (bad) bad.scrollIntoView({ block: 'center' });
       return;
     }
-    if (sending) { e.preventDefault(); return; }
 
     alertBox.hidden = true;
     sending = true;
     sendBtn.disabled = true;
     sendBtn.textContent = '送信しています…';
-    /* ここで preventDefault はしない。<form> が iframe を宛先に送っていく */
-  });
 
-  /* 返事が返ってきたら受付の画面へ。中身は読めない（別のドメインなので）。
-     返事が来ないことも考えて、時間でも受ける。 */
-  var shown = false;
-  function finish() {
-    if (!sending || shown) return;
-    shown = true;
-    showDone();
-  }
-  sink.addEventListener('load', finish);
-  form.addEventListener('submit', function () { window.setTimeout(finish, 8000); });
+    fetch('/api/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: collect() })
+    })
+      .then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (data) { if (data && data.ok) showDone(); else showFailed(); })
+      .catch(showFailed);
+  });
 
   syncAgree();
   paintFee();
