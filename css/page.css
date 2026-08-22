@@ -226,58 +226,120 @@
 
 /* =========================================================================
    分科会の選び口
+
+   四つの会が、スクロールなしで 1 画面に収まることを最優先にしている。
+   寸法はすべて画面の高さ（vh）に紐づけてあり、低い端末では自動で詰まる。
+   ただし下限は決めてあって、それ以上は小さくしない。
+
+   以前は札ごとに横幅いっぱいのボタンを敷いていたが、それだと 1 枚が
+   高くなりすぎて 4 枚が入らなかった。押すところは右端にまとめ、
+   矢印が左から右へ流れる動きで「進める」ことを示す。
    ========================================================================= */
 
-.kaiPick { padding: 34px 22px 46px; display: grid; gap: 14px; }
+.kaiPick {
+  /* ヘッダーとタブバーを引いた残り、ちょうどに収める */
+  height: calc(100vh - var(--header-h) - var(--nav-h));
+  height: calc(100dvh - var(--header-h) - var(--nav-h));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(9px, 1.5vh, 14px);
+  padding: clamp(12px, 2vh, 20px) 18px;
+  overflow: hidden;
+}
+
 .kaiPick__item {
-  position: relative; overflow: hidden;
-  display: grid; gap: 4px; padding: 22px 20px;
-  align-content: start;
-  border-radius: 16px; text-decoration: none; color: #fff;
+  /* 余った高さを 4 枚で分け合う。どの画面でもちょうど 1 画面に収まる */
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(11px, 1.9vh, 18px) clamp(14px, 4vw, 20px);
+  border-radius: 16px;
+  text-decoration: none;
+  color: #fff;
   background: var(--green-800);
-  box-shadow: 0 8px 20px rgba(5, 42, 23, .18);
+  box-shadow: 0 6px 16px rgba(5, 42, 23, .20);
   touch-action: manipulation;
   transition: transform .26s cubic-bezier(.2, .8, .3, 1), box-shadow .26s ease;
 }
 .kaiPick__item.is-pressed, .kaiPick__item:active {
-  transform: scale(.975); box-shadow: 0 2px 8px rgba(5, 42, 23, .22); transition-duration: 0s;
+  transform: scale(.975);
+  box-shadow: 0 2px 8px rgba(5, 42, 23, .24);
+  transition-duration: 0s;
 }
-.kaiPick__no {
-  font-size: 12px; font-weight: 700; letter-spacing: .24em; color: var(--orange-300);
+.kaiPick__item::after {
+  content: ''; position: absolute; right: -30px; top: -40px;
+  width: 130px; height: 130px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 146, 28, .26), transparent 68%);
+  pointer-events: none;
 }
-.kaiPick__name { font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 26px; line-height: 1.4; }
-.kaiPick__when { font-size: 14px; color: #C3D6BE; }
-/* 「見る ›」という小さな文字だと、押せるものだと気づかれなかった。
-   面で塗った琥珀色のボタンにして、押すところをはっきりさせる。
-   ロゴの三色にオレンジが入っているので、深緑の上でも色は浮かない。
-   文字は濃緑を載せる（琥珀の上に白だと、明るすぎて読みにくい）。 */
-.kaiPick__btn {
+
+.kaiPick__text { position: relative; display: grid; gap: 2px; min-width: 0; }
+
+.kaiPick__name {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: clamp(19px, 2.7vh, 24px);
+  line-height: 1.4;
+}
+.kaiPick__when {
+  font-size: clamp(15px, 2vh, 17px);
+  line-height: 1.55;
+  color: #C3D6BE;
+}
+.kaiPick__go {
+  margin-top: 3px;
+  font-size: clamp(14px, 1.8vh, 15.5px);
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--orange-300);
+}
+/* とりわけ低い画面では、この一行を落として 4 枚を収める。
+   右端の琥珀色と流れる矢印だけでも、押せることは伝わる。 */
+@media (max-height: 640px) { .kaiPick__go { display: none; } }
+
+/* 右端。押すところをここにまとめ、矢印を左から右へ順に光らせる */
+.kaiPick__wave {
+  position: relative;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 16px;
-  min-height: 52px;
-  padding: 12px 22px;
+  padding: clamp(8px, 1.3vh, 12px) clamp(10px, 2.6vw, 14px);
   border-radius: 999px;
   background: linear-gradient(180deg, var(--orange-300), var(--orange-500));
   color: #21160A;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: .02em;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .45);
-  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .26), inset 0 1px 0 rgba(255, 255, 255, .45);
 }
-.kaiPick__btn svg { width: 20px; height: 20px; flex: none; }
-.kaiPick__item.is-pressed .kaiPick__btn, .kaiPick__item:active .kaiPick__btn {
+.kaiPick__wave svg {
+  width: clamp(15px, 2.1vh, 19px);
+  height: clamp(15px, 2.1vh, 19px);
+  margin-right: -6px;
+  opacity: .3;
+  animation: kaiWave 1.7s ease-in-out infinite;
+}
+.kaiPick__wave svg:last-child { margin-right: 0; }
+.kaiPick__wave svg:nth-child(2) { animation-delay: .17s; }
+.kaiPick__wave svg:nth-child(3) { animation-delay: .34s; }
+
+@keyframes kaiWave {
+  0%, 62%, 100% { opacity: .3; transform: translateX(0); }
+  31%           { opacity: 1;  transform: translateX(2px); }
+}
+
+.kaiPick__item.is-pressed .kaiPick__wave, .kaiPick__item:active .kaiPick__wave {
   transform: translateY(2px);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .35);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .35);
 }
-.kaiPick__item::after {
-  content: ''; position: absolute; right: -40px; top: -40px;
-  width: 150px; height: 150px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(240, 146, 28, .30), transparent 68%);
-  pointer-events: none;
+
+/* 動きを減らす設定のときは、流さずに全部見せておく */
+@media (prefers-reduced-motion: reduce) {
+  .kaiPick__wave svg { opacity: 1; animation: none; }
 }
 
 /* =========================================================================
