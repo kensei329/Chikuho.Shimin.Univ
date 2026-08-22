@@ -7,6 +7,10 @@
 
 .page { background: var(--paper); }
 
+/* ヘッダーは上に固定してある。# で飛んだときに見出しがその下へ潜らないよう、
+   固定ぶんの高さだけ手前で止める。 */
+.page section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
+
 /* --- 見出しまわりの共通部品 -------------------------------------------- */
 
 .sect { padding: 44px 22px; border-top: 1px solid rgba(5, 42, 23, .10); }
