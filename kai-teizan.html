@@ -14,10 +14,28 @@
 <meta property="og:title" content="低山｜筑豊市民大学">
 <meta property="og:description" content="筑豊市民大学の低山。第4日曜 8:30 集合 ／ 13:00 頃 解散。岩石山、関の山、貫山など、近くの低い山に登ります。">
 <meta property="og:url" content="https://chikuho-shimin-univ.vercel.app/kai-teizan.html">
-<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/logo.png">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="/favicon-96.png" sizes="any">
-<link rel="apple-touch-icon" href="/favicon-96.png">
+<!-- X・LINE などに貼ったときの絵。1200x630。中身は真ん中に寄せてあるので、
+     正方形に切られる置き場でもロゴが欠けない。透過のままだと黒地で潰れるため、
+     紙色を敷いたものを別に用意している（ロゴそのものは透過）。 -->
+<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="筑豊市民大学のロゴ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="低山｜筑豊市民大学">
+<meta name="twitter:description" content="筑豊市民大学の低山。第4日曜 8:30 集合 ／ 13:00 頃 解散。岩石山、関の山、貫山など、近くの低い山に登ります。">
+<meta name="twitter:image" content="https://chikuho-shimin-univ.vercel.app/og.png">
+<meta name="twitter:image:alt" content="筑豊市民大学のロゴ">
+<!-- ファビコン。データURIで埋め込んではいけない（Googleはクロールできる
+     実ファイルのURLしか読まないため、埋め込むと検索結果に出ない）。
+     Google は 48 の倍数を薦めているので 48/96/192 を置いてある。 -->
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- 書体は Google から取り寄せている。描画待ちに入れると、向こうが遅い回線では
@@ -110,7 +128,7 @@
 
     <!-- 下の帯。実際に届く先が無い入力欄は置かず、申し込みフォームへ通す -->
     <div class="story__foot">
-      <a class="story__msg story__msgGo" href="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/viewform" target="_blank" rel="noopener">
+      <a class="story__msg story__msgGo slide__go" href="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/viewform" target="_blank" rel="noopener">
         <span>お申し込み・お問い合わせ</span>
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>

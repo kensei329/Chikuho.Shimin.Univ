@@ -14,10 +14,28 @@
 <meta property="og:title" content="分科会｜筑豊市民大学">
 <meta property="og:description" content="筑豊市民大学の四つの会。歴史をたどる会、ヘルシー、教養講座、低山。見たい会をえらぶと、活動の様子をストーリーでご覧いただけます。">
 <meta property="og:url" content="https://chikuho-shimin-univ.vercel.app/bunkakai.html">
-<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/logo.png">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="/favicon-96.png" sizes="any">
-<link rel="apple-touch-icon" href="/favicon-96.png">
+<!-- X・LINE などに貼ったときの絵。1200x630。中身は真ん中に寄せてあるので、
+     正方形に切られる置き場でもロゴが欠けない。透過のままだと黒地で潰れるため、
+     紙色を敷いたものを別に用意している（ロゴそのものは透過）。 -->
+<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="筑豊市民大学のロゴ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="分科会｜筑豊市民大学">
+<meta name="twitter:description" content="筑豊市民大学の四つの会。歴史をたどる会、ヘルシー、教養講座、低山。見たい会をえらぶと、活動の様子をストーリーでご覧いただけます。">
+<meta name="twitter:image" content="https://chikuho-shimin-univ.vercel.app/og.png">
+<meta name="twitter:image:alt" content="筑豊市民大学のロゴ">
+<!-- ファビコン。データURIで埋め込んではいけない（Googleはクロールできる
+     実ファイルのURLしか読まないため、埋め込むと検索結果に出ない）。
+     Google は 48 の倍数を薦めているので 48/96/192 を置いてある。 -->
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- 書体は Google から取り寄せている。描画待ちに入れると、向こうが遅い回線では
@@ -49,43 +67,35 @@
 </header>
 
 <main class="page" id="main">
-  <section class="sect" style="border-top:0;padding-bottom:6px">
-    <p class="sect__eyebrow">分科会</p>
-    <h1 class="sect__h">どの会を、見ますか。</h1>
-    <p class="sect__text">四つの会があります。えらぶと、その会の様子をストーリーでご覧いただけます。</p>
-  </section>
+  <h1 class="sr">分科会</h1>
 
+  <!-- 前置きは置かない。開いてすぐ、四つのうちどれかを選べる状態にする -->
   <nav class="kaiPick" aria-label="四つの会">
     <a class="kaiPick__item" href="kai-history.html">
       <span class="kaiPick__no">分科会 01</span>
       <span class="kaiPick__name">歴史をたどる会</span>
       <span class="kaiPick__when">第1日曜 ／ 9:30 – 11:30</span>
-      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+      <span class="kaiPick__btn">ストーリーを見る<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
     <a class="kaiPick__item" href="kai-healthy.html">
       <span class="kaiPick__no">分科会 02</span>
       <span class="kaiPick__name">ヘルシー</span>
       <span class="kaiPick__when">第1日曜 ／ 13:00 – 15:00</span>
-      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+      <span class="kaiPick__btn">ストーリーを見る<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
     <a class="kaiPick__item" href="kai-kyoyo.html">
       <span class="kaiPick__no">分科会 03</span>
       <span class="kaiPick__name">教養講座</span>
       <span class="kaiPick__when">第3日曜 ／ 13:30 – 15:30</span>
-      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+      <span class="kaiPick__btn">ストーリーを見る<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
     <a class="kaiPick__item" href="kai-teizan.html">
       <span class="kaiPick__no">分科会 04</span>
       <span class="kaiPick__name">低山</span>
       <span class="kaiPick__when">第4日曜 ／ 8:30 集合 ／ 13:00 頃 解散</span>
-      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+      <span class="kaiPick__btn">ストーリーを見る<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
   </nav>
-
-  <section class="sect sect--tint">
-    <p class="sect__text">受けたい会は、いくつでも組み合わせられます。年会費は1講座1万円から、4講座で19,000円が上限です。</p>
-    <a class="btn btn--primary sect__btn" href="index.html#fee">年会費を確かめる<span aria-hidden="true">›</span></a>
-  </section>
 
   <p class="foot">© 筑豊市民大学</p>
 </main>
