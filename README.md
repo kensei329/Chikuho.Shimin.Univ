@@ -333,7 +333,7 @@ Googleフォームのチェックボックスは、**選択肢に無い文字列
 
 ## 公開
 
-Vercel で公開しています（`https://chikuho-shimin-univ.vercel.app/`）。
+Vercel で公開しています（`https://chikuho.uk/`）。
 main ブランチに push すると自動でデプロイされます。それ以外のブランチに push すると、
 プレビュー用のURLが作られます。
 
