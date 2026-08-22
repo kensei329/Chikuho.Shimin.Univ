@@ -265,3 +265,205 @@ a { color: var(--gold-ink); }
   * { animation-duration: .001ms !important; animation-iteration-count: 1 !important;
       transition-duration: .001ms !important; }
 }
+
+/* =========================================================================
+   PC で見たときの、柱の外の両側
+   =========================================================================
+   柱（520px）は指で持つ端末に合わせた幅なので、PC では左右に地色が残る。
+   そこを埋めるが、**あくまで添えもの**。真ん中の柱より目立たせない。
+
+     ・地は暗い深緑のまま。パネルで塗りつぶさない
+     ・字は小さく、色は落とす（柱の中は 17px、ここは 13px）
+     ・押しどころは輪郭だけ。面で塗るのは柱の中だけにする
+
+   例外は案内（.railGuide）。そのページの動かし方を伝えるもので、
+   知らないと気づけない。あるときは右の帯のいちばん上に置き、
+   琥珀色をつけて、この両側でただ一つ目立つものにする。
+
+   幅が足りない画面では出さない。指で送れるので要らない。
+   ========================================================================= */
+
+.siteRail {
+  position: fixed;
+  top: calc(var(--header-h) + 22px);
+  bottom: 22px;
+  z-index: 30;
+  display: none;
+  /* 柱との間を空けたうえで、余った幅に合わせて伸び縮みさせる */
+  width: clamp(168px, calc((100vw - var(--column)) / 2 - 32px), 232px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', system-ui, sans-serif;
+}
+.siteRail::-webkit-scrollbar { display: none; }
+
+.siteRail--left  { left: 50%; transform: translateX(-100%); margin-left: calc(var(--column) / -2 - 18px); }
+.siteRail--right { left: 50%; margin-left: calc(var(--column) / 2 + 18px); }
+
+@media (min-width: 940px) and (pointer: fine) {
+  .siteRail { display: block; }
+}
+
+/* 見出し。小さく、字を離して、添えものらしく */
+.siteRail__cap {
+  margin: 0 0 12px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .22em;
+  color: #7E9078;
+}
+
+/* --- 左：サイトマップ ---------------------------------------------------- */
+
+.tree__list, .tree__sub { list-style: none; margin: 0; padding: 0; }
+
+.tree__list > li + li { margin-top: 3px; }
+
+.tree a {
+  display: block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #C2CFBC;
+  text-decoration: none;
+  transition: color .2s ease, background-color .2s ease;
+}
+.tree a:hover { color: #F4AC4E; background: rgba(255, 255, 255, .06); }
+
+/* いま見ているところ。塗らずに、左の一本線と色だけで示す */
+.tree a[aria-current] {
+  color: #F4AC4E;
+  box-shadow: inset 2px 0 0 var(--orange-400);
+  background: rgba(240, 146, 28, .09);
+}
+
+/* 理念はこの大学の芯。ここだけ明朝で、ひとまわり大きく */
+.tree__item--main > a {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #E8EFE4;
+}
+.tree__item--main > a em {
+  display: block;
+  font-style: normal;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: #7E9078;
+  margin-top: 1px;
+}
+.tree__item--main { margin-bottom: 9px; padding-bottom: 9px; border-bottom: 1px solid rgba(255, 255, 255, .10); }
+
+/* 枝。縦の一本線と、項目ごとの短い横線で木に見せる */
+.tree__sub { margin: 2px 0 6px 13px; padding-left: 11px; border-left: 1px solid rgba(255, 255, 255, .14); }
+.tree__sub li { position: relative; }
+.tree__sub li::before {
+  content: '';
+  position: absolute;
+  left: -11px;
+  top: 15px;
+  width: 7px;
+  height: 1px;
+  background: rgba(255, 255, 255, .18);
+}
+.tree__sub a { font-size: 12px; font-weight: 600; color: #A3B39D; padding: 4px 7px; }
+
+/* --- 右：案内とお申し込み ------------------------------------------------ */
+
+/* 案内。両側でただ一つ、色をつけて目立たせるもの */
+.railGuide {
+  margin-bottom: 16px;
+  padding: 13px 14px 14px;
+  border-radius: 13px;
+  background: rgba(240, 146, 28, .13);
+  border: 1px solid rgba(240, 146, 28, .42);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .28);
+  text-align: center;
+}
+.railGuide__cap {
+  margin: 0 0 9px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  color: var(--orange-300);
+}
+.railGuide__btns { display: flex; justify-content: center; gap: 9px; }
+.railGuide__btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 146, 28, .5);
+  background: rgba(4, 36, 20, .55);
+  color: var(--orange-400);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.2, .8, .3, 1), background-color .25s ease;
+}
+.railGuide__btn svg { width: 20px; height: 20px; }
+.railGuide__btn:hover { background: rgba(240, 146, 28, .26); }
+.railGuide__btn:active { transform: scale(.9); transition-duration: 0s; }
+.railGuide__text {
+  margin: 9px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.65;
+  color: #E4D2B4;
+}
+
+/* お申し込み。常に出すが、面では塗らない。輪郭だけの押しどころにして、
+   柱の中の「お申し込みはこちらから」（深緑で塗った帯）より一段引く */
+.railJoin {
+  padding: 15px 15px 16px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  background: rgba(255, 255, 255, .04);
+}
+.railJoin__cap {
+  margin: 0 0 7px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  color: #7E9078;
+}
+.railJoin__lead {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.75;
+  color: #BCCAB6;
+}
+.railJoin__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 146, 28, .55);
+  color: var(--orange-300);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color .25s ease, color .25s ease;
+}
+.railJoin__btn span { opacity: .7; }
+.railJoin__btn:hover { background: rgba(240, 146, 28, .16); color: var(--orange-300); }
+.railJoin__note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: #7E9078;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .siteRail * { transition: none !important; }
+}
