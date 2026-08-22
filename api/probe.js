@@ -98,5 +98,24 @@ export default async function handler(req, res) {
   }
   report.backHead = back.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
 
+  /* viewform が実際に出している入力欄の name を、そのまま並べる */
+  report.inputNames = [...new Set(
+    [...html.matchAll(/<(?:input|select|textarea)\b[^>]*\bname="([^"]+)"/g)].map((m) => m[1])
+  )];
+
+  /* 弾かれた画面で「必須の質問です」の前後を切り出す。どの設問で転んだかが出る */
+  const flat = back.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+  report.errorContext = [];
+  let at = flat.indexOf('必須の質問です');
+  while (at !== -1 && report.errorContext.length < 4) {
+    report.errorContext.push(flat.slice(Math.max(0, at - 160), at + 20));
+    at = flat.indexOf('必須の質問です', at + 1);
+  }
+
+  /* メール収集まわりの設定値 */
+  report.flags.raw1_10 = data?.[1]?.[10] ?? null;
+  report.flags.raw1_9  = data?.[1]?.[9] ?? null;
+  report.flags.raw1_11 = data?.[1]?.[11] ?? null;
+
   return res.status(200).json(report);
 }
