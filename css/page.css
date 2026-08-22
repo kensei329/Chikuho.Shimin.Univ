@@ -7,6 +7,10 @@
 
 .page { background: var(--paper); }
 
+/* ヘッダーは上に固定してある。# で飛んだときに見出しがその下へ潜らないよう、
+   固定ぶんの高さだけ手前で止める。 */
+.page section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
+
 /* --- 見出しまわりの共通部品 -------------------------------------------- */
 
 .sect { padding: 44px 22px; border-top: 1px solid rgba(5, 42, 23, .10); }
@@ -129,27 +133,87 @@
   color: var(--gold-ink); font-weight: 700; text-decoration: none;
 }
 
-/* --- 7. 年会費の計算 ---------------------------------------------------- */
+/* --- 7. 年会費のめやす ------------------------------------------------- */
 
-.calc { margin-top: 22px; display: grid; gap: 16px; }
-.calc__picks { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }
+.fee { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 8px; }
+.fee li {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 12px 18px; border-radius: 12px;
+  background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .20);
+}
+.fee b { font-size: 18px; font-weight: 800; color: #fff; }
+.fee b i { font-style: normal; font-size: 14px; font-weight: 700; margin-left: 3px; }
+.fee span { font-family: 'Shippori Mincho B1', serif; font-size: 21px; font-weight: 800; color: var(--orange-300); }
+.sect--dark .sect__note { color: #B9CDB4; }
 
-/* 中の input は目には見せないが、キーボードでは触れる。position: relative を
-   置いておかないと、絶対配置の起点が柱まで飛んで、焦点が当たったときに
-   画面が思わぬところへ動く。 */
+/* --- 8. 申し込みフォーム -----------------------------------------------
+   見た目は自前、送り先は Google フォーム。入力欄の name が、そのまま
+   Google 側の entry ID になっている（js/home.js の頭書きを参照）。
+   会員は 70 代が中心なので、字は 16px を割らず、押すところは 52px 以上。
+   ------------------------------------------------------------------- */
+
+.jform { margin-top: 24px; display: grid; gap: 22px; }
+/* display を指定したものは、hidden 属性だけでは消えない（display の指定が
+   ブラウザ既定の [hidden]{display:none} に勝つ）。明示して消す。 */
+.jform[hidden] { display: none; }
+
+.jf { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+.jf__label {
+  display: flex; align-items: center; gap: 8px; padding: 0;
+  font-size: 16px; font-weight: 800; color: var(--green-800); line-height: 1.6;
+}
+.jf__req {
+  flex: none; padding: 2px 8px; border-radius: 4px;
+  background: var(--orange-500); color: #fff;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .04em;
+}
+
+.jf__in {
+  width: 100%; min-height: 54px; padding: 14px 16px;
+  border: 1.5px solid rgba(5, 42, 23, .26); border-radius: 10px;
+  background: #fff; color: var(--ink);
+  font-family: inherit; font-size: 16px; line-height: 1.6;
+  /* iOS は 16px 未満の入力欄に触れると画面ごと拡大する。16px は割らない */
+}
+.jf__in::placeholder { color: #8C9A88; }
+.jf__in:focus { outline: 3px solid var(--orange-400); outline-offset: 2px; border-color: var(--green-600); }
+.jf__in[aria-invalid="true"] { border-color: #B3261E; background: #FFF7F6; }
+
+.jf__hint { font-size: 14.5px; line-height: 1.75; color: var(--ink-3); }
+.jf__err { font-size: 15px; font-weight: 700; line-height: 1.7; color: #B3261E; }
+.jf__err::before { content: '⚠ '; }
+
+/* 生年月日。iPhone では下からせり上がるルーレットになる */
+.jf__date { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 8px; }
+.jf__sel { position: relative; display: flex; align-items: center; }
+.jf__sel select {
+  width: 100%; min-height: 54px; padding: 14px 30px 14px 14px;
+  border: 1.5px solid rgba(5, 42, 23, .26); border-radius: 10px;
+  background: #fff; color: var(--ink);
+  font-family: inherit; font-size: 16px; font-weight: 700;
+  appearance: none; -webkit-appearance: none;
+}
+.jf__sel i {
+  position: absolute; right: 12px; pointer-events: none;
+  font-style: normal; font-size: 14px; font-weight: 700; color: var(--ink-3);
+}
+.jf__sel select:focus { outline: 3px solid var(--orange-400); outline-offset: 2px; }
+
+.jf__picks { display: grid; gap: 10px; }
+
+/* えらぶ札。明るい地の上なので、濃い字で置く */
 .pick {
   position: relative;
   display: flex; align-items: center; gap: 14px;
-  min-height: 62px; padding: 12px 16px; cursor: pointer;
-  background: rgba(255, 255, 255, .07);
-  border: 1px solid rgba(255, 255, 255, .22);
-  border-radius: 12px;
+  min-height: 64px; padding: 12px 16px; cursor: pointer;
+  background: #fff; border: 1.5px solid rgba(5, 42, 23, .22); border-radius: 12px;
   transition: background .2s ease, border-color .2s ease;
 }
 .pick input { position: absolute; opacity: 0; width: 0; height: 0; }
 .pick__box {
   flex: none; width: 26px; height: 26px; border-radius: 7px;
-  border: 2px solid rgba(255, 255, 255, .55); background: transparent;
+  border: 2px solid rgba(5, 42, 23, .4); background: #fff;
   display: grid; place-items: center;
   transition: background .18s ease, border-color .18s ease;
 }
@@ -159,37 +223,77 @@
   transform: rotate(-45deg) scale(.4); opacity: 0;
   transition: transform .18s ease, opacity .18s ease;
 }
-.pick__text b { display: block; font-size: 18px; font-weight: 700; color: #fff; line-height: 1.5; }
-.pick__text em { display: block; font-style: normal; font-size: 13px; color: #B9CDB4; }
+.pick__text b { display: block; font-size: 18px; font-weight: 800; color: var(--green-800); line-height: 1.5; }
+.pick__text em { display: block; font-style: normal; font-size: 14px; color: var(--ink-3); }
 
-.pick:has(input:checked) { background: rgba(240, 146, 28, .20); border-color: var(--orange-400); }
-.pick:has(input:checked) .pick__box { background: var(--orange-400); border-color: var(--orange-400); }
-.pick:has(input:checked) .pick__box::after { transform: rotate(-45deg) scale(1); opacity: 1; }
-/* :has() が使えない環境のための控え。JavaScript が is-on を付ける */
-.pick.is-on { background: rgba(240, 146, 28, .20); border-color: var(--orange-400); }
-.pick.is-on .pick__box { background: var(--orange-400); border-color: var(--orange-400); }
-.pick.is-on .pick__box::after { transform: rotate(-45deg) scale(1); opacity: 1; }
-.pick input:focus-visible + .pick__box { outline: 3px solid var(--orange-300); outline-offset: 3px; }
+.pick:has(input:checked), .pick.is-on { background: #FFF3E2; border-color: var(--orange-500); }
+.pick:has(input:checked) .pick__box, .pick.is-on .pick__box { background: var(--orange-500); border-color: var(--orange-500); }
+.pick:has(input:checked) .pick__box::after, .pick.is-on .pick__box::after { transform: rotate(-45deg) scale(1); opacity: 1; }
+.pick input:focus-visible + .pick__box { outline: 3px solid var(--orange-400); outline-offset: 3px; }
 
-.calc__out {
-  display: block; padding: 20px; border-radius: 14px; text-align: center;
-  background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .22);
+/* 年会費。画面に出るだけで、書き換えはできない */
+.jfee {
+  display: block; padding: 18px 20px; border-radius: 12px; text-align: center;
+  background: var(--green-800); color: #fff;
 }
-.calc__label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .2em; color: var(--orange-300); }
-.calc__yen {
-  display: block; margin: 4px 0 6px;
-  font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 44px;
-  line-height: 1.15; color: #fff;
+.jfee__yen {
+  display: block; font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800; font-size: 40px; line-height: 1.2;
 }
-.calc__note { display: block; font-size: 14px; line-height: 1.8; color: #C8DAC4; }
+.jfee__note { display: block; margin-top: 4px; font-size: 15px; line-height: 1.7; color: #C8DAC4; }
 
-/* --- 8. 申し込みフォーム ------------------------------------------------ */
-
-.embed {
-  margin-top: 20px; border-radius: 14px; overflow: hidden;
-  border: 1px solid var(--card-line); background: #fff;
+/* 確認事項 */
+.jagree {
+  /* 中の input は目に見せないが、キーボードでは触れる。position: relative を
+     置かないと、絶対配置の起点が柱まで飛んで、焦点が当たったときに画面が動く */
+  position: relative;
+  display: flex; align-items: flex-start; gap: 14px; cursor: pointer;
+  padding: 16px; border-radius: 12px;
+  background: var(--paper-2); border: 1.5px solid rgba(5, 42, 23, .22);
 }
-.embed iframe { display: block; width: 100%; height: 1180px; border: 0; }
+.jagree input { position: absolute; opacity: 0; width: 0; height: 0; }
+.jagree__box {
+  flex: none; margin-top: 2px; width: 28px; height: 28px; border-radius: 7px;
+  border: 2px solid rgba(5, 42, 23, .45); background: #fff;
+  display: grid; place-items: center;
+}
+.jagree__box::after {
+  content: ''; width: 14px; height: 8px; border: 0 solid #fff;
+  border-left-width: 2.8px; border-bottom-width: 2.8px;
+  transform: rotate(-45deg) scale(.4); opacity: 0;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.jagree__text { font-size: 16px; line-height: 1.85; color: var(--ink-2); }
+.jagree__text .jf__req { display: inline-block; margin-left: 6px; vertical-align: 2px; }
+.jagree:has(input:checked) { background: #FFF3E2; border-color: var(--orange-500); }
+.jagree:has(input:checked) .jagree__box { background: var(--orange-500); border-color: var(--orange-500); }
+.jagree:has(input:checked) .jagree__box::after { transform: rotate(-45deg) scale(1); opacity: 1; }
+.jagree input:focus-visible + .jagree__box { outline: 3px solid var(--orange-400); outline-offset: 3px; }
+
+.jform__alert {
+  padding: 14px 16px; border-radius: 10px;
+  background: #FFF1F0; border: 1.5px solid #B3261E;
+  font-size: 16px; font-weight: 700; line-height: 1.75; color: #8C1D18;
+}
+.jform__send { width: 100%; min-height: 60px; font-size: 18px; }
+.jform__send[disabled] { opacity: .6; }
+.jform__foot { text-align: center; }
+.jform__foot a { color: var(--gold-ink); font-weight: 700; }
+
+/* 送信の受け皿。見せない */
+#jsink { position: absolute; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; }
+
+/* 受け付けたあと */
+.jdone {
+  margin-top: 24px; padding: 26px 22px; border-radius: 16px;
+  background: var(--green-800); color: #fff;
+}
+.jdone__h {
+  font-family: 'Shippori Mincho B1', serif; font-weight: 800;
+  font-size: 24px; line-height: 1.5; margin-bottom: 12px;
+}
+.jdone__text { font-size: 16px; line-height: 1.95; color: #D6E3D2; }
+.jdone__text a { color: var(--orange-300); font-weight: 700; }
 
 .foot {
   padding: 30px 22px calc(28px + env(safe-area-inset-bottom));
