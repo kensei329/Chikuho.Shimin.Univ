@@ -623,3 +623,28 @@
   margin-top: 12px; font-size: 14.5px; line-height: 1.9; color: var(--ink-3);
 }
 .cal__note a { font-weight: 800; color: var(--green-800); }
+
+/* ── 年間予定の、季節の飾り ──────────────────────────────────────
+   読んでいる月に合わせて、鯉のぼりや雪や桜が流れる。
+   ヘッダーとタブバーの内側だけを使う。指は通す。 */
+
+.season {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  bottom: var(--nav-h);
+  width: 100%;
+  /* canvas は置き換え要素なので、top と bottom だけでは伸びない。
+     指定がないと 300x150 の比率のまま、画面の上のほうだけになる。 */
+  height: calc(100dvh - var(--header-h) - var(--nav-h));
+  z-index: 40;               /* 本文より上、ヘッダー(90)とタブバー(95)より下 */
+  pointer-events: none;
+  /* 文字の上を流れるので、はっきり薄くする。会員の多くは 70 代で、
+     読みにくくなっては本末転倒。飾りとわかる濃さにとどめる。 */
+  opacity: .55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .season { display: none; }
+}

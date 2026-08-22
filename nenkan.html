@@ -55,6 +55,7 @@
 </script>
 <script src="js/site.js" defer></script>
 <script src="js/nenkan.js" defer></script>
+<script src="js/season.js" defer></script>
 <noscript><style>
   /* JavaScript が無い環境では、はじめから出しておく */
   .mo__badge { transform: none !important; }
@@ -63,6 +64,8 @@
 </head>
 <body data-page="nenkan">
 <div class="column">
+<!-- 読んでいる月に合わせて、季節のものが流れる。飾りなので読み上げない -->
+<canvas class="season" id="season" aria-hidden="true"></canvas>
 <a class="skip" href="#main">本文へ移動</a>
 
 <header class="head">
@@ -280,7 +283,7 @@
         <p class="mo__what"><span class="sr">2026年11月　</span>公開講演会</p>
         <div class="mo__big">
           <p class="mo__bigWhen">11月3日（火・祝）13:30 – 15:30</p>
-          <p class="mo__bigTitle">「（仮題）月や火星の探査について」</p>
+          <p class="mo__bigTitle">「月や火星の探査について」</p>
           <p class="mo__bigWho">講師：河野 功 氏（JAXA・宇宙航空研究開発機構 特任教授）<br>会員でなくても、どなたでも無料でお聞きいただけます。</p>
         </div>
         <ul class="mo__list">
@@ -454,24 +457,7 @@
   <p class="year__foot">公開講演会は年に一度。会員でなくても、どなたでも無料でお聞きいただけます。校外学習の行き先や集合場所など、細かいところは決まりしだいこのページで更新します。<br>日程は都合により変わることがあります。</p>
 
   <nav class="yearGo" aria-label="各会の詳しい日程">
-    <a class="yearGo__btn" href="kai-kyoyo.html">教養講座の日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-healthy.html">ヘルシーエイジングの日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-teizan.html">低山に登ろうの日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-history.html">歴史を辿る会の日程を見る<span aria-hidden="true">›</span></a>
-  </nav>
-
-  <nav class="yearGo" aria-label="各会の詳しい日程">
-    <a class="yearGo__btn" href="kai-kyoyo.html">教養講座の日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-healthy.html">ヘルシーエイジングの日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-teizan.html">低山に登ろうの日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-history.html">歴史を辿る会の日程を見る<span aria-hidden="true">›</span></a>
-  </nav>
-
-  <nav class="yearGo" aria-label="各会の詳しい日程">
-    <a class="yearGo__btn" href="kai-kyoyo.html">教養講座の日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-healthy.html">ヘルシーエイジングの日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-teizan.html">低山に登ろうの日程を見る<span aria-hidden="true">›</span></a>
-    <a class="yearGo__btn" href="kai-history.html">歴史を辿る会の日程を見る<span aria-hidden="true">›</span></a>
+    <a class="yearGo__btn" href="bunkakai.html">四つの会の日程を見る<span aria-hidden="true">›</span></a>
   </nav>
 
   <p class="foot">© 筑豊市民大学</p>
