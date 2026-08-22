@@ -81,8 +81,15 @@
 @keyframes flicker{0%,100%{opacity:1}44%{opacity:.62}70%{opacity:.95}}
 
 /* ───────── stage（ヘッダーとフッターの内側） ───────── */
+/* 6枚を同じ升目に重ね、その升目の真ん中に置く。
+   升目の高さは minmax(0,1fr) で舞台そのものに釘付けにしておく。
+   これを書かないと、升目の高さが「いちばん背の高い中身」に合わせて伸びる。
+   6枚目には理念の全文が入っていて、狭い画面では700px を超える。すると升目が
+   舞台からはみ出し、その真ん中に揃えられる1枚目は画面のずっと下へ落ちる
+   （手元の 402x700 では 128px 下がった）。全文は .panel 側で隠すので、
+   升目まで伸ばす必要はない。 */
 #stage{position:absolute;top:var(--head);bottom:var(--foot);left:0;right:0;z-index:2;
-  display:grid;place-items:center;padding:3% var(--side)}
+  display:grid;grid-template-rows:minmax(0,1fr);place-items:center;padding:3% var(--side)}
 .slide{grid-area:1/1;width:100%;max-height:100%;text-align:center;opacity:0;visibility:hidden;
   pointer-events:none;transition:opacity .55s ease,visibility 0s linear .55s}
 .slide.active{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .55s ease,visibility 0s}
