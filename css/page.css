@@ -1,0 +1,360 @@
+@charset "utf-8";
+
+/* =========================================================================
+   ホーム・理念・分科会の選び口・年間予定 — 縦に読むページの見た目
+   本文は 17px / 行間 1.95。会員は 70 代が中心なので、ここは縮めない。
+   ========================================================================= */
+
+.page { background: var(--paper); }
+
+/* --- 見出しまわりの共通部品 -------------------------------------------- */
+
+.sect { padding: 44px 22px; border-top: 1px solid rgba(5, 42, 23, .10); }
+.sect__eyebrow {
+  font-size: 12.5px; font-weight: 700; letter-spacing: .22em;
+  color: var(--green-600); margin-bottom: 10px;
+}
+.sect__h { font-size: 27px; font-weight: 800; color: var(--green-800); margin-bottom: 18px; text-wrap: pretty; }
+.sect__text { color: var(--ink-2); }
+.sect__note { margin-top: 14px; font-size: 14px; line-height: 1.8; color: var(--ink-4); }
+.sect__btn { width: 100%; margin-top: 24px; }
+
+.sect--tint { background: var(--paper-2); }
+.sect--dark { background: var(--green-800); border-top: 0; }
+.sect--dark .sect__eyebrow { color: var(--orange-300); }
+.sect--dark .sect__h { color: #fff; }
+.sect--dark .sect__text { color: #D6E3D2; }
+
+/* --- 1. 冒頭 ----------------------------------------------------------- */
+
+.hero { padding: 34px 22px 38px; background:
+  radial-gradient(120% 70% at 100% 0%, rgba(61, 138, 42, .13) 0%, rgba(61, 138, 42, 0) 62%), var(--paper); }
+.hero__eyebrow {
+  font-size: 12.5px; font-weight: 700; letter-spacing: .18em;
+  color: var(--green-600); margin-bottom: 16px;
+}
+.hero__lead {
+  font-family: 'Shippori Mincho B1', serif; font-weight: 700;
+  /* 390px の画面で「いくつになっても学びたい人が、」が 1 行に収まる大きさ。
+     ここを上げると折り返しが「学びたい／人が、」と割れる */
+  font-size: clamp(19px, 5.1vw, 24px); line-height: 1.75; color: var(--green-800);
+  letter-spacing: .02em; margin-bottom: 18px; text-wrap: pretty;
+}
+.hero__body { color: var(--ink-2); }
+
+/* --- 2. 掲げている言葉 --------------------------------------------------
+   縦書きだと 1 行に入る字数が画面の高さで決まってしまい、字を小さく
+   せざるを得なかった。横書きにして、そのぶん字を大きくしている。 */
+
+.creed {
+  position: relative; overflow: hidden;
+  padding: 46px 22px 40px;
+  background: linear-gradient(165deg, var(--green-800) 0%, var(--green-900) 100%);
+  color: #fff;
+}
+.creed__mark {
+  position: absolute; right: -46px; top: -26px; width: 232px;
+  opacity: .09; pointer-events: none;
+}
+.creed__line {
+  position: relative;
+  font-family: 'Shippori Mincho B1', serif; font-weight: 800;
+  line-height: 1.34; letter-spacing: .04em;
+  /* 画面の幅に合わせて伸び縮みさせる。520px の柱では 40px あたりで止まる */
+  font-size: clamp(30px, 8.6vw, 42px);
+}
+.creed__line--2 { color: var(--orange-300); }
+.creed__line--2::after {
+  content: ''; display: block; width: 74px; height: 4px; margin-top: 14px;
+  background: var(--orange-400); border-radius: 2px;
+}
+.creed__note {
+  position: relative; margin-top: 22px;
+  font-size: 14.5px; line-height: 1.9; color: #BCD2B7;
+}
+.creed__more {
+  position: relative; display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 20px; padding: 12px 0;
+  color: var(--orange-300); font-weight: 700; text-decoration: none;
+}
+
+/* --- 3. 三つの数字 ------------------------------------------------------ */
+
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--paper-2); }
+.fact { padding: 22px 10px; text-align: center; border-right: 1px solid rgba(5, 42, 23, .10); }
+.fact:last-child { border-right: 0; }
+.fact b {
+  display: block; font-family: 'Shippori Mincho B1', serif; font-weight: 800;
+  font-size: 34px; line-height: 1.1; color: var(--green-800);
+}
+.fact b i { font-style: normal; font-size: 16px; }
+.fact span { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.6; color: var(--ink-3); }
+
+/* --- 4. ひと月の暦 ------------------------------------------------------ */
+
+.cal { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.cal__day {
+  background: #fff; border: 1px solid var(--card-line); border-radius: 14px;
+  padding: 16px 16px 6px; box-shadow: var(--card-lift);
+}
+.cal__when {
+  display: inline-block; padding: 4px 12px; border-radius: 999px;
+  background: var(--green-800); color: #fff;
+  font-size: 13px; font-weight: 700; letter-spacing: .08em;
+}
+.cal__items { margin-top: 6px; }
+.cal__item {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 12px 2px; text-decoration: none;
+  border-bottom: 1px dashed rgba(5, 42, 23, .14);
+}
+.cal__item:last-child { border-bottom: 0; }
+.cal__time { font-size: 13.5px; font-weight: 700; letter-spacing: .04em; color: var(--gold-ink); }
+.cal__name { font-family: 'Shippori Mincho B1', serif; font-weight: 700; font-size: 20px; color: var(--green-800); }
+.cal__item::after {
+  content: 'くわしく ›'; align-self: flex-end; margin-top: -22px;
+  font-size: 12.5px; font-weight: 700; color: var(--green-600);
+}
+
+/* --- 6. 会場 ------------------------------------------------------------ */
+
+.map {
+  margin-top: 20px; border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--card-line); background: var(--paper-2);
+  aspect-ratio: 4 / 3;
+}
+.map iframe { display: block; width: 100%; height: 100%; border: 0; }
+.map__link, .embed__link {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 12px 0;
+  color: var(--gold-ink); font-weight: 700; text-decoration: none;
+}
+
+/* --- 7. 年会費の計算 ---------------------------------------------------- */
+
+.calc { margin-top: 22px; display: grid; gap: 16px; }
+.calc__picks { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+/* 中の input は目には見せないが、キーボードでは触れる。position: relative を
+   置いておかないと、絶対配置の起点が柱まで飛んで、焦点が当たったときに
+   画面が思わぬところへ動く。 */
+.pick {
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+  min-height: 62px; padding: 12px 16px; cursor: pointer;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 12px;
+  transition: background .2s ease, border-color .2s ease;
+}
+.pick input { position: absolute; opacity: 0; width: 0; height: 0; }
+.pick__box {
+  flex: none; width: 26px; height: 26px; border-radius: 7px;
+  border: 2px solid rgba(255, 255, 255, .55); background: transparent;
+  display: grid; place-items: center;
+  transition: background .18s ease, border-color .18s ease;
+}
+.pick__box::after {
+  content: ''; width: 13px; height: 7px; border: 0 solid #fff;
+  border-left-width: 2.6px; border-bottom-width: 2.6px;
+  transform: rotate(-45deg) scale(.4); opacity: 0;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.pick__text b { display: block; font-size: 18px; font-weight: 700; color: #fff; line-height: 1.5; }
+.pick__text em { display: block; font-style: normal; font-size: 13px; color: #B9CDB4; }
+
+.pick:has(input:checked) { background: rgba(240, 146, 28, .20); border-color: var(--orange-400); }
+.pick:has(input:checked) .pick__box { background: var(--orange-400); border-color: var(--orange-400); }
+.pick:has(input:checked) .pick__box::after { transform: rotate(-45deg) scale(1); opacity: 1; }
+/* :has() が使えない環境のための控え。JavaScript が is-on を付ける */
+.pick.is-on { background: rgba(240, 146, 28, .20); border-color: var(--orange-400); }
+.pick.is-on .pick__box { background: var(--orange-400); border-color: var(--orange-400); }
+.pick.is-on .pick__box::after { transform: rotate(-45deg) scale(1); opacity: 1; }
+.pick input:focus-visible + .pick__box { outline: 3px solid var(--orange-300); outline-offset: 3px; }
+
+.calc__out {
+  display: block; padding: 20px; border-radius: 14px; text-align: center;
+  background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .22);
+}
+.calc__label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .2em; color: var(--orange-300); }
+.calc__yen {
+  display: block; margin: 4px 0 6px;
+  font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 44px;
+  line-height: 1.15; color: #fff;
+}
+.calc__note { display: block; font-size: 14px; line-height: 1.8; color: #C8DAC4; }
+
+/* --- 8. 申し込みフォーム ------------------------------------------------ */
+
+.embed {
+  margin-top: 20px; border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--card-line); background: #fff;
+}
+.embed iframe { display: block; width: 100%; height: 1180px; border: 0; }
+
+.foot {
+  padding: 30px 22px calc(28px + env(safe-area-inset-bottom));
+  text-align: center; font-size: 13px; color: var(--ink-4);
+  background: var(--paper-2); border-top: 1px solid rgba(5, 42, 23, .10);
+}
+
+/* =========================================================================
+   理念
+   ========================================================================= */
+
+.rinen { padding: 40px 22px 46px; }
+.rinen__cascade { margin-bottom: 34px; }
+.rinen__cascade p {
+  font-family: 'Shippori Mincho B1', serif; font-weight: 700;
+  color: var(--green-800); line-height: 1.7; letter-spacing: .03em; margin-bottom: .3em;
+}
+.rinen__cascade p:nth-child(1) { font-size: clamp(21px, 5.4vw, 26px); }
+.rinen__cascade p:nth-child(2) { font-size: clamp(23px, 6.0vw, 29px); padding-left: .7em; }
+.rinen__cascade p:nth-child(3) { font-size: clamp(25px, 6.6vw, 32px); padding-left: 1.4em; }
+.rinen__cascade b { font-weight: 700; color: var(--gold-ink); }
+
+.rinen__pillar {
+  font-family: 'Shippori Mincho B1', serif; font-size: 19px; line-height: 2;
+  color: var(--ink); border-left: 4px solid var(--orange-500);
+  padding: 4px 0 4px 18px; margin-bottom: 32px;
+}
+.rinen__body p { margin-bottom: 1.5em; color: var(--ink-2); }
+.rinen__body p:last-child { margin-bottom: 0; color: var(--ink); }
+.rinen__sign {
+  margin-top: 34px; padding-top: 20px; border-top: 1px solid rgba(5, 42, 23, .14);
+  font-size: 14px; letter-spacing: .16em; color: var(--green-600);
+}
+
+/* =========================================================================
+   分科会の選び口
+   ========================================================================= */
+
+.kaiPick { padding: 34px 22px 46px; display: grid; gap: 14px; }
+.kaiPick__item {
+  position: relative; overflow: hidden;
+  display: grid; gap: 4px; padding: 22px 20px;
+  min-height: 116px; align-content: center;
+  border-radius: 16px; text-decoration: none; color: #fff;
+  background: var(--green-800);
+  box-shadow: 0 8px 20px rgba(5, 42, 23, .18);
+  touch-action: manipulation;
+  transition: transform .26s cubic-bezier(.2, .8, .3, 1), box-shadow .26s ease;
+}
+.kaiPick__item.is-pressed, .kaiPick__item:active {
+  transform: scale(.975); box-shadow: 0 2px 8px rgba(5, 42, 23, .22); transition-duration: 0s;
+}
+.kaiPick__no {
+  font-size: 12px; font-weight: 700; letter-spacing: .24em; color: var(--orange-300);
+}
+.kaiPick__name { font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 26px; line-height: 1.4; }
+.kaiPick__when { font-size: 14px; color: #C3D6BE; }
+.kaiPick__go {
+  position: absolute; right: 18px; bottom: 16px;
+  font-size: 13px; font-weight: 700; color: var(--orange-300);
+}
+.kaiPick__item::after {
+  content: ''; position: absolute; right: -40px; top: -40px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 146, 28, .30), transparent 68%);
+  pointer-events: none;
+}
+
+/* =========================================================================
+   ストーリーの下の帯
+   実際に届く先の無い入力欄は置かず、申し込みフォームへ通す。
+   ========================================================================= */
+
+.story__msgGo {
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 12px;
+  text-decoration: none;
+  color: var(--green-800);
+  font-weight: 800;
+  font-size: 14px;
+}
+.story__msgGo svg { width: 19px; height: 19px; flex: none; }
+
+/* =========================================================================
+   年間予定
+   スクロールで下から順に、ぽこっと出てくる。
+   動きを減らす設定の環境では、最初から出したままにする。
+   ========================================================================= */
+
+.year { padding: 30px 0 46px; }
+
+.year__head { padding: 10px 22px 26px; }
+.year__title {
+  font-family: 'Shippori Mincho B1', serif; font-weight: 800;
+  font-size: 30px; color: var(--green-800); line-height: 1.4;
+}
+.year__sub { margin-top: 10px; color: var(--ink-2); }
+
+.line { position: relative; list-style: none; margin: 0; padding: 0 22px 0 74px; }
+/* 背骨。上から下へ一本通す */
+.line::before {
+  content: ''; position: absolute; left: 40px; top: 6px; bottom: 6px; width: 3px;
+  background: linear-gradient(180deg, var(--green-600), var(--orange-400));
+  border-radius: 2px; opacity: .3;
+}
+
+.mo { position: relative; padding-bottom: 18px; }
+
+.mo__badge {
+  position: absolute; left: -54px; top: 4px;
+  width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-content: center; text-align: center;
+  background: var(--green-800); color: #fff;
+  box-shadow: 0 5px 14px rgba(5, 42, 23, .28);
+  /* 出てくる前 */
+  transform: scale(0);
+}
+.mo__badge b { font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 19px; line-height: 1; }
+.mo__badge span { font-size: 10px; line-height: 1.2; opacity: .8; }
+
+.mo__card {
+  background: #fff; border: 1px solid var(--card-line); border-radius: 16px;
+  padding: 16px 18px; box-shadow: var(--card-lift);
+  /* 出てくる前 */
+  opacity: 0; transform: translateY(16px) scale(.94);
+}
+.mo__what { font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 20px; color: var(--green-800); line-height: 1.5; }
+.mo__note { margin-top: 4px; font-size: 14.5px; line-height: 1.85; color: var(--ink-3); }
+
+/* 特別な回は色を変えて目を引く */
+.mo--special .mo__badge { background: var(--orange-500); }
+.mo--special .mo__card { background: #FFF7EC; border-color: rgba(224, 122, 5, .34); }
+.mo--special .mo__what { color: var(--gold-ink); }
+
+/* 出てくる動き。行きすぎてから戻る「ポコッ」を、ばね状の曲線でつくる */
+.mo.is-in .mo__badge {
+  animation: pop .52s cubic-bezier(.34, 1.56, .64, 1) forwards;
+}
+.mo.is-in .mo__card {
+  animation: rise .58s cubic-bezier(.34, 1.42, .64, 1) .08s forwards;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0) rotate(-18deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes rise {
+  0%   { opacity: 0; transform: translateY(16px) scale(.94); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* 動きを減らす設定のときは、はじめから出しておく */
+@media (prefers-reduced-motion: reduce) {
+  .mo__badge { transform: none; }
+  .mo__card { opacity: 1; transform: none; }
+  .mo.is-in .mo__badge, .mo.is-in .mo__card { animation: none; }
+}
+
+/* JavaScript が動かないときも読めるようにしておく */
+.no-js .mo__badge { transform: none; }
+.no-js .mo__card { opacity: 1; transform: none; }
+
+.year__foot {
+  margin: 26px 22px 0; padding: 18px 20px;
+  background: var(--paper-2); border-radius: 14px;
+  font-size: 14.5px; line-height: 1.9; color: var(--ink-3);
+}

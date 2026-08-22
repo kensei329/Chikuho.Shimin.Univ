@@ -1,0 +1,267 @@
+@charset "utf-8";
+
+/* =========================================================================
+   筑豊市民大学 — 共通スタイル
+
+   スマートフォンの画面だけを作っている。本文は 520px 幅の縦長の柱を
+   基準に組み、PC で開いたときはその柱を画面の中央に置く。
+   ここで面倒を見るのは
+     1) 色と寸法の決めごと
+     2) 上に固定するヘッダー
+     3) 下に固定するタブバー
+     4) どのページでも使う小さな部品
+   の 4 つ。リールとストーリーの見た目は reel.css / story.css にある。
+   ========================================================================= */
+
+:root {
+  --header-h: 61px;   /* 上に固定するヘッダーの高さ */
+  /* 下に固定するタブバーの高さ。iPhone の下端の安全域も含める。
+     リールとストーリーはこの値で下を留めるので、実寸とずれると隠れる。 */
+  --nav-h: calc(78px + env(safe-area-inset-bottom));
+  --column: 520px;    /* 本文の柱の最大幅 */
+
+  /* ロゴから採った色。深緑・緑・オレンジの三色でできている */
+  --green-900: #02240F;
+  --green-800: #033D20;
+  --green-700: #0A4A28;
+  --green-600: #1E6B27;
+  --green-500: #3D8A2A;
+  --orange-500:#E07A05;
+  --orange-400:#F0921C;
+  --orange-300:#F4AC4E;
+
+  --paper:   #F1F2EA;
+  --paper-2: #E7EADF;
+  --paper-3: #DCE2D3;
+
+  /* 明るい面の上に置く文字。いちばん明るい地でも WCAG AA を満たす濃さ */
+  --ink:   #10200F;   /* 見出しと数字 */
+  --ink-2: #2C3D2A;   /* 本文 */
+  --ink-3: #4A5A46;   /* 添え書き */
+  --ink-4: #56664F;   /* 注記・出典 */
+
+  /* 明るい地の上でオレンジをそのまま置くと読めない。文字として置く用 */
+  --gold-ink:  #6B3602;
+  --gold-pale: #FAE2BE;
+
+  --card:      rgba(255, 255, 255, .88);
+  --card-line: rgba(5, 42, 23, .10);
+  --card-lift: 0 6px 18px rgba(5, 42, 23, .12);
+  --halo:      0 1px 10px rgba(255, 255, 255, .9);
+
+  /* 写真の上に直接置く文字の縁取り。白だけでは明るい地に溶けるので、
+     外側にごく薄い影を重ねて、暗い地でも明るい地でも輪郭が立つようにする */
+  --edge: 0 0 4px rgba(255, 255, 255, .95),
+          0 1px 2px rgba(4, 36, 20, .45),
+          0 0 10px rgba(4, 36, 20, .26);
+
+  /* 会員は 70 代が中心。本文は小さくしない */
+  --body-size: 17px;
+  --body-lead: 1.95;
+}
+
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+html {
+  background: var(--green-900);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', system-ui, sans-serif;
+  font-size: var(--body-size);
+  line-height: var(--body-lead);
+  color: var(--ink-2);
+  background: var(--green-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: 'Shippori Mincho B1', serif; line-height: 1.45; margin: 0; }
+p { margin: 0; }
+img { max-width: 100%; }
+a { color: var(--gold-ink); }
+
+/* 柱。ここから外は PC で見たときの余白になる */
+.column {
+  max-width: var(--column);
+  margin: 0 auto;
+  background: var(--paper);
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-shadow: 0 0 60px rgba(0, 0, 0, .45);
+  position: relative;
+}
+
+/* 読み上げ用に置くが、目には見せない */
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.skip { position: absolute; left: -9999px; z-index: 200; }
+.skip:focus { left: 16px; top: 12px; background: #fff; color: var(--green-800);
+              padding: 12px 18px; border-radius: 6px; font-weight: 700; }
+
+:focus-visible { outline: 3px solid var(--orange-400); outline-offset: 3px; }
+
+/* =========================================================================
+   ヘッダー — ロゴと団体名だけ
+   ========================================================================= */
+
+.head {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--column);
+  height: var(--header-h);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 16px;
+  background: rgba(241, 242, 234, .95);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(5, 42, 23, .12);
+}
+
+.head__home { display: flex; align-items: center; gap: 11px; text-decoration: none; min-width: 0; }
+.head__mark { width: 44px; height: auto; flex: none; }
+.head__name {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: .07em;
+  color: var(--green-800);
+  white-space: nowrap;
+}
+
+/* ヘッダーは固定なので、本文の頭をその分だけ下げる */
+.page { padding-top: var(--header-h); padding-bottom: var(--nav-h); }
+
+/* =========================================================================
+   タブバー — 活動 / 理念 / ホーム / 分科会 / 年間予定
+   ========================================================================= */
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--column);
+  z-index: 95;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  padding: 10px 4px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(3, 61, 32, .97);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(240, 146, 28, .45);
+  box-shadow: 0 -8px 26px rgba(2, 36, 15, .34);
+}
+
+.nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 2px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #C3D6BE;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  background-color: transparent;
+  touch-action: manipulation;
+  /* ここは「離したあと」の戻り方。押した瞬間は下で 0s に上書きする */
+  transition: transform .26s cubic-bezier(.2, .8, .3, 1),
+              background-color .3s ease, color .2s ease;
+}
+
+.nav__link svg { flex: none; }
+/* 現在地の下線は、色だけを付け外しする。線そのものを出し入れすると、
+   そのぶんバーの高さがページごとに変わってしまう。 */
+.nav__label { white-space: nowrap; border-bottom: 2px solid transparent; padding-bottom: 2px; }
+
+.nav__link.is-active { color: var(--orange-300); }
+.nav__link.is-active .nav__label { border-bottom-color: var(--orange-300); }
+
+/* 押した手応え。押した瞬間は間を置かずに沈ませ、離したあとだけ戻す。
+   is-pressed は site.js が付け外しする（iOS の Safari は <a> の :active が
+   効かないことがあるため、CSS だけに頼らない）。 */
+.nav__link.is-pressed, .nav__link:active {
+  transform: scale(.92);
+  background-color: rgba(255, 255, 255, .14);
+  transition-duration: 0s;
+}
+
+@media (hover: hover) {
+  .nav__link:hover { color: #fff; background-color: rgba(255, 255, 255, .08); }
+  .nav__link.is-active:hover { color: var(--orange-300); }
+}
+
+/* 中央のホームだけ一段せり上げる */
+.nav__link--center { margin-top: -30px; gap: 6px; }
+.nav__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--green-700);
+  border: 3px solid rgba(255, 255, 255, .88);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .38);
+  transition: transform .26s cubic-bezier(.2, .8, .3, 1), box-shadow .26s ease, background .3s ease;
+}
+.nav__link--center.is-active .nav__badge {
+  background: linear-gradient(160deg, var(--orange-400), var(--orange-500));
+}
+.nav__link--center.is-active .nav__label { border-bottom-color: transparent; }
+/* 中央だけは丸ごと縮めず、円が沈み込むように見せる */
+.nav__link--center.is-pressed, .nav__link--center:active {
+  transform: none; background-color: transparent;
+}
+.nav__link--center.is-pressed .nav__badge, .nav__link--center:active .nav__badge {
+  transform: translateY(3px) scale(.94);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .42);
+  transition-duration: 0s;
+}
+
+@media (max-width: 359px) { .nav__link { font-size: 10.5px; } }
+
+/* =========================================================================
+   どのページでも使う小さな部品
+   ========================================================================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 14px 26px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .16s ease, background .2s ease;
+}
+.btn--primary { background: var(--green-800); color: #fff; }
+.btn--primary:hover, .btn--primary:focus-visible { background: var(--green-600); transform: translateY(-2px); }
+.btn--orange { background: var(--orange-500); color: #fff; }
+.btn--orange:hover, .btn--orange:focus-visible { background: var(--orange-400); transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important; }
+}

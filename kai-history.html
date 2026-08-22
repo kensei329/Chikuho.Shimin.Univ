@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>歴史をたどる会｜筑豊市民大学</title>
+<meta name="description" content="筑豊市民大学の歴史をたどる会。第1日曜 9:30 – 11:30。福岡県と筑豊の郷土史を、深く学びます。">
+<meta name="theme-color" content="#033D20">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<link rel="canonical" href="https://chikuho-shimin-univ.vercel.app/kai-history.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="筑豊市民大学">
+<meta property="og:title" content="歴史をたどる会｜筑豊市民大学">
+<meta property="og:description" content="筑豊市民大学の歴史をたどる会。第1日曜 9:30 – 11:30。福岡県と筑豊の郷土史を、深く学びます。">
+<meta property="og:url" content="https://chikuho-shimin-univ.vercel.app/kai-history.html">
+<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/logo.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon-96.png" sizes="any">
+<link rel="apple-touch-icon" href="/favicon-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 書体は Google から取り寄せている。描画待ちに入れると、向こうが遅い回線では
+     そのあいだ真っ白になる。media="print" で取り寄せだけ先に始め、届いた時点で
+     本文へ適用する。JavaScript が無い環境には noscript の控えを置く。 -->
+<link id="webfont" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/story.css">
+<link rel="stylesheet" href="css/page.css">
+<script>
+(function () {
+  var f = document.getElementById('webfont');
+  if (!f) return;
+  var on = function () { f.media = 'all'; };
+  if (f.sheet) on(); else f.addEventListener('load', on);
+})();
+</script>
+<script src="js/site.js" defer></script>
+<script src="js/story.js" defer></script>
+</head>
+<body data-page="kai" data-kai="history" data-kai-name="歴史をたどる会">
+<div class="column">
+<a class="skip" href="#main">本文へ移動</a>
+
+<header class="head">
+  <a class="head__home" href="index.html" aria-label="ホームへ">
+    <img class="head__mark" src="logo-mark.png" alt="" width="44" height="32" decoding="async" fetchpriority="high">
+    <span class="head__name">筑豊市民大学</span>
+  </a>
+</header>
+
+  <section class="story" id="story" aria-label="歴史をたどる会">
+
+    <!-- 上のゲージ。枚数ぶんに割れる -->
+    <div class="story__bars" aria-hidden="true">
+      <div class="story__bar"><i></i></div>
+      <div class="story__bar"><i></i></div>
+      <div class="story__bar"><i></i></div>
+    </div>
+
+    <div class="story__head">
+      <img class="story__face" src="logo-mark.png" alt="" width="30" height="22" decoding="async">
+      <span class="story__name">筑豊市民大学</span>
+      <span class="story__time">第1日曜</span>
+      <span class="story__sect" id="storySect"></span>
+      <button type="button" class="story__pause" id="storyPause" aria-pressed="false" aria-label="自動送りを止める">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5v14M15 5v14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="story__track" id="storyTrack">
+
+      <article class="slide" id="history1" data-sect="歴史をたどる会">
+        <div class="slide__photo" style="background-image:linear-gradient(168deg,#E4ECD8 0%,#F2F5EA 52%,#DCE7CE 100%)"></div>
+        <div class="slide__body">
+          <p class="slide__eyebrow">分科会 01</p>
+          <h1 class="slide__h">歴史をたどる会</h1>
+          <p class="slide__big"><b>9:30<i>– 11:30</i></b><span>毎月 第1日曜</span></p>
+          <p class="slide__lead">9:30 – 11:30</p>
+        </div>
+      </article>
+
+      <article class="slide" id="history2" data-sect="歴史をたどる会">
+        <div class="slide__photo" style="background-image:linear-gradient(168deg,#E4ECD8 0%,#F2F5EA 52%,#DCE7CE 100%)"></div>
+        <div class="slide__body">
+          <p class="slide__eyebrow">どんな会か</p>
+          <h2 class="slide__h slide__h--sans">福岡県と筑豊の郷土史を、深く学びます。</h2>
+          <p class="slide__lead">香春の銅の産出や採銅所の来歴など、いま自分が立っている土地がどうつくられてきたのかを、一つずつたどっていきます。</p>
+        </div>
+      </article>
+
+      <article class="slide" id="history3" data-sect="歴史をたどる会">
+        <div class="slide__photo" style="background-image:linear-gradient(168deg,#E4ECD8 0%,#F2F5EA 52%,#DCE7CE 100%)"></div>
+        <div class="slide__body">
+          <p class="slide__eyebrow">お申し込み</p>
+          <h2 class="slide__h">まず、聞きにきてください。</h2>
+          <p class="slide__lead">見学だけでも歓迎します。お申し込みとお問い合わせは、フォームで承ります。</p>
+          <nav class="slide__go" aria-label="お申し込み">
+            <a class="slide__goBtn" href="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/viewform" target="_blank" rel="noopener">お申し込みはこちらから<span aria-hidden="true">›</span></a>
+            <a class="slide__goBtn slide__goBtn--sub" href="bunkakai.html">ほかの会を見る<span aria-hidden="true">›</span></a>
+          </nav>
+        </div>
+      </article>
+
+    </div>
+
+    <button type="button" class="story__sr" id="storyPrevSr">前のストーリーへ</button>
+    <button type="button" class="story__sr" id="storyNextSr">次のストーリーへ</button>
+
+    <!-- 下の帯。実際に届く先が無い入力欄は置かず、申し込みフォームへ通す -->
+    <div class="story__foot">
+      <a class="story__msg story__msgGo" href="https://docs.google.com/forms/d/e/1FAIpQLSf4ndb0q_DS74N1hV--7RFzZG_3PwCfU23aEpLBHUWar4KGtw/viewform" target="_blank" rel="noopener">
+        <span>お申し込み・お問い合わせ</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <button type="button" class="story__act" id="storyHeart" aria-pressed="false" aria-label="いいねする">
+        <span class="tip" aria-hidden="true">ありがとうございます！</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20.6 4.3 13a4.7 4.7 0 0 1 6.6-6.6l1.1 1.1 1.1-1.1A4.7 4.7 0 0 1 19.7 13z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="story__act" id="storyShare" aria-label="共有する">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21.5 3.2 2.8 10.1l6.5 2.3 2.3 6.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M21.5 3.2 9.3 12.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+    </div>
+
+    <!-- 開いた直後だけ出る案内。ストーリーであること・横に送れることを伝える -->
+    <div class="storyGuide" id="storyGuide" aria-hidden="true">
+      <span class="storyGuide__badge">ストーリー</span>
+      <div class="storyGuide__row">
+        <span class="storyGuide__arrow storyGuide__arrow--l">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="storyGuide__pill">横にスワイプ</span>
+        <span class="storyGuide__arrow storyGuide__arrow--r">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <span class="storyGuide__note">画面の右・左をタップしても送れます</span>
+    </div>
+  </section>
+
+  <button type="button" class="story__side story__side--prev" id="storySidePrev" aria-label="前のストーリーへ">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button type="button" class="story__side story__side--next" id="storySideNext" aria-label="次のストーリーへ">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+<nav class="nav" aria-label="サイト内メニュー">
+  <a class="nav__link" href="katsudo.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.4 12a8.6 8.6 0 1 0 2.5-6.1"/><path d="M3.1 4.2v4.1h4.1"/><path d="M12 7.7V12l3 1.8"/></svg><span class="nav__label">活動</span></a>
+  <a class="nav__link" href="rinen.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4v-7.6"/><path d="M12 12.8C12 9.4 9.4 6.8 6 6.8c0 3.4 2.6 6 6 6Z"/><path d="M12 12.8c0-4 3-7 7-7 0 4-3 7-7 7Z"/></svg><span class="nav__label">理念</span></a>
+  <a class="nav__link nav__link--center" href="index.html"><span class="nav__badge"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M5.9 9.7V20h12.2V9.7"/><path d="M10 20v-4.7h4V20"/></svg></span><span class="nav__label">ホーム</span></a>
+  <a class="nav__link is-active" href="bunkakai.html" aria-current="page"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.1" cy="8.5" r="2.9"/><path d="M3.5 19.1a5.6 5.6 0 0 1 11.2 0"/><path d="M16.3 6.3a2.7 2.7 0 0 1 0 5.2"/><path d="M17.5 13.7a5 5 0 0 1 3.1 4.6"/></svg><span class="nav__label">分科会</span></a>
+  <a class="nav__link" href="nenkan.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="5" width="17.2" height="15.6" rx="2.4"/><path d="M3.4 9.8h17.2"/><path d="M8.2 3.2v3.4"/><path d="M15.8 3.2v3.4"/><path d="M7.6 13.6h3"/><path d="M7.6 17h6.8"/></svg><span class="nav__label">年間予定</span></a>
+</nav>
+</div>
+</body>
+</html>

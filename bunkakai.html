@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>分科会｜筑豊市民大学</title>
+<meta name="description" content="筑豊市民大学の四つの会。歴史をたどる会、ヘルシー、教養講座、低山。見たい会をえらぶと、活動の様子をストーリーでご覧いただけます。">
+<meta name="theme-color" content="#033D20">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<link rel="canonical" href="https://chikuho-shimin-univ.vercel.app/bunkakai.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="筑豊市民大学">
+<meta property="og:title" content="分科会｜筑豊市民大学">
+<meta property="og:description" content="筑豊市民大学の四つの会。歴史をたどる会、ヘルシー、教養講座、低山。見たい会をえらぶと、活動の様子をストーリーでご覧いただけます。">
+<meta property="og:url" content="https://chikuho-shimin-univ.vercel.app/bunkakai.html">
+<meta property="og:image" content="https://chikuho-shimin-univ.vercel.app/logo.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon-96.png" sizes="any">
+<link rel="apple-touch-icon" href="/favicon-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 書体は Google から取り寄せている。描画待ちに入れると、向こうが遅い回線では
+     そのあいだ真っ白になる。media="print" で取り寄せだけ先に始め、届いた時点で
+     本文へ適用する。JavaScript が無い環境には noscript の控えを置く。 -->
+<link id="webfont" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/page.css">
+<script>
+(function () {
+  var f = document.getElementById('webfont');
+  if (!f) return;
+  var on = function () { f.media = 'all'; };
+  if (f.sheet) on(); else f.addEventListener('load', on);
+})();
+</script>
+<script src="js/site.js" defer></script>
+</head>
+<body data-page="bunkakai">
+<div class="column">
+<a class="skip" href="#main">本文へ移動</a>
+
+<header class="head">
+  <a class="head__home" href="index.html" aria-label="ホームへ">
+    <img class="head__mark" src="logo-mark.png" alt="" width="44" height="32" decoding="async" fetchpriority="high">
+    <span class="head__name">筑豊市民大学</span>
+  </a>
+</header>
+
+<main class="page" id="main">
+  <section class="sect" style="border-top:0;padding-bottom:6px">
+    <p class="sect__eyebrow">分科会</p>
+    <h1 class="sect__h">どの会を、見ますか。</h1>
+    <p class="sect__text">四つの会があります。えらぶと、その会の様子をストーリーでご覧いただけます。</p>
+  </section>
+
+  <nav class="kaiPick" aria-label="四つの会">
+    <a class="kaiPick__item" href="kai-history.html">
+      <span class="kaiPick__no">分科会 01</span>
+      <span class="kaiPick__name">歴史をたどる会</span>
+      <span class="kaiPick__when">第1日曜 ／ 9:30 – 11:30</span>
+      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+    </a>
+    <a class="kaiPick__item" href="kai-healthy.html">
+      <span class="kaiPick__no">分科会 02</span>
+      <span class="kaiPick__name">ヘルシー</span>
+      <span class="kaiPick__when">第1日曜 ／ 13:00 – 15:00</span>
+      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+    </a>
+    <a class="kaiPick__item" href="kai-kyoyo.html">
+      <span class="kaiPick__no">分科会 03</span>
+      <span class="kaiPick__name">教養講座</span>
+      <span class="kaiPick__when">第3日曜 ／ 13:30 – 15:30</span>
+      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+    </a>
+    <a class="kaiPick__item" href="kai-teizan.html">
+      <span class="kaiPick__no">分科会 04</span>
+      <span class="kaiPick__name">低山</span>
+      <span class="kaiPick__when">第4日曜 ／ 8:30 集合 ／ 13:00 頃 解散</span>
+      <span class="kaiPick__go" aria-hidden="true">見る ›</span>
+    </a>
+  </nav>
+
+  <section class="sect sect--tint">
+    <p class="sect__text">受けたい会は、いくつでも組み合わせられます。年会費は1講座1万円から、4講座で19,000円が上限です。</p>
+    <a class="btn btn--primary sect__btn" href="index.html#fee">年会費を確かめる<span aria-hidden="true">›</span></a>
+  </section>
+
+  <p class="foot">© 筑豊市民大学</p>
+</main>
+<nav class="nav" aria-label="サイト内メニュー">
+  <a class="nav__link" href="katsudo.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.4 12a8.6 8.6 0 1 0 2.5-6.1"/><path d="M3.1 4.2v4.1h4.1"/><path d="M12 7.7V12l3 1.8"/></svg><span class="nav__label">活動</span></a>
+  <a class="nav__link" href="rinen.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4v-7.6"/><path d="M12 12.8C12 9.4 9.4 6.8 6 6.8c0 3.4 2.6 6 6 6Z"/><path d="M12 12.8c0-4 3-7 7-7 0 4-3 7-7 7Z"/></svg><span class="nav__label">理念</span></a>
+  <a class="nav__link nav__link--center" href="index.html"><span class="nav__badge"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M5.9 9.7V20h12.2V9.7"/><path d="M10 20v-4.7h4V20"/></svg></span><span class="nav__label">ホーム</span></a>
+  <a class="nav__link is-active" href="bunkakai.html" aria-current="page"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.1" cy="8.5" r="2.9"/><path d="M3.5 19.1a5.6 5.6 0 0 1 11.2 0"/><path d="M16.3 6.3a2.7 2.7 0 0 1 0 5.2"/><path d="M17.5 13.7a5 5 0 0 1 3.1 4.6"/></svg><span class="nav__label">分科会</span></a>
+  <a class="nav__link" href="nenkan.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="5" width="17.2" height="15.6" rx="2.4"/><path d="M3.4 9.8h17.2"/><path d="M8.2 3.2v3.4"/><path d="M15.8 3.2v3.4"/><path d="M7.6 13.6h3"/><path d="M7.6 17h6.8"/></svg><span class="nav__label">年間予定</span></a>
+</nav>
+</div>
+</body>
+</html>
