@@ -112,39 +112,32 @@
   <section class="sect" id="tsuki">
     <p class="sect__eyebrow">ひと月の暦</p>
     <h2 class="sect__h">日曜日が、学びの日。</h2>
+    <!-- 日にちは月ごとに変わる。ここでは時間帯と回数だけを示し、
+         実際の日付は年間予定のページに任せる。 -->
     <ol class="cal">
       <li class="cal__day">
-        <p class="cal__when">第1日曜</p>
-        <div class="cal__items">
-          <a class="cal__item" href="kai-history.html">
-            <span class="cal__time">9:30 – 11:30</span>
-            <span class="cal__name">歴史をたどる会</span>
-          </a>
-          <a class="cal__item" href="kai-healthy.html">
-            <span class="cal__time">13:00 – 15:00</span>
-            <span class="cal__name">ヘルシー</span>
-          </a>
-        </div>
-      </li>
-      <li class="cal__day">
-        <p class="cal__when">第3日曜</p>
+        <p class="cal__when">月に一度、日曜日を中心に</p>
         <div class="cal__items">
           <a class="cal__item" href="kai-kyoyo.html">
-            <span class="cal__time">13:30 – 15:30</span>
+            <span class="cal__time">13:30 – 15:30 ／ 全8回</span>
             <span class="cal__name">教養講座</span>
           </a>
-        </div>
-      </li>
-      <li class="cal__day">
-        <p class="cal__when">第4日曜</p>
-        <div class="cal__items">
+          <a class="cal__item" href="kai-healthy.html">
+            <span class="cal__time">13:30 – 15:30 ／ 全8回</span>
+            <span class="cal__name">ヘルシーエイジング</span>
+          </a>
           <a class="cal__item" href="kai-teizan.html">
-            <span class="cal__time">8:30 集合 ／ 13:00 頃 解散</span>
-            <span class="cal__name">登山</span>
+            <span class="cal__time">8:30 集合 ／ 全9回</span>
+            <span class="cal__name">低山に登ろう</span>
+          </a>
+          <a class="cal__item" href="kai-history.html">
+            <span class="cal__time">10:00 – 12:00 ／ 全9回</span>
+            <span class="cal__name">歴史を辿る会</span>
           </a>
         </div>
       </li>
     </ol>
+    <p class="cal__note">日にちは月によって変わります。<a href="nenkan.html">年間予定でくわしく見る ›</a></p>
     <a class="btn btn--primary sect__btn" href="bunkakai.html">四つの会をくわしく見る<span aria-hidden="true">›</span></a>
   </section>
 
@@ -226,26 +219,29 @@
 
       <fieldset class="jf">
         <legend class="jf__label">入会を希望する会<span class="jf__req">必須</span></legend>
+        <!-- value は Google フォームの選択肢と一字一句そろえてある。
+             表に出る名前だけをそろえた呼び名にしてあり、value は触らない
+             （フォームに無い字を送ると、その送信はまるごと弾かれる）。 -->
         <div class="jf__picks">
           <label class="pick">
             <input type="checkbox" name="entry.939298798" value="歴史をたどる会">
             <span class="pick__box" aria-hidden="true"></span>
-            <span class="pick__text"><b>歴史をたどる会</b><em>第1日曜 9:30 – 11:30</em></span>
+            <span class="pick__text"><b>歴史を辿る会</b><em>全9回 ／ 10:00 – 12:00</em></span>
           </label>
           <label class="pick">
             <input type="checkbox" name="entry.939298798" value="ヘルシー健康講座">
             <span class="pick__box" aria-hidden="true"></span>
-            <span class="pick__text"><b>ヘルシー健康講座</b><em>第1日曜 13:00 – 15:00</em></span>
+            <span class="pick__text"><b>ヘルシーエイジング</b><em>全8回 ／ 13:30 – 15:30</em></span>
           </label>
           <label class="pick">
             <input type="checkbox" name="entry.939298798" value="教養講座">
             <span class="pick__box" aria-hidden="true"></span>
-            <span class="pick__text"><b>教養講座</b><em>第3日曜 13:30 – 15:30</em></span>
+            <span class="pick__text"><b>教養講座</b><em>全8回 ／ 13:30 – 15:30</em></span>
           </label>
           <label class="pick">
             <input type="checkbox" name="entry.939298798" value="低山山登り">
             <span class="pick__box" aria-hidden="true"></span>
-            <span class="pick__text"><b>低山山登り</b><em>第4日曜 8:30 集合</em></span>
+            <span class="pick__text"><b>低山に登ろう</b><em>全9回 ／ 8:30 集合</em></span>
           </label>
         </div>
         <!-- フォームがチェックボックスに必ず添えている連れ。無くても通るが、そろえておく -->

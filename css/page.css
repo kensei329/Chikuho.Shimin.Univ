@@ -543,3 +543,83 @@
   background: var(--paper-2); border-radius: 14px;
   font-size: 14.5px; line-height: 1.9; color: var(--ink-3);
 }
+
+/* --- 月ごとの中身 --------------------------------------------------------
+   分科会は月に3〜4回ある。日付・会・内容を1行にまとめて並べる。
+   会員は70代が中心なので、日付は大きめに、会の名前は色の札で見分ける。 */
+
+.mo__list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+
+.mo__row {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(10, 61, 32, .16);
+}
+.mo__list > li:first-child .mo__row { padding-top: 0; border-top: none; }
+
+/* 日付。曜日は紙の予定表と同じで、日曜と祝日は赤、土曜は青 */
+.mo__d { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.mo__d b {
+  font-family: 'Shippori Mincho B1', serif; font-weight: 800;
+  font-size: 23px; line-height: 1; color: var(--green-800);
+}
+.mo__d em {
+  font-style: normal; font-size: 11px; font-weight: 800; line-height: 1;
+  color: #fff; background: var(--ink-3); border-radius: 999px; padding: 3px 7px;
+}
+.mo__d em.is-sun { background: #b4453a; }
+.mo__d em.is-sat { background: #2a5b8c; }
+
+.mo__body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; }
+
+/* 会の名前の札。会ごとに色を変えて、ひと目で見分けられるようにする */
+.mo__kai {
+  padding: 3px 9px; border-radius: 999px;
+  font-size: 12px; font-weight: 800; letter-spacing: .02em; white-space: nowrap;
+}
+.mo__kai--kyoyo   { color: #24486b; background: #e4edf5; border: 1px solid rgba(36, 72, 107, .3); }
+.mo__kai--healthy { color: #a2452c; background: #fbe8de; border: 1px solid rgba(162, 69, 44, .3); }
+.mo__kai--teizan  { color: #2c5b3a; background: #dff0d8; border: 1px solid rgba(44, 91, 58, .3); }
+.mo__kai--history { color: #6b3602; background: #f6e9cf; border: 1px solid rgba(107, 54, 2, .3); }
+
+.mo__t { font-size: 12.5px; font-weight: 700; color: var(--gold-ink); white-space: nowrap; }
+
+.mo__topic {
+  flex-basis: 100%;
+  font-size: 15px; font-weight: 700; line-height: 1.65; color: var(--ink-2);
+}
+.mo__topic small { display: block; font-size: 13px; font-weight: 600; color: var(--ink-3); }
+
+/* 開講式・公開講演会・閉講式は、月の頭に大きく置く */
+.mo__big {
+  margin-top: 10px; padding: 13px 15px;
+  background: #fff; border: 1px solid rgba(224, 122, 5, .34); border-radius: 12px;
+}
+.mo__big p { margin: 0; }
+.mo__bigWhen { font-size: 15px; font-weight: 800; color: var(--gold-ink); }
+.mo__bigTitle {
+  margin-top: 6px; font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800; font-size: 17px; line-height: 1.6; color: var(--green-800);
+}
+.mo__bigWho { margin-top: 6px; font-size: 13.5px; font-weight: 700; line-height: 1.7; color: var(--ink-3); }
+
+/* 各会の詳しい日程へ */
+.yearGo { display: grid; gap: 8px; margin: 22px 22px 0; }
+.yearGo__btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 48px; padding: 11px 18px; border-radius: 999px;
+  background: var(--green-800); color: #fff;
+  font-size: 15.5px; font-weight: 800; letter-spacing: .02em; text-decoration: none;
+  box-shadow: 0 4px 14px rgba(5, 42, 23, .2);
+}
+.yearGo__btn span { opacity: .72; font-weight: 700; }
+.yearGo__btn:active { transform: translateY(2px); }
+
+/* 暦の下に置く但し書き。日にちは月ごとに変わるので、年間予定へ通す */
+.cal__note {
+  margin-top: 12px; font-size: 14.5px; line-height: 1.9; color: var(--ink-3);
+}
+.cal__note a { font-weight: 800; color: var(--green-800); }

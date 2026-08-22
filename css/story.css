@@ -1241,3 +1241,205 @@ body[data-page="kai"] {
     rgba(255, 255, 255, .36) 76%,
     rgba(255, 255, 255, .80) 100%);
 }
+
+/* =========================================================================
+   各回のストーリーカード
+   =========================================================================
+   分科会は年に8〜9回。その1回ぶんを1枚にして、横に送ると次の回が出てくる。
+   絵は外から借りず、回の中身に合わせて描き起こしたものを埋め込んである
+   （svg なので拡大しても粗れず、取り寄せる時間もかからない）。
+
+   上に絵、下に紙のカード。会員は70代が中心なので、日付と講師は
+   大きめに、説明はそのあとに小さく置く。
+   ========================================================================= */
+
+/* 絵は上半分だけ。下は紙のカードのために空けておく */
+.slide--ses .slide__photo,
+.slide--top .slide__photo { bottom: auto; height: 46%; }
+.ses__art .ses__svg { display: block; width: 100%; height: 100%; }
+
+/* 絵の下ぶちを、ストーリーの地色へ溶かす */
+.slide--ses .slide__photo::after,
+.slide--top .slide__photo::after,
+.slide .slide__photo:has(.ses__svg)::after {
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, .30) 0%,
+    rgba(255, 255, 255, .04) 38%,
+    rgba(238, 242, 233, .55) 82%,
+    #eef2e9 100%);
+}
+
+/* カードは下に寄せる。絵とのあいだが空くぶんは地色で受ける */
+.slide--ses .slide__body { justify-content: flex-end; }
+
+.ses__card {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 1.2vh, 9px);
+  padding: clamp(15px, 4vw, 21px);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid rgba(10, 61, 32, .11);
+  box-shadow: 0 14px 34px rgba(5, 42, 23, .15);
+}
+
+/* 何回目か、と、その回の但し書き */
+.ses__no {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: var(--gold-ink);
+}
+
+.ses__tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: #24486b;
+  background: #e4edf5;
+  border: 1px solid rgba(36, 72, 107, .3);
+}
+.ses__tag--go   { color: #0a3d20; background: #dfeedd; border-color: rgba(10, 61, 32, .3); }
+.ses__tag--warn { color: #7a3a06; background: #fbe7cb; border-color: rgba(122, 58, 6, .32); }
+
+/* 日付。ここがいちばん見たいところなので、大きく取る */
+.ses__when {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ses__when b {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(30px, 8.8vw, 40px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.ses__when b i {
+  font-style: normal;
+  font-size: .44em;
+  font-weight: 700;
+  color: var(--ink-3);
+  margin: 0 .08em 0 .04em;
+}
+
+/* 曜日。日曜と祝日は赤、土曜は青。紙の予定表と同じ約束ごとにしておく */
+.ses__dow {
+  font-style: normal;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #fff;
+  background: var(--ink-3);
+}
+.ses__dow.is-sun { background: #b4453a; }
+.ses__dow.is-sat { background: #2a5b8c; }
+
+.ses__yr { font-size: 12.5px; font-weight: 700; color: var(--ink-3); }
+
+.ses__time {
+  margin: 0;
+  font-size: clamp(14.5px, 4vw, 16px);
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: var(--gold-ink);
+}
+
+.ses__topic {
+  margin: 0;
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(19px, 5.3vw, 24px);
+  font-weight: 800;
+  line-height: 1.46;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.ses__sub {
+  margin: 0;
+  font-size: clamp(13.5px, 3.6vw, 15px);
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--gold-ink);
+}
+
+.ses__note {
+  margin: 0;
+  font-size: clamp(13.5px, 3.6vw, 15px);
+  font-weight: 600;
+  line-height: 1.78;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* 講師。線で区切って、名前を大きく */
+.ses__who {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: clamp(7px, 1.5vh, 10px);
+  border-top: 1px dashed rgba(10, 61, 32, .24);
+}
+
+.ses__who > span {
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: #fff;
+  background: var(--gold-ink);
+}
+
+.ses__who b { font-size: clamp(15.5px, 4.3vw, 17px); font-weight: 900; color: var(--ink); }
+
+.ses__who em {
+  flex-basis: 100%;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/* 会の紹介スライドに置くときは、カードの中ではないので枠だけ整える */
+.ses__who--flat {
+  border-top: none;
+  padding: 10px 13px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .8);
+  border: 1px solid rgba(10, 61, 32, .13);
+}
+
+/* 画面が低い端末では、絵をすこし詰めてカードの居場所をつくる */
+@media (max-height: 660px) {
+  .slide--ses .slide__photo, .slide--top .slide__photo { height: 38%; }
+  .ses__card { gap: 4px; padding: 13px 15px; border-radius: 16px; }
+  .ses__note { display: none; }
+}
+
+/* 動きを減らす設定では、カードのふわりも省く */
+.slide[aria-hidden="false"] .ses__card {
+  animation: cardIn .5s cubic-bezier(.2, .8, .3, 1) .04s both;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide[aria-hidden="false"] .ses__card { animation: none; }
+}
