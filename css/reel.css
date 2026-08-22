@@ -1301,3 +1301,90 @@ body[data-page="katsudo"] {
   .card__lead { -webkit-line-clamp: 2; }
   .card__note { display: none; }
 }
+
+/* ── これからお招きする方の、日時と演題 ─────────────────────────────
+   まだ先の話なので、いつ・何を・誰が、の三つだけを表に出す。
+   下の申し込みボタンと縦に続けて読めるよう、行間は詰めすぎない。 */
+
+.card__when {
+  margin: clamp(6px, 1.4vh, 12px) 0 0;
+  padding: clamp(9px, 1.5vh, 13px) 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(255, 255, 255, .93);
+  border: 1.5px solid rgba(10, 61, 32, .16);
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(5, 42, 23, .12);
+}
+
+.card__when__row { display: flex; gap: 10px; align-items: baseline; }
+
+.card__when dt {
+  flex: none;
+  width: 3.2em;
+  font-size: max(13.5px, .82em);
+  font-weight: 900;
+  color: var(--ink-3);
+}
+
+.card__when dd {
+  margin: 0;
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 800;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* 低い画面では、余白と見出しの幅だけを詰める。文字は 10pt を割らせない */
+@media (max-height: 780px) {
+  .card__when { gap: 3px; padding: 8px 12px; }
+  .card__when dt { width: 3em; }
+  .card__when dd { line-height: 1.45; }
+}
+
+/* ── 要約は、途中で切らない ───────────────────────────────────────
+   低い画面では行数を絞っていたが、「…」で終わって続きが読めない、
+   という声があった。文字を短くしたので絞る必要がなくなった。
+   万一あふれても最後の一行が欠けないよう、行数の制限は外す。 */
+
+.card__lead {
+  display: block;
+  -webkit-line-clamp: none;
+  overflow: visible;
+}
+
+@media (max-height: 780px) {
+  .card__lead { display: block; -webkit-line-clamp: none; overflow: visible; }
+}
+
+@media (max-height: 700px) {
+  .card__lead { display: block; -webkit-line-clamp: none; overflow: visible; }
+}
+
+@media (max-height: 620px) {
+  .card__lead { display: block; -webkit-line-clamp: none; overflow: visible; }
+}
+
+/* 低い画面では、これから来る方のカードだけ中身が多い。
+   見出し・要約・日時・ボタン二つは 568px の高さには入りきらない。
+   いちばん大事なのは日時と申し込みなので、要約を落として場所をつくる。
+   人物の話は解説のシートで読める。 */
+@media (max-height: 700px) {
+  .card:has(.card__when) .card__lead { display: none; }
+  .card:has(.card__when) .card__main { gap: 6px; }
+  .card__when { margin-top: 6px; }
+}
+
+@media (max-height: 620px) {
+  .card:has(.card__when) .card__h { font-size: clamp(16px, 4.6vw, 19px); }
+  .card__when { padding: 7px 11px; gap: 2px; }
+  .card__when dd { font-size: max(13.5px, .9em); line-height: 1.4; }
+  .card:has(.card__when) .card__go { gap: 6px; }
+}
+
+/* 320x568 のような画面では、講師の行を落とす。
+   誰が話すかは、上の名札（河野 功／JAXA 特任教授）に出ている。 */
+@media (max-height: 620px) {
+  .card__when__row--extra { display: none; }
+}
