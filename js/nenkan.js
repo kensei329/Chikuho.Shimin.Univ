@@ -33,4 +33,12 @@
   });
 
   months.forEach(function (el) { io.observe(el); });
+
+  /* サイトマップから「11月」のように月を指して開いたとき。
+     指した月まで一気に飛ぶので、その手前の月は一度も画面に入らない。
+     観察は画面に入ったときしか動かないので、そのままだと透明のまま
+     残ってしまう。指して開いたときだけ、全部出したうえで始める。 */
+  if (location.hash && document.querySelector(location.hash)) {
+    months.forEach(function (el) { el.classList.add('is-in'); io.unobserve(el); });
+  }
 })();
