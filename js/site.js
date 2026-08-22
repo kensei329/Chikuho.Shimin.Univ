@@ -66,3 +66,66 @@
     }, 1200);   // まず今のページを出し切ってから
   });
 })();
+
+/**
+ * 横の案内板（デスクトップ）— いま見ているところを光らせる
+ * ------------------------------------------------------------------------
+ * 左の帯には、活動の講師や年間予定の月へ飛ぶリンクが並んでいる。
+ * 押したときだけでなく、画面を送っているあいだも、いま読んでいるところが
+ * 光って移り変わるようにする。5月から6月へ入れば、帯の色もついてくる。
+ *
+ * 光らせ方は aria-current。ページそのものを示す aria-current="page" と
+ * 同じ見た目になるので、CSS は既にあるものがそのまま効く。
+ *
+ * 帯は幅 940px 以上でしか出さないが、DOM には常にある。リンクの飛び先が
+ * このページに無ければ何もしないので、携帯で読み込んでも害はない。
+ */
+(function () {
+  'use strict';
+
+  var tree = document.querySelector('.siteRail--left .tree');
+  if (!tree) return;
+
+  var here = location.pathname.split('/').pop() || 'index.html';
+
+  /* このページの中を指しているリンクだけを拾う */
+  var spots = [];
+  [].forEach.call(tree.querySelectorAll('a[href*="#"]'), function (a) {
+    var href = a.getAttribute('href') || '';
+    var cut = href.indexOf('#');
+    if ((href.slice(0, cut) || here) !== here) return;
+    var el = document.getElementById(href.slice(cut + 1));
+    if (el) spots.push({ a: a, el: el });
+  });
+  if (!spots.length) return;
+
+  /* 活動のカードは自前の帯（.reel）の中で送られる。ほかは画面ごと動く */
+  var reel = document.querySelector('.reel');
+  var head = document.querySelector('.head');
+  var now = null;
+
+  function look() {
+    /* ヘッダーの少し下を基準の線にして、そこを最後に越えたものを選ぶ */
+    var line = (head ? head.getBoundingClientRect().bottom : 0) + 24;
+    var pick = spots[0];
+    for (var i = 0; i < spots.length; i++) {
+      if (spots[i].el.getBoundingClientRect().top <= line) pick = spots[i];
+    }
+    if (pick === now) return;
+    if (now) now.a.removeAttribute('aria-current');
+    pick.a.setAttribute('aria-current', 'true');
+    now = pick;
+  }
+
+  var waiting = 0;
+  function onScroll() {
+    if (waiting) return;
+    waiting = requestAnimationFrame(function () { waiting = 0; look(); });
+  }
+
+  (reel || window).addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('hashchange', onScroll);
+  window.addEventListener('load', onScroll);
+  look();
+})();

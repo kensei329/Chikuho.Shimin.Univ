@@ -528,7 +528,9 @@
   border-radius: 2px; opacity: .3;
 }
 
-.mo { position: relative; padding-bottom: 18px; }
+/* 帯のリンクから飛んできたとき、固定ヘッダーに月の丸が隠れないようにする。
+   これが無いと #m5 は画面のてっぺんに合わせられ、ヘッダーの裏に入る。 */
+.mo { position: relative; padding-bottom: 18px; scroll-margin-top: calc(var(--header-h) + 12px); }
 
 .mo__badge {
   position: absolute; left: -54px; top: 4px;
