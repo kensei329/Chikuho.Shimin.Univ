@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://chikuho-shimin-univ.vercel.app/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/katsudo.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/rinen.html</loc><changefreq>yearly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/bunkakai.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/nenkan.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/kai-history.html</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/kai-healthy.html</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/kai-kyoyo.html</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://chikuho-shimin-univ.vercel.app/kai-teizan.html</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://chikuho.uk/</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://chikuho.uk/katsudo.html</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://chikuho.uk/rinen.html</loc><lastmod>2026-08-22</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://chikuho.uk/bunkakai.html</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://chikuho.uk/nenkan.html</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://chikuho.uk/kai-history.html</loc><lastmod>2026-08-22</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://chikuho.uk/kai-healthy.html</loc><lastmod>2026-08-22</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://chikuho.uk/kai-kyoyo.html</loc><lastmod>2026-08-22</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://chikuho.uk/kai-teizan.html</loc><lastmod>2026-08-22</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>
 </urlset>
