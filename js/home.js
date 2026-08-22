@@ -35,7 +35,6 @@
 
   var name  = document.getElementById('jf-name');
   var mail  = document.getElementById('jf-mail');
-  var mail2 = document.getElementById('jf-mail2');
   var tel   = document.getElementById('jf-tel');
   var agree  = document.getElementById('jf-agree');
   var agree2 = document.getElementById('jf-agree2');
@@ -159,8 +158,6 @@
     e.preventDefault();
     if (sending) return;
 
-    /* メールは、フォーム側の設問にも同じ値を送る */
-    mail2.value = mail.value.trim();
     syncAgree();
     paintFee();
 

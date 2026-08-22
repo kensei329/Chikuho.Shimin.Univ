@@ -3,8 +3,11 @@
  * ---------------------------------------------------------------------------
  * ブラウザから Google フォームへ直接投げる方式は、二つの点で行き詰まった。
  *
- *   ・送信が通らない。中身は一字一句正しいのに、別ドメインからの生の POST は
- *     Google に受け取ってもらえない。
+ *   ・送信が通らない。中身は一字一句正しいのに、Google が 400 を返していた。
+ *     原因はフォーム側の「メールアドレスを収集する」設定だった。あれは設問では
+ *     なく収集設定が描く必須欄で、外から埋める手立てが無い。永久に未入力扱いに
+ *     なり、すべての送信が「必須の質問です」で弾かれていた。設定を切って解決。
+ *     メールアドレスは設問（entry.458126145）として別にあるので、失うものはない。
  *   ・通ったかどうかも読めない。Google は別ドメインからの読み取りを許さない
  *     ので、弾かれても画面には「受け付けました」と出てしまう。
  *
@@ -22,7 +25,6 @@ const ENDPOINT = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
 
 /* 受け取ってよい欄。これ以外は捨てる。 */
 const ALLOWED = new Set([
-  'emailAddress',
   'entry.1279542342',        /* お名前 */
   'entry.1074325515_year',   /* 生年月日 */
   'entry.1074325515_month',
@@ -32,6 +34,8 @@ const ALLOWED = new Set([
   'entry.939298798',         /* 入会を希望する会 */
   'entry.1699267920',        /* 年会費 */
   'entry.1335746439',        /* 確認事項 */
+  'entry.939298798_sentinel',   /* チェックボックスに添える連れ */
+  'entry.1335746439_sentinel',
 ]);
 
 const MAX_FIELDS = 40;
@@ -87,7 +91,7 @@ export default async function handler(req, res) {
     if (!ALLOWED.has(name)) continue;
     form.append(name, value.slice(0, MAX_LEN));
   }
-  if (!form.has('emailAddress') || !form.has('entry.939298798')) {
+  if (!form.has('entry.458126145') || !form.has('entry.939298798')) {
     return res.status(400).json({ ok: false, reason: 'missing-required' });
   }
 

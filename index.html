@@ -212,10 +212,8 @@
 
       <div class="jf">
         <label class="jf__label" for="jf-mail">メールアドレス<span class="jf__req">必須</span></label>
-        <input class="jf__in" id="jf-mail" name="emailAddress" type="email"
+        <input class="jf__in" id="jf-mail" name="entry.458126145" type="email"
                inputmode="email" autocomplete="email" placeholder="例：taro@example.com" required>
-        <!-- フォーム側に同じ設問もあるため、同じ値を両方へ送る -->
-        <input type="hidden" id="jf-mail2" name="entry.458126145">
         <p class="jf__err" id="jf-mail-err" hidden></p>
       </div>
 
@@ -250,6 +248,8 @@
             <span class="pick__text"><b>低山山登り</b><em>第4日曜 8:30 集合</em></span>
           </label>
         </div>
+        <!-- フォームがチェックボックスに必ず添えている連れ。無くても通るが、そろえておく -->
+        <input type="hidden" name="entry.939298798_sentinel" value="">
         <p class="jf__err" id="jf-kai-err" hidden></p>
       </fieldset>
 
@@ -271,6 +271,7 @@
           <span class="jagree__box" aria-hidden="true"></span>
           <span class="jagree__text">入力した内容を確認し、筑豊市民大学への入会を申し込みます。個人情報の取り扱いに同意します。<span class="jf__req">必須</span></span>
         </label>
+        <input type="hidden" name="entry.1335746439_sentinel" value="">
         <p class="jf__err" id="jf-agree-err" hidden></p>
       </div>
 
