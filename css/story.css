@@ -1116,32 +1116,8 @@ body[data-page="kai"] {
 
 
 
-/* PC では左右に送りのボタンを出す（カラムの外なので中身に掛からない） */
-.story__side {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 61;
-  display: none;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 1px solid rgba(240, 146, 28, .38);
-  background: rgba(4, 36, 20, .8);
-  color: #f0921c;
-  place-items: center;
-  cursor: pointer;
-}
-
-.story__side svg { width: 21px; height: 21px; }
-.story__side--prev { left: 50%; margin-left: calc(var(--column) / -2 - 72px); }
-.story__side--next { left: 50%; margin-left: calc(var(--column) / 2 + 26px); }
-.story__side:hover { background: rgba(240, 146, 28, .22); }
-.story__side:active { transform: translateY(-50%) scale(.9); }
-
-@media (min-width: 900px) and (pointer: fine) {
-  .story__side { display: grid; }
-}
+/* PC で見たときの送りボタンは、柱の外の帯（.railGuide）へ移した。
+   様式は css/site.css の「PC で見たときの、柱の外の両側」にある。 */
 
 /* --- 画面が低いとき -----------------------------------------------------
    320x568 のような画面ではストーリー 1 枚に 421px しか使えない。
@@ -1229,7 +1205,6 @@ body[data-page="kai"] {
 .no-js .story__pause,
 .no-js .story__foot,
 .no-js .story__zone,
-.no-js .story__side { display: none; }
 
 /* 写真がまだ無いスライドでも、色の面として成立させる。
    白いベールをやや薄くして、下に敷いた色を通す。 */

@@ -116,6 +116,12 @@
   const again = document.getElementById('again');
   if(again) again.addEventListener('click', () => { setPaused(false); idx = -1; go(0); });
 
+  /* PC で柱の外に出る、前後の送りボタン。無いページでも落ちないようにする */
+  const sidePrev = document.getElementById('rinenPrev');
+  const sideNext = document.getElementById('rinenNext');
+  if(sidePrev) sidePrev.addEventListener('click', prev);
+  if(sideNext) sideNext.addEventListener('click', next);
+
   document.addEventListener('keydown', e => {
     if(e.key === 'ArrowRight'){ next(); }
     else if(e.key === 'ArrowLeft'){ prev(); }

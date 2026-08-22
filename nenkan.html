@@ -467,5 +467,48 @@
   <a class="nav__link is-active" href="nenkan.html" aria-current="page"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="5" width="17.2" height="15.6" rx="2.4"/><path d="M3.4 9.8h17.2"/><path d="M8.2 3.2v3.4"/><path d="M15.8 3.2v3.4"/><path d="M7.6 13.6h3"/><path d="M7.6 17h6.8"/></svg><span class="nav__label">年間予定</span></a>
 </nav>
 </div>
+<!-- PC で見たときの、柱の外の両側。あくまで添えもの。
+     幅の足りない画面では css で出さないようにしてある。
+     ヘッダーやタブバーと同じで、9ページすべてに同じものを写している。 -->
+<aside class="siteRail siteRail--left" aria-label="サイトマップ">
+  <p class="siteRail__cap">サイトマップ</p>
+  <nav class="tree">
+    <ul class="tree__list">
+      <li class="tree__item tree__item--main">
+        <a href="rinen.html">理念<em>この大学の芯</em></a>
+      </li>
+      <li class="tree__item"><a href="index.html">ホーム</a></li>
+      <li class="tree__item">
+        <a href="katsudo.html">活動</a>
+        <ul class="tree__sub">
+          <li><a href="katsudo.html#murata">村田 喜代子</a></li>
+          <li><a href="katsudo.html#nakamura">中村 哲</a></li>
+          <li><a href="katsudo.html#tabei">田部井 淳子</a></li>
+          <li><a href="katsudo.html#kimihara">君原 健二</a></li>
+          <li><a href="katsudo.html#kawano">河野 功</a></li>
+        </ul>
+      </li>
+      <li class="tree__item">
+        <a href="bunkakai.html">分科会</a>
+        <ul class="tree__sub">
+          <li><a href="kai-kyoyo.html">教養講座</a></li>
+          <li><a href="kai-healthy.html">ヘルシーエイジング</a></li>
+          <li><a href="kai-teizan.html">低山に登ろう</a></li>
+          <li><a href="kai-history.html">歴史を辿る会</a></li>
+          <li><a href="nenkan.html" aria-current="page">年間予定</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</aside>
+
+<aside class="siteRail siteRail--right" aria-label="お申し込みと、このページの案内">
+  <div class="railJoin">
+    <p class="railJoin__cap">お申し込み</p>
+    <p class="railJoin__lead">見学だけでも歓迎します。<br>こちらのフォームからどうぞ。</p>
+    <a class="railJoin__btn" href="index.html#join">お申し込みフォームへ<span aria-hidden="true">›</span></a>
+    <p class="railJoin__note">年会費 1講座 10,000円<br>途中入会は月割りです</p>
+  </div>
+</aside>
 </body>
 </html>
