@@ -16,6 +16,10 @@
  * ■ 数は絞る
  *   古い端末でも詰まらないよう、同時に出るのは 18 個まで。画面を見ていない
  *   あいだ（別のタブなど）は止める。
+ *
+ * ■ 文字より後ろを通る
+ *   日程の札は canvas より手前にある（css/page.css の z-index）。
+ *   鯉のぼりもサンタも、札の裏を通っていく。読む文字には何も重ならない。
  */
 (function () {
   'use strict';
@@ -29,7 +33,7 @@
 
   var ctx = canvas.getContext('2d');
   var TAU = Math.PI * 2;
-  var MAX = 14;
+  var MAX = 18;
 
   /* ── 絵 ───────────────────────────────────────────────────────────
      どれも原点を中心に、大きさ s で描く。向きと濃さは呼ぶ側で決める。 */
@@ -200,17 +204,23 @@
   }
 
   function snow(c, s) {                             /* 1月 雪 */
-    c.strokeStyle = '#FFFFFF';
-    c.lineWidth = Math.max(1.2, s * 0.09);
+    /* 白い結晶を白っぽい紙の上に置くと、輪郭が消えて見えない。
+       先に濃い線でひとまわり大きく描き、その上に白を重ねて縁取りにする。 */
     c.lineCap = 'round';
-    for (var i = 0; i < 6; i++) {
-      c.save(); c.rotate(i * Math.PI / 3);
-      c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -0.8 * s); c.stroke();
-      c.beginPath();
-      c.moveTo(0, -0.48 * s); c.lineTo(-0.22 * s, -0.66 * s);
-      c.moveTo(0, -0.48 * s); c.lineTo(0.22 * s, -0.66 * s);
-      c.stroke();
-      c.restore();
+    for (var pass = 0; pass < 2; pass++) {
+      c.strokeStyle = pass === 0 ? 'rgba(46,66,78,.55)' : '#FFFFFF';
+      c.lineWidth = pass === 0
+        ? Math.max(2.2, s * 0.17)
+        : Math.max(1.2, s * 0.09);
+      for (var i = 0; i < 6; i++) {
+        c.save(); c.rotate(i * Math.PI / 3);
+        c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -0.8 * s); c.stroke();
+        c.beginPath();
+        c.moveTo(0, -0.48 * s); c.lineTo(-0.22 * s, -0.66 * s);
+        c.moveTo(0, -0.48 * s); c.lineTo(0.22 * s, -0.66 * s);
+        c.stroke();
+        c.restore();
+      }
     }
   }
 
@@ -283,7 +293,7 @@
     10: { mode: 'tate', size: [18, 28], speed: [30, 52], spin: true, draw: function (c, s, r) { leaf(c, s, HA[r % 4]); } },
     11: { mode: 'yoko', size: [22, 32], speed: [10, 20], draw: function (c, s) { lantern(c, s); } },
     12: { mode: 'tate', size: [22, 32], speed: [24, 40], draw: function (c, s) { santa(c, s); } },
-    1:  { mode: 'tate', size: [13, 22], speed: [22, 40], draw: function (c, s) { snow(c, s); } },
+    1:  { mode: 'tate', size: [14, 24], speed: [22, 40], solid: true, draw: function (c, s) { snow(c, s); } },
     2:  { mode: 'tate', size: [18, 29], speed: [30, 52], draw: function (c, s, r) { (r % 3 === 0 ? oni : mame)(c, s); } },
     3:  { mode: 'tate', size: [14, 23], speed: [26, 46], spin: true, draw: function (c, s) { sakura(c, s); } }
   };
@@ -317,7 +327,7 @@
       sway: rnd(8, 26), w: rnd(0.6, 1.5), ph: Math.random() * TAU,
       spin: k.spin ? rnd(-1.1, 1.1) : 0,
       rot: k.spin ? Math.random() * TAU : 0,
-      a: 0, to: rnd(0.5, 0.78)
+      a: 0, to: k.solid ? rnd(0.78, 1) : rnd(0.5, 0.78)
     };
     if (k.mode === 'yoko') {
       b.yoko = true;
@@ -332,7 +342,7 @@
   }
 
   function fill(fresh) {
-    var want = Math.min(MAX, Math.round(W / 46) + 4);
+    var want = Math.min(MAX, Math.round(W / 34) + 5);
     var live = 0, i;
     for (i = 0; i < bits.length; i++) if (bits[i].m === now && !bits[i].bye) live++;
     for (i = live; i < want; i++) {
