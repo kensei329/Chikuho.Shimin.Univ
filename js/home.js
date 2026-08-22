@@ -108,13 +108,22 @@
     return setErr(null, 'jf-kai-err', any ? '' : '入会を希望する会を、1つ以上えらんでください。');
   }
 
+  /* 赤い印が全部消えたら、上の注意書きも引っこめる。
+     直したのに警告が出たままだと、どこが悪いのか分からなくなる。 */
+  function sweep() {
+    if (alertBox.hidden) return;
+    if (!form.querySelector('.jf__err:not([hidden])')) alertBox.hidden = true;
+  }
+
   /* 触ったところから順に、その場で直せるようにする */
   [[name, checkName], [mail, checkMail], [tel, checkTel]].forEach(function (p) {
-    p[0].addEventListener('blur', p[1]);
-    p[0].addEventListener('input', function () { if (p[0].getAttribute('aria-invalid') === 'true') p[1](); });
+    p[0].addEventListener('blur', function () { p[1](); sweep(); });
+    p[0].addEventListener('input', function () {
+      if (p[0].getAttribute('aria-invalid') === 'true') { p[1](); sweep(); }
+    });
   });
-  agree.addEventListener('change', checkAgree);
-  kais.forEach(function (b) { b.addEventListener('change', checkKai); });
+  agree.addEventListener('change', function () { checkAgree(); sweep(); });
+  kais.forEach(function (b) { b.addEventListener('change', function () { checkKai(); sweep(); }); });
 
   /* ── 送信 ───────────────────────────────────────────────────────── */
 
