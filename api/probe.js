@@ -1,5 +1,6 @@
 /**
  * 一時的な調べもの用。原因が分かったら消すこと。
+ * （ファイル名を _ で始めると Vercel が関数として拾わない）
  *
  * Google が 400 を返す理由を突き止めるため、制御用パラメータの組み合わせを
  * 順に試し、それぞれの返事を持ち帰る。弾かれた分は記録に残らないので、
@@ -40,7 +41,8 @@ const MARKS = ['freebirdFormviewerViewResponseConfirmationMessage',
                'Your response has been recorded', '回答を記録しました', 'フォームを送信しました'];
 
 export default async function handler(req, res) {
-  if (req.query?.key !== 'shirabe') return res.status(404).json({ ok: false });
+  const key = new URL(req.url, 'http://x').searchParams.get('key');
+  if (key !== 'shirabe') return res.status(404).json({ ok: false });
 
   const out = [];
   for (const [label, ctrl, filter] of VARIANTS) {
