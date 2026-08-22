@@ -138,6 +138,22 @@ a { color: var(--gold-ink); }
   white-space: nowrap;
 }
 
+/* 「公式サイト」は添え書き。名前と同じ大きさにすると窮屈になるので、
+   一段小さく、明朝ではなくゴシックにして、主役を食わないようにする。 */
+.head__name small {
+  margin-left: 9px;
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--ink-3);
+}
+
+/* 幅の狭い端末では、添え書きの余白だけ詰める */
+@media (max-width: 340px) {
+  .head__name small { margin-left: 6px; font-size: 11.5px; }
+}
+
 /* ヘッダーは固定なので、本文の頭をその分だけ下げる */
 .page { padding-top: var(--header-h); padding-bottom: var(--nav-h); }
 
