@@ -209,6 +209,39 @@
   @keyframes burst{from{opacity:0}to{opacity:1;transform:scale(1)}}
 }
 
+/* 終わりの画面から、ほかのページへ。
+   ここで行き止まりにすると、タブバーを押すしか先が無い。
+   「はじめから見る」は輪郭だけの控えめな見た目なので、こちらは面で塗って
+   区別する。押せる高さは 48px を割らない。 */
+.endGo { display: grid; gap: 8px; margin-top: 1.1rem; width: 100%; }
+.endGo__btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 48px; padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--yamaai);
+  color: var(--kinari);
+  font-family: var(--gothic); font-size: 16px; font-weight: 700;
+  letter-spacing: .04em; text-decoration: none;
+  box-shadow: 0 3px 10px rgba(34, 48, 42, .22);
+  transition: transform .18s ease, background .25s ease;
+}
+.endGo__btn span { opacity: .7; font-weight: 700; }
+.endGo__btn:active { transform: translateY(2px); background: #143726; }
+
+/* 終わりの画面は、中身が入りきらないときだけ動かせるようにしておく */
+#ending > div { max-height: 100%; overflow-y: auto; width: 100%; max-width: 22rem; }
+#ending .again { margin-top: 1.6rem; }
+
+/* 画面が低い端末では、行き先まで一目で見えるように余白を詰める。
+   文字は 12pt（16px）のまま。詰めるのは余白と、二の次の英字表記だけ。 */
+@media (max-height: 660px) {
+  #ending .en { display: none; }
+  #ending .org { margin-top: 1.1rem; }
+  #ending .again { margin-top: 1rem; }
+  .endGo { gap: 6px; margin-top: .8rem; }
+  .endGo__btn { min-height: 44px; padding: 9px 18px; }
+}
+
 /* この1ページだけ、ページ自体は動かさない。動くのは舞台の中だけ */
 body[data-page="rinen"] { overflow: hidden; }
 body[data-page="rinen"] .column { min-height: 100vh; min-height: 100dvh; }
