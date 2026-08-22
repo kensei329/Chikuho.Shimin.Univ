@@ -1229,6 +1229,21 @@ body[data-page="katsudo"] {
 /* 案内が出ているあいだは、名前も一緒に沈める */
 .card.is-hinting .card__who { opacity: .35; transition: opacity .3s ease; }
 
+/* 帯は絶対配置なので、本文が伸びるとその下に潜り込む。
+   ブラウザのアドレスバーが出ている実機では画面が低く、実際に重なった。
+   帯 1 行ぶんの高さを本文側にあらかじめ空けておく。
+   帯を出さないカード（締めの1枚）は、もとの余白のままでよい。 */
+.card:has(.card__who) .card__main { padding-top: 64px; }
+
+/* 帯そのものも、名前と肩書きを 1 行に収める。折り返すと下へ伸びて、
+   空けたぶんを越えてしまう。 */
+.card__who { flex-wrap: nowrap; white-space: nowrap; }
+.card__who span { overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-height: 700px) {
+  .card:has(.card__who) .card__main { padding-top: 56px; }
+}
+
 /* =========================================================================
    文字は 12pt（16px）を下回らせない
 
