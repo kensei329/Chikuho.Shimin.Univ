@@ -52,7 +52,7 @@
   if (c.saveData || /2g/.test(c.effectiveType || '')) return;
 
   var here = location.pathname.split('/').pop() || 'index.html';
-  var order = ['katsudo.html', 'rinen.html', 'index.html', 'bunkakai.html', 'nenkan.html'];
+  var order = ['katsudo.html', 'rinen.html', '/', 'bunkakai.html', 'nenkan.html'];
 
   window.addEventListener('load', function () {
     window.setTimeout(function () {

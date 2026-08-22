@@ -499,3 +499,244 @@ a { color: var(--gold-ink); }
 @media (prefers-reduced-motion: reduce) {
   .siteRail * { transition: none !important; }
 }
+
+/* =========================================================================
+   右の帯に置く申し込みフォーム
+   幅にゆとりのある画面（1180px 以上）では、ページを移らずその場で
+   申し込めるようにフォームそのものを置く。それより狭いときは、
+   フォームのある場所へ渡す札に戻す。両方を書いておいて、切り替える。
+   ========================================================================= */
+
+.railJoin--form { display: none; }
+.railJoin--card { display: block; }
+
+@media (min-width: 1180px) and (pointer: fine) {
+  .railJoin--form { display: block; }
+  .railJoin--card { display: none; }
+  /* フォームを入れるぶん、右の帯だけ広げる */
+  .siteRail--right {
+    width: clamp(232px, calc((100vw - var(--column)) / 2 - 32px), 320px);
+  }
+}
+
+/* 帯は暗い地なので、本文の申し込み欄（明るい地）とは色を入れ替える。
+   会員は 70 代が中心。字は詰めても 12px を下回らせない。 */
+
+.jform--rail { display: grid; gap: 11px; margin-top: 4px; }
+
+.jform--rail .jf { display: grid; gap: 5px; border: 0; margin: 0; padding: 0; }
+
+.jform--rail .jf__label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #D6E0D1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+.jform--rail .jf__req {
+  font-size: 10px;
+  font-weight: 800;
+  color: #2A1C08;
+  background: var(--orange-400);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.jform--rail .jf__in,
+.jform--rail .jf__sel select {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 13px;
+  color: #EDF2EA;
+  background: rgba(0, 0, 0, .26);
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+.jform--rail .jf__in::placeholder { color: #7E9078; }
+.jform--rail .jf__in:focus,
+.jform--rail .jf__sel select:focus {
+  outline: 2px solid var(--orange-400);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+/* 生年月日。選ぶまでは薄字の見本を出しておく */
+.jform--rail .jf__date { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 5px; }
+.jform--rail .jf__sel { position: relative; display: block; }
+.jform--rail .jf__sel select { appearance: none; padding-right: 20px; }
+.jform--rail .jf__sel i {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #7E9078;
+  pointer-events: none;
+}
+.jform--rail select.is-empty { color: #7E9078; }
+
+/* 会のえらび。狭いので、時間の添え書きは出さず名前だけにしてある */
+.jform--rail .jf__picks { display: grid; gap: 4px; }
+.jform--rail .pick {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  background: rgba(0, 0, 0, .18);
+  cursor: pointer;
+}
+.jform--rail .pick input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.jform--rail .pick__box {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(255, 255, 255, .4);
+  background: rgba(0, 0, 0, .3);
+}
+.jform--rail .pick__text b { font-size: 12.5px; font-weight: 700; color: #DCE6D7; }
+.jform--rail .pick.is-on {
+  border-color: rgba(240, 146, 28, .6);
+  background: rgba(240, 146, 28, .13);
+}
+.jform--rail .pick.is-on .pick__box {
+  background: var(--orange-400);
+  border-color: var(--orange-400);
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, .22);
+}
+
+/* 年会費。金額だけは大きく出す */
+.jform--rail .jfee {
+  display: grid;
+  gap: 2px;
+  padding: 10px 11px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, .26);
+  border: 1px solid rgba(255, 255, 255, .13);
+}
+.jform--rail .jfee__yen {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--orange-300);
+}
+.jform--rail .jfee__note { font-size: 11.5px; line-height: 1.6; color: #A3B39D; }
+
+/* 確認事項 */
+.jform--rail .jagree {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  background: rgba(0, 0, 0, .18);
+  cursor: pointer;
+}
+.jform--rail .jagree input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.jform--rail .jagree__box {
+  flex: none;
+  margin-top: 1px;
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(255, 255, 255, .4);
+  background: rgba(0, 0, 0, .3);
+}
+.jform--rail .jagree__text { font-size: 11.5px; line-height: 1.65; color: #C2CFBC; }
+.jform--rail .jagree:has(input:checked) { border-color: rgba(240, 146, 28, .6); background: rgba(240, 146, 28, .12); }
+.jform--rail .jagree:has(input:checked) .jagree__box {
+  background: var(--orange-400);
+  border-color: var(--orange-400);
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, .22);
+}
+
+/* 送信のボタンと、知らせ */
+.jform--rail .jform__send {
+  width: 100%;
+  min-height: 44px;
+  font-size: 13.5px;
+  border-radius: 999px;
+}
+.jform--rail .jf__err,
+.jform--rail .jform__alert {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  font-weight: 700;
+  color: #FFB4A6;
+}
+.jform--rail .jform__alert {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(200, 60, 40, .16);
+  border: 1px solid rgba(255, 140, 120, .35);
+}
+
+/* 受け付けたあとの知らせ */
+.railJoin--form .jdone {
+  padding: 12px 13px;
+  border-radius: 10px;
+  background: rgba(240, 146, 28, .12);
+  border: 1px solid rgba(240, 146, 28, .4);
+}
+.railJoin--form .jdone__h { margin: 0 0 5px; font-size: 13px; font-weight: 800; color: var(--orange-300); }
+.railJoin--form .jdone__text { margin: 0; font-size: 11.5px; line-height: 1.7; color: #C2CFBC; }
+
+/* 本文の申し込み欄でも、生年月日は選ぶまで薄字にする */
+.jform select.is-empty { color: var(--ink-4); }
+
+/* ホーム冒頭の会場表記から、会場の案内へ渡す */
+.hero__place {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(224, 122, 5, .45);
+  padding-bottom: 1px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.hero__place__go { margin-left: 5px; font-weight: 800; color: var(--orange-500); }
+.hero__place:hover { color: var(--gold-ink); border-color: var(--orange-500); }
+
+/* =========================================================================
+   横の案内板の字を大きくする
+   会員は 70 代が中心。13px の帯は小さすぎて読めない、という声があった。
+   主だった項目を 14pt（約 18px）、その下の枝を 12pt（16px）に上げ、
+   帯の幅と余白もそれに合わせて広げる。
+   ========================================================================= */
+
+.siteRail--left {
+  width: clamp(178px, calc((100vw - var(--column)) / 2 - 32px), 268px);
+}
+
+.siteRail__cap { font-size: 12px; letter-spacing: .18em; margin-bottom: 14px; }
+
+.tree__list > li + li { margin-top: 5px; }
+
+.tree a {
+  font-size: 18px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  line-height: 1.45;
+}
+
+.tree__item--main > a { font-size: 20px; }
+.tree__item--main > a em { font-size: 12.5px; margin-top: 3px; }
+.tree__item--main { padding-top: 12px; margin-top: 10px; }
+
+.tree__sub { margin: 4px 0 9px 15px; padding-left: 13px; }
+.tree__sub a { font-size: 16px; padding: 6px 9px; }
+.tree__sub li::before { top: 18px; width: 8px; }
+
+/* 月は 11 個。字を上げたぶん、桝も広げる */
+.tree__sub--months { gap: 3px 4px; }
+.tree__sub--months a { padding: 6px 3px; }
