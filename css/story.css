@@ -1443,3 +1443,26 @@ body[data-page="kai"] {
 @media (prefers-reduced-motion: reduce) {
   .slide[aria-hidden="false"] .ses__card { animation: none; }
 }
+
+/* --- 1枚目（お預かりした写真） ------------------------------------------
+   写真は画面いっぱい。その上に会の名前と回数を置く。
+   会員は70代が中心なので、文字が乗る帯だけベールを濃くして、
+   写真の明るいところ・こまかいところに文字が沈まないようにする。 */
+.slide--hero .slide__photo::after {
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, .88) 0%,
+    rgba(255, 255, 255, .50) 13%,
+    rgba(255, 255, 255, .40) 26%,
+    rgba(255, 255, 255, .74) 34%,
+    rgba(255, 255, 255, .76) 60%,
+    rgba(255, 255, 255, .44) 70%,
+    rgba(255, 255, 255, .86) 100%);
+}
+
+/* 添え書きは、写真の上だと沈みやすい。濃さと白いふちを足す */
+.slide--hero .slide__big span,
+.slide--hero .slide__lead {
+  color: var(--ink-2);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, .98), 0 0 14px rgba(255, 255, 255, .92);
+}
+.slide--hero .slide__big span { font-weight: 800; }
