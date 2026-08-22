@@ -70,24 +70,18 @@
   <h1 class="sr">分科会</h1>
 
   <!-- 前置きは置かない。開いてすぐ、四つのうちどれかを選べる状態にする -->
+  <!-- 第1分科会から第4分科会の順。案内文の番号にそろえてある。
+       札の地には、ストーリーの1枚目と同じ写真をうっすら敷いて、
+       名前を読む前に「どんな会か」が目に入るようにした。
+
+       写真の道筋は先頭のスラッシュを外さないこと。--kai-photo を使うのは
+       css/page.css の側で、ブラウザは変数の中の相対パスをその「使った
+       スタイルシート」から数える。assets/... と書くと /css/assets/... を
+       探しにいって、写真が出ない（実際にそうなった）。 -->
   <nav class="kaiPick" aria-label="四つの会">
-    <a class="kaiPick__item" href="kai-history.html">
-      <span class="kaiPick__text">
-        <span class="kaiPick__name">歴史を辿る会</span>
-        <span class="kaiPick__when">第4分科会 ／ 全9回 ／ 10:00 – 12:00</span>
-        <span class="kaiPick__go">ストーリーを見る</span>
-      </span>
-      <span class="kaiPick__wave" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    </a>
-    <a class="kaiPick__item" href="kai-healthy.html">
-      <span class="kaiPick__text">
-        <span class="kaiPick__name">ヘルシーエイジング</span>
-        <span class="kaiPick__when">第2分科会 ／ 全8回 ／ 13:30 – 15:30</span>
-        <span class="kaiPick__go">ストーリーを見る</span>
-      </span>
-      <span class="kaiPick__wave" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    </a>
     <a class="kaiPick__item" href="kai-kyoyo.html">
+      <span class="kaiPick__bg" aria-hidden="true"
+            style="--kai-photo:url(/assets/kai/kyoyo-card.webp)"></span>
       <span class="kaiPick__text">
         <span class="kaiPick__name">教養講座</span>
         <span class="kaiPick__when">第1分科会 ／ 全8回 ／ 13:30 – 15:30</span>
@@ -95,10 +89,32 @@
       </span>
       <span class="kaiPick__wave" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
+    <a class="kaiPick__item" href="kai-healthy.html">
+      <span class="kaiPick__bg" aria-hidden="true"
+            style="--kai-photo:url(/assets/kai/healthy-card.webp)"></span>
+      <span class="kaiPick__text">
+        <span class="kaiPick__name">ヘルシーエイジング</span>
+        <span class="kaiPick__when">第2分科会 ／ 全8回 ／ 13:30 – 15:30</span>
+        <span class="kaiPick__go">ストーリーを見る</span>
+      </span>
+      <span class="kaiPick__wave" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
     <a class="kaiPick__item" href="kai-teizan.html">
+      <span class="kaiPick__bg" aria-hidden="true"
+            style="--kai-photo:url(/assets/kai/teizan-card.webp)"></span>
       <span class="kaiPick__text">
         <span class="kaiPick__name">低山に登ろう</span>
         <span class="kaiPick__when">第3分科会 ／ 全9回 ／ 8:30 集合</span>
+        <span class="kaiPick__go">ストーリーを見る</span>
+      </span>
+      <span class="kaiPick__wave" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+    <a class="kaiPick__item" href="kai-history.html">
+      <span class="kaiPick__bg" aria-hidden="true"
+            style="--kai-photo:url(/assets/kai/history-card.webp)"></span>
+      <span class="kaiPick__text">
+        <span class="kaiPick__name">歴史を辿る会</span>
+        <span class="kaiPick__when">第4分科会 ／ 全9回 ／ 10:00 – 12:00</span>
         <span class="kaiPick__go">ストーリーを見る</span>
       </span>
       <span class="kaiPick__wave" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
