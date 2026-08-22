@@ -62,6 +62,33 @@ export default async function handler(req, res) {
       { fbzx: fbzx || '', submissionTimestamp: '-1', emailAddress: 'test@example.com', emailReceipt: 'false' }],
   ];
 
+  /* 送り方そのものを変えて試す */
+  const shapes = [];
+  const mini = new URLSearchParams();
+  mini.set('fvv', '1'); mini.set('pageHistory', '0');
+  mini.append('entry.939298798', '歴史をたどる会');
+  mini.append('entry.939298798_sentinel', '');
+
+  async function shape(label, init, url = POST) {
+    try {
+      const r = await fetch(url, init);
+      const back = await r.text();
+      shapes.push({ label, status: r.status, recorded: MARKS.some((m) => back.includes(m)) });
+    } catch (e) { shapes.push({ label, status: 0, recorded: false, err: e.message }); }
+  }
+
+  const enc = { 'content-type': 'application/x-www-form-urlencoded;charset=UTF-8' };
+  await shape('必須1問だけ・素のUA', { method: 'POST', headers: enc, body: mini.toString() });
+  await shape('必須1問だけ・ブラウザのUA',
+    { method: 'POST', headers: { ...enc, 'user-agent': UA }, body: mini.toString() });
+  await shape('GET で送る', { method: 'GET', headers: { 'user-agent': UA } },
+    POST + '?' + mini.toString());
+  await shape('embedded=true', { method: 'POST', headers: { ...enc, 'user-agent': UA }, body: mini.toString() },
+    POST + '?embedded=true');
+  await shape('/forms/d/ID/formResponse 形式',
+    { method: 'POST', headers: { ...enc, 'user-agent': UA }, body: mini.toString() },
+    `https://docs.google.com/forms/d/${FORM_ID}/formResponse`);
+
   const tried = [];
   for (const [label, extraPairs, ctrl] of V) {
     const body = new URLSearchParams();
@@ -88,5 +115,5 @@ export default async function handler(req, res) {
     if (r.status === 200 && recorded) break;
   }
 
-  return res.status(200).json({ found, tried });
+  return res.status(200).json({ found, shapes, tried });
 }
