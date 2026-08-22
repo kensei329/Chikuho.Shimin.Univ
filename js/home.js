@@ -147,12 +147,23 @@
       b.addEventListener('change', function () { paintFee(); checkKai(); sweep(); });
     });
 
-    /* 生年月日は空から始める。選んだところだけ、薄字をやめて濃くする */
+    /* 生年月日。月と日は空から始め、選んだところだけ薄字をやめて濃くする */
     var dates = [].slice.call(form.querySelectorAll('select[name^="' + BIRTH + '"]'));
     function paintDate() {
       dates.forEach(function (s) { s.classList.toggle('is-empty', !s.value); });
     }
     dates.forEach(function (s) { s.addEventListener('change', paintDate); });
+
+    /* 年だけは、いまから 60 年前を初めから出しておく。会員のおおよその世代で、
+       そこから遠くへ回さずに済む。年を書き込まず毎回その場で数えるのは、
+       年が明けても直さなくてよいようにするため。 */
+    var yearSel = form.querySelector('select[name="' + BIRTH + 'year"]');
+    if (yearSel && !yearSel.value) {
+      var want = String(new Date().getFullYear() - 60);
+      for (var i = 0; i < yearSel.options.length; i++) {
+        if (yearSel.options[i].value === want) { yearSel.value = want; break; }
+      }
+    }
 
     /* ── 送信 ─────────────────────────────────────────────────────── */
 
