@@ -404,6 +404,14 @@ body[data-page="kai"] {
 .slide__big i { -webkit-text-stroke-width: 4.5px; }
 .slide__copy span { -webkit-text-stroke-width: 5px; }
 
+/* 2枚目から先には写真を敷いていない。無地の上では白い縁取りが
+   字のまわりをぼかしてしまうので、そこだけ外して輪郭を戻す。 */
+.slide--top .slide__h,
+.slide--top .slide__lead {
+  -webkit-text-stroke-width: 0;
+  text-shadow: none;
+}
+
 /* 日本語は文の切れ目で折り返す。「…平均価／格」のように語の途中で
    切れるのを防ぐ（対応しないブラウザでは今までどおり）。 */
 .slide__lead, .slide__note, .slide__stats span, .slide__steps span, .slide__big span {
@@ -1198,54 +1206,29 @@ body[data-page="kai"] {
 
 /* --- JavaScript が無効なとき --------------------------------------------
    横のスナップは CSS だけで効くので、指では送れる。
-   自動送りと押せないボタンだけ引っ込める。 */
+   自動送りと、押しても何も起きない飾りだけ引っ込める。
 
-/* JavaScript が無効なとき */
+   下の帯にある「お申し込み・お問い合わせ」はただのリンクで、JavaScript が
+   無くても通じる。ここだけは残す。 */
 .no-js .story__bars,
 .no-js .story__pause,
-.no-js .story__foot,
-.no-js .story__zone,
-
-/* 写真がまだ無いスライドでも、色の面として成立させる。
-   白いベールをやや薄くして、下に敷いた色を通す。 */
-.slide__photo:not(:has(img))::after {
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, .78) 0%,
-    rgba(255, 255, 255, .30) 20%,
-    rgba(255, 255, 255, .14) 48%,
-    rgba(255, 255, 255, .36) 76%,
-    rgba(255, 255, 255, .80) 100%);
-}
+.no-js .story__act { display: none; }
 
 /* =========================================================================
    各回のストーリーカード
    =========================================================================
    分科会は年に8〜9回。その1回ぶんを1枚にして、横に送ると次の回が出てくる。
-   絵は外から借りず、回の中身に合わせて描き起こしたものを埋め込んである
-   （svg なので拡大しても粗れず、取り寄せる時間もかからない）。
+   写真は1枚目だけで、2枚目から先は紙のカードだけを置く。読むものが
+   一つだと、どこを見ればよいか迷わない。
 
-   上に絵、下に紙のカード。会員は70代が中心なので、日付と講師は
-   大きめに、説明はそのあとに小さく置く。
+   会員は70代が中心なので、日付と講師は大きめに、説明はそのあとに
+   小さく置く。
    ========================================================================= */
 
-/* 絵は上半分だけ。下は紙のカードのために空けておく */
-.slide--ses .slide__photo,
-.slide--top .slide__photo { bottom: auto; height: 46%; }
-.ses__art .ses__svg { display: block; width: 100%; height: 100%; }
-
-/* 絵の下ぶちを、ストーリーの地色へ溶かす */
-.slide--ses .slide__photo::after,
-.slide--top .slide__photo::after,
-.slide .slide__photo:has(.ses__svg)::after {
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, .30) 0%,
-    rgba(255, 255, 255, .04) 38%,
-    rgba(238, 242, 233, .55) 82%,
-    #eef2e9 100%);
-}
-
-/* カードは下に寄せる。絵とのあいだが空くぶんは地色で受ける */
-.slide--ses .slide__body { justify-content: flex-end; }
+/* 2枚目から先に絵は置かない。上に絵があった前提で下へ寄せていたので、
+   その空きを埋めるようカードを真ん中に置く。 */
+.slide--ses .slide__body,
+.slide--top .slide__body { justify-content: center; }
 
 .ses__card {
   display: flex;
@@ -1400,9 +1383,8 @@ body[data-page="kai"] {
   border: 1px solid rgba(10, 61, 32, .13);
 }
 
-/* 画面が低い端末では、絵をすこし詰めてカードの居場所をつくる */
+/* 画面が低い端末では、カードを詰める */
 @media (max-height: 660px) {
-  .slide--ses .slide__photo, .slide--top .slide__photo { height: 38%; }
   .ses__card { gap: 4px; padding: 13px 15px; border-radius: 16px; }
   .ses__note { display: none; }
 }
