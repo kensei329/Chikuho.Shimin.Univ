@@ -129,3 +129,30 @@
   window.addEventListener('load', onScroll);
   look();
 })();
+
+/**
+ * 写真が届かなかったとき
+ * ------------------------------------------------------------------------
+ * 以前は <img onerror="..."> と HTML に直接書いていた。読みやすかったが、
+ * 「このページで動かしてよい JavaScript は、この置き場のものだけ」という
+ * 決まり（Content-Security-Policy）を入れると、直書きは動かせない。
+ * 同じことをここでやる。
+ *
+ * script は defer で後から動くので、走り出す前にもう失敗している写真が
+ * ある。読み終わっているのに大きさが 0 のものは、そこで失敗したものなので
+ * 拾い直す。あとから失敗するものは error で受ける。
+ */
+(function () {
+  'use strict';
+
+  function blank(img) {
+    var box = img.closest('.card__photo, .slide__photo');
+    if (box) box.classList.add('is-blank');
+    img.remove();
+  }
+
+  [].forEach.call(document.querySelectorAll('.card__photo img, .slide__photo img'), function (img) {
+    if (img.complete) { if (!img.naturalWidth) blank(img); return; }
+    img.addEventListener('error', function () { blank(img); }, { once: true });
+  });
+})();

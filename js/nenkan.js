@@ -38,7 +38,11 @@
      指した月まで一気に飛ぶので、その手前の月は一度も画面に入らない。
      観察は画面に入ったときしか動かないので、そのままだと透明のまま
      残ってしまう。指して開いたときだけ、全部出したうえで始める。 */
-  if (location.hash && document.querySelector(location.hash)) {
+  /* hash はアドレス欄から来る。CSS の選び方として通らない字が混じっていると
+     querySelector はその場で例外を投げ、ここから下が動かなくなる。
+     id をそのまま探す getElementById なら、どんな字が来ても投げない。 */
+  var wanted = decodeURIComponent(location.hash.slice(1) || '');
+  if (wanted && document.getElementById(wanted)) {
     months.forEach(function (el) { el.classList.add('is-in'); io.unobserve(el); });
   }
 })();

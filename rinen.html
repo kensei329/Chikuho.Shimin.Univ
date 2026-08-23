@@ -10,7 +10,7 @@
 <link rel="canonical" href="https://chikuho.uk/rinen.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:site_name" content="筑豊市民大学 公式サイト">
+<meta property="og:site_name" content="筑豊市民大学 | 公式サイト">
 <meta property="og:title" content="設立理念｜筑豊市民大学">
 <meta property="og:description" content="わたしが変われば周りが変わる。周りが変われば、地域が変わる。地域が変われば社会が変わる。筑豊市民大学の設立理念。">
 <meta property="og:url" content="https://chikuho.uk/rinen.html">
@@ -65,7 +65,7 @@
 </head>
 <body data-page="rinen">
 <div class="column">
-<a class="skip" href="#main">本文へ移動</a>
+<a class="skip" href="#stage">本文へ移動</a>
 
 <header class="head">
   <a class="head__home" href="/" aria-label="ホームへ">
@@ -332,6 +332,11 @@
     <p class="railJoin__lead">見学だけでも歓迎します。</p>
 
     <form class="jform jform--rail" action="/api/join" method="post" novalidate>
+      <!-- 人には見えない欄。欄という欄を埋めていく機械を見分けるためだけに置く。
+           読み上げからは外し、タブでも止まらないので、人が触ることはない。 -->
+      <div class="jf__trap" aria-hidden="true">
+        <label>確認<input type="text" name="kakunin" tabindex="-1" autocomplete="off"></label>
+      </div>
       <div class="jf">
         <label class="jf__label" for="rf-name">お名前<span class="jf__req">必須</span></label>
         <input class="jf__in" id="rf-name" name="entry.1279542342" type="text"

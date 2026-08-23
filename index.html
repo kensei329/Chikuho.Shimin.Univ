@@ -10,7 +10,7 @@
 <link rel="canonical" href="https://chikuho.uk/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:site_name" content="筑豊市民大学 公式サイト">
+<meta property="og:site_name" content="筑豊市民大学 | 公式サイト">
 <meta property="og:title" content="筑豊市民大学｜あなたが変われば地域が変わる">
 <meta property="og:description" content="福岡県田川市の筑豊市民大学。いくつになっても学びたい人が、月に1回の日曜日に集まります。行政の補助は受けず、会員の受講料だけで25年つづく、市民の手による学びの場です。">
 <meta property="og:url" content="https://chikuho.uk/">
@@ -66,7 +66,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "筑豊市民大学 公式サイト",
+  "name": "筑豊市民大学 | 公式サイト",
   "alternateName": "筑豊市民大学",
   "url": "https://chikuho.uk/"
 }
@@ -199,6 +199,11 @@
     <p class="sect__text">受け付けはこのフォームのみです。事務局に届きしだい、担当者からご連絡し、お支払いの方法をご案内します。</p>
 
     <form class="jform" id="jform" action="/api/join" method="post" novalidate>
+      <!-- 人には見えない欄。欄という欄を埋めていく機械を見分けるためだけに置く。
+           読み上げからは外し、タブでも止まらないので、人が触ることはない。 -->
+      <div class="jf__trap" aria-hidden="true">
+        <label>確認<input type="text" name="kakunin" tabindex="-1" autocomplete="off"></label>
+      </div>
       <!-- Google フォーム側が見ている印。単ページなのでどちらも固定でよい -->
       <input type="hidden" name="fvv" value="1">
       <input type="hidden" name="pageHistory" value="0">
@@ -366,6 +371,11 @@
     <p class="railJoin__lead">見学だけでも歓迎します。</p>
 
     <form class="jform jform--rail" action="/api/join" method="post" novalidate>
+      <!-- 人には見えない欄。欄という欄を埋めていく機械を見分けるためだけに置く。
+           読み上げからは外し、タブでも止まらないので、人が触ることはない。 -->
+      <div class="jf__trap" aria-hidden="true">
+        <label>確認<input type="text" name="kakunin" tabindex="-1" autocomplete="off"></label>
+      </div>
       <div class="jf">
         <label class="jf__label" for="rf-name">お名前<span class="jf__req">必須</span></label>
         <input class="jf__in" id="rf-name" name="entry.1279542342" type="text"

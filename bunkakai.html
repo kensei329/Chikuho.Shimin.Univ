@@ -10,7 +10,7 @@
 <link rel="canonical" href="https://chikuho.uk/bunkakai.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:site_name" content="筑豊市民大学 公式サイト">
+<meta property="og:site_name" content="筑豊市民大学 | 公式サイト">
 <meta property="og:title" content="分科会｜筑豊市民大学">
 <meta property="og:description" content="筑豊市民大学の四つの会。教養講座、ヘルシーエイジング、低山に登ろう、歴史を辿る会。見たい会をえらぶと、一年ぶんの日程・内容・講師をストーリーでご覧いただけます。">
 <meta property="og:url" content="https://chikuho.uk/bunkakai.html">
@@ -194,6 +194,11 @@
     <p class="railJoin__lead">見学だけでも歓迎します。</p>
 
     <form class="jform jform--rail" action="/api/join" method="post" novalidate>
+      <!-- 人には見えない欄。欄という欄を埋めていく機械を見分けるためだけに置く。
+           読み上げからは外し、タブでも止まらないので、人が触ることはない。 -->
+      <div class="jf__trap" aria-hidden="true">
+        <label>確認<input type="text" name="kakunin" tabindex="-1" autocomplete="off"></label>
+      </div>
       <div class="jf">
         <label class="jf__label" for="rf-name">お名前<span class="jf__req">必須</span></label>
         <input class="jf__in" id="rf-name" name="entry.1279542342" type="text"

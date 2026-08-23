@@ -522,6 +522,19 @@ a { color: var(--gold-ink); }
 /* 帯は暗い地なので、本文の申し込み欄（明るい地）とは色を入れ替える。
    会員は 70 代が中心。字は詰めても 12px を下回らせない。 */
 
+/* 機械よけの、人には見えない欄。
+   display:none や visibility:hidden にすると「隠してある欄は埋めない」と
+   判じる道具に見抜かれるので、画面の外へ出すだけにしてある。
+   読み上げ（aria-hidden）とタブ順（tabindex="-1"）からは外してあるので、
+   人がここにたどり着くことはない。 */
+.jf__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .jform--rail { display: grid; gap: 11px; margin-top: 4px; }
 
 /* 送り終えたらフォームは引っこめる。display を指定したものは hidden 属性

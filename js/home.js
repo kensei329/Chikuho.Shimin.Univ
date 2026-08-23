@@ -197,14 +197,18 @@
       }
     }
 
-    function showFailed() {
+    function showFailed(why) {
       sending = false;
       sendBtn.disabled = false;
       sendBtn.textContent = 'もう一度送る';
       if (!alertBox) return;
-      alertBox.textContent =
-        '送信できませんでした。入力はそのまま残してあります。' +
-        '恐れ入りますが、もう一度「送る」を押してください。';
+      /* 何度も押してしまったときは、そう伝える。「送れません」とだけ出すと
+         もう一度押させることになり、余計に通らなくなる。 */
+      alertBox.textContent = why === 'too-many'
+        ? '短いあいだに何度も送られています。入力はそのまま残してあります。' +
+          '恐れ入りますが、少し経ってからもう一度お試しください。'
+        : '送信できませんでした。入力はそのまま残してあります。' +
+          '恐れ入りますが、もう一度「送る」を押してください。';
       alertBox.hidden = false;
       alertBox.scrollIntoView({ block: 'center' });
     }
@@ -240,8 +244,10 @@
         body: JSON.stringify({ fields: collect() })
       })
         .then(function (r) { return r.json().catch(function () { return {}; }); })
-        .then(function (data) { if (data && data.ok) showDone(); else showFailed(); })
-        .catch(showFailed);
+        .then(function (data) {
+          if (data && data.ok) showDone(); else showFailed(data && data.reason);
+        })
+        .catch(function () { showFailed(); });
     });
 
     syncAgree();
