@@ -182,7 +182,15 @@
     }
 
     function showDone() {
+      /* hidden 属性だけに頼らない。フォームに display が指定してあると、
+         その指定がブラウザ既定の [hidden]{display:none} に勝ってしまい、
+         属性を立てても消えない。実際それで、送れているのに画面は
+         「送信しています…」のまま止まって見えた。
+         CSS 側でも打ち消してあるが、申し込みが届いたかどうかは
+         一枚のスタイルシートの有無に預けてよい話ではないので、
+         どの CSS より強い直書きでも消す。 */
       form.hidden = true;
+      form.style.display = 'none';
       if (done) {
         done.hidden = false;
         done.scrollIntoView({ block: 'center' });

@@ -524,6 +524,14 @@ a { color: var(--gold-ink); }
 
 .jform--rail { display: grid; gap: 11px; margin-top: 4px; }
 
+/* 送り終えたらフォームは引っこめる。display を指定したものは hidden 属性
+   だけでは消えず、ブラウザ既定の [hidden]{display:none} に勝ってしまう。
+   同じ断りは css/page.css にもあるが、あちらは本文の申し込み欄がある
+   ページしか読み込まない。帯のフォームは活動・理念にも出るので、
+   どのページでも読む site.css の側にも要る。
+   ここが無いと「送信しています…」のまま画面が止まって見える。 */
+.jform--rail[hidden] { display: none; }
+
 .jform--rail .jf { display: grid; gap: 5px; border: 0; margin: 0; padding: 0; }
 
 .jform--rail .jf__label {
