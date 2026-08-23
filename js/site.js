@@ -54,6 +54,13 @@
   var here = location.pathname.split('/').pop() || 'index.html';
   var order = ['katsudo.html', 'rinen.html', '/', 'bunkakai.html', 'nenkan.html'];
 
+  /* 分科会の選び口にいるときは、次に押されるのが四つの札のどれかだと
+     分かっている。先に取っておくと、選んだ瞬間に開く。
+     取り寄せるのは HTML だけで、中の写真までは付いてこない。 */
+  if (here === 'bunkakai.html') {
+    order = order.concat(['kai-kyoyo.html', 'kai-healthy.html', 'kai-teizan.html', 'kai-history.html']);
+  }
+
   window.addEventListener('load', function () {
     window.setTimeout(function () {
       order.forEach(function (href) {
