@@ -311,6 +311,28 @@ def _estimated_durations(
 # ---------------------------------------------------------------------------
 
 
+def _carry_over(
+    previous: Mapping[str, Any] | None, input_sha256: Any
+) -> tuple[list[Any], list[str]] | None:
+    """前回の decisions.json から llm_calls と warnings を引き継ぐ（同じ入力のときだけ）。
+
+    入力ファイルが違えば別のエピソードの記録なので混ぜない。
+    SHA-256 が両方に載っているときだけ突き合わせる。
+    """
+    if not isinstance(previous, Mapping):
+        return None
+    old_sha = previous.get("input_sha256")
+    if old_sha and input_sha256 and old_sha != input_sha256:
+        return None
+    old_calls = previous.get("llm_calls")
+    old_warnings = previous.get("warnings")
+    calls = [c for c in old_calls if isinstance(c, dict)] if isinstance(old_calls, list) else []
+    notes = [str(w) for w in old_warnings] if isinstance(old_warnings, list) else []
+    if not calls and not notes:
+        return None
+    return (calls, notes)
+
+
 def build_decisions(
     ctx: RunContext,
     *,
@@ -321,11 +343,17 @@ def build_decisions(
     render: RenderResult | None,
     generated_at: str,
     input_sha256: str | None = None,
+    previous: Mapping[str, Any] | None = None,
 ) -> dict:
     """SPEC 8章の decisions.json を組み立てて dict で返す。
 
     途中のステップまでしか回っていなくても落ちない（取れた分だけ書く）。
     warnings と llm_calls だけは空でも必ず出す。「何も無かった」ことを記録として残すため。
+
+    `previous` に前回の decisions.json を渡すと、同じ入力ファイルに対する記録として
+    llm_calls と warnings を引き継ぐ。`--dry-run` で判断を確かめてから
+    `--from-step 7` で書き出す、という普段の流れだと後半の実行では LLM を呼ばないので、
+    引き継がないと「何回どのモデルを叩いたか」も前半で出た警告も消えてしまう。
     """
     payload: dict[str, Any] = {
         "episode_id": ctx.episode_id,
@@ -359,8 +387,22 @@ def build_decisions(
         payload["durations"] = durations
         payload["durations_source"] = source
 
-    payload["llm_calls"] = [record.to_dict() for record in ctx.llm_calls]
-    payload["warnings"] = list(ctx.warnings)
+    llm_calls = [record.to_dict() for record in ctx.llm_calls]
+    warnings = list(ctx.warnings)
+    if render is not None:
+        # Step 7 の検算の警告は render.json にも残る。中間ファイルから読んだ回でも拾う。
+        for message in render.warnings:
+            if message not in warnings:
+                warnings.append(message)
+
+    carried = _carry_over(previous, payload.get("input_sha256"))
+    if carried is not None:
+        old_calls, old_warnings = carried
+        llm_calls = [*old_calls, *llm_calls]
+        warnings = [*[w for w in old_warnings if w not in warnings], *warnings]
+
+    payload["llm_calls"] = llm_calls
+    payload["warnings"] = warnings
 
     return payload
 

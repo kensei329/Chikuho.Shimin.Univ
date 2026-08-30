@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import time
 from dataclasses import dataclass, field
@@ -18,7 +19,7 @@ from pathlib import Path
 from typing import Any, Callable, Sequence, TypeVar
 
 from .context import RunContext
-from .decisions import build_decisions, decisions_path, now_iso, write_decisions
+from .decisions import DECISIONS_FILE, build_decisions, decisions_path, now_iso, write_decisions
 from .errors import LlmError, MissingArtifactError, RadioCutterError
 from .llm.client import LlmClient, build_client
 from .logging_util import fmt_duration, get_logger, step_timer
@@ -374,6 +375,21 @@ class _Pipeline:
         """Step 4 以降に着手していれば書く（--dry-run でも、途中で落ちても書く）。"""
         return any(step >= DECISIONS_FROM_STEP for step in self._reached)
 
+    def _previous_decisions(self) -> dict | None:
+        """前回の decisions.json を読む。無い・壊れていても例外は投げない。
+
+        --from-step で後半だけ回した実行でも、前半で出た警告と LLM の呼び出し記録を
+        落とさないための控え。
+        """
+        path = self.ctx.out_path(DECISIONS_FILE)
+        if not path.exists():
+            return None
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        return data if isinstance(data, dict) else None
+
     def _write_decisions(self) -> None:
         """decisions.json を組み立てて out/<episode_id>/ に書く。"""
         anchors = self.result.anchors if self.result.anchors is not None else self._load_optional(s3)
@@ -403,6 +419,7 @@ class _Pipeline:
             highlight=highlight,
             render=render,
             generated_at=now_iso(),
+            previous=self._previous_decisions(),
         )
         self.result.decisions = payload
         write_decisions(self.ctx, payload)

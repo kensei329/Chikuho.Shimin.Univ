@@ -619,6 +619,9 @@ def run(
             "llm/prompts/highlight.md の「本編の範囲」の指示を確認してください。"
         )
 
+    # SPEC Step 5 の「残り2つは decisions.json に残し、UI追加時の差し替え候補にする」。
+    # 本編の外だったものも含めて全部残す。LLM が何を出してきたかは
+    # プロンプトを直すときの手がかりになるし、破棄した理由は warnings 側に出ている。
     alternatives = [c for c in candidates if c is not source]
     result = HighlightResult(
         selected=selected,
