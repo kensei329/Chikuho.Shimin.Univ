@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
-from typing import Mapping, Sequence
+from typing import Callable, Mapping, Sequence
 
 from ..config import YoutubeConfig
 from ..context import RunContext
@@ -178,7 +178,8 @@ def first_sentence(text: str) -> str:
     for i, ch in enumerate(s):
         if ch in "\n\r":
             return s[:i].strip()
-        if ch in "。．.？?！!":
+        # 半角ピリオドは入れない。「実は3.5倍になるんです」が「実は3」に千切れる。
+        if ch in "。．？?！!":
             # 疑問符・感嘆符は文の意味に効くので残し、句点は落とす。
             return (s[: i + 1] if ch in "？?！!" else s[:i]).strip()
     return s
@@ -264,21 +265,29 @@ def render_transcript_lines(
     cut_b: float,
     highlight_dur: float,
     main_dur: float,
+    to_final: Callable[[float], float] | None = None,
 ) -> str:
     """要約セグメントを `[秒] テキスト` の行にする。秒は final.mp4 のタイムラインに変換する。
 
     プロンプト（metadata.md）は「この秒数はすでに final.mp4 に変換済み」と書いてあるので、
     ここで変換しないとチャプターが丸ごとずれる。
+
+    `to_final` を渡すとそれを使う（segments が2本でない config や position="append" 用）。
+    渡さなければ SPEC 6-a の式をそのまま使う。
     """
     lines: list[str] = []
     for item in windows:
         raw_start = float(item["start"])
-        final_t = to_final_time(
-            raw_start,
-            cut_a=cut_a,
-            cut_b=cut_b,
-            highlight_dur=highlight_dur,
-            main_dur=main_dur,
+        final_t = (
+            to_final(raw_start)
+            if to_final is not None
+            else to_final_time(
+                raw_start,
+                cut_a=cut_a,
+                cut_b=cut_b,
+                highlight_dur=highlight_dur,
+                main_dur=main_dur,
+            )
         )
         text = str(item["text"]).strip()
         if not text:
@@ -508,6 +517,7 @@ def generate_description_parts(
     hook_line: str,
     final_duration: float,
     highlight_duration: float,
+    highlight_at_start: bool = True,
 ) -> MetadataResult:
     """6-a を1回だけ呼び、summary_lead / body / chapters / keywords を得る。
 
@@ -538,14 +548,19 @@ def generate_description_parts(
 
     data = response.data
     raw_chapters = [Chapter.from_dict(c) for c in data.get("chapters", [])]
-    # 先に 0:00 をハイライトへ割り当ててから、YouTube の成立条件で整える。
-    # 順番を逆にすると normalize_chapters が本編のチャプターを 0 に寄せてしまう。
-    staged, warnings = ensure_highlight_chapter(
-        raw_chapters,
-        hook_line=hook_line,
-        highlight_duration=highlight_duration,
-        final_duration=final_duration,
-    )
+    if highlight_at_start:
+        # 先に 0:00 をハイライトへ割り当ててから、YouTube の成立条件で整える。
+        # 順番を逆にすると normalize_chapters が本編のチャプターを 0 に寄せてしまう。
+        staged, warnings = ensure_highlight_chapter(
+            raw_chapters,
+            hook_line=hook_line,
+            highlight_duration=highlight_duration,
+            final_duration=final_duration,
+        )
+    else:
+        # position="append" ではハイライトが末尾なので、0:00 は本編の頭。
+        # SPEC の「0:00 はハイライト」は既定の prepend を前提にした話。
+        staged, warnings = list(raw_chapters), []
     chapters, more = normalize_chapters(staged, final_duration)
     for message in [*warnings, *more]:
         ctx.warn(f"チャプター: {message}")
@@ -673,6 +688,55 @@ def resolve_durations(
     return (cut_a, cut_b, highlight_dur, main_dur, ending_dur)
 
 
+def build_final_timeline(
+    ctx: RunContext,
+    cuts: Mapping[str, CutPoint],
+    highlight: HighlightResult,
+    total_duration: float,
+) -> tuple[Callable[[float], float], float, float]:
+    """元動画の時刻 → final.mp4 の時刻 に直す関数と、final の総尺・本編の開始位置を返す。
+
+    SPEC 6-a の式は「ハイライトが先頭・その後ろに本編とエンディングの2本」という
+    既定の構成を前提にしている。config は segments を自由に組めるし、
+    highlight.position は "append" も取れるので、ここでは Step 7 と同じ書き出し順から
+    各区間の先頭位置を積み上げて作る。既定の構成では SPEC の式と同じ値になる。
+
+    返り値の3つ目は「本編（ハイライトの取得元セグメント）が final の何秒目から始まるか」。
+    prepend ならハイライトの尺、append なら 0 になる。
+    """
+    spans: list[tuple[float, float]] = []
+    for seg in ctx.config.segments:
+        spans.append(resolve_segment_bounds(seg, cuts, total_duration))
+    highlight_dur = max(0.0, float(highlight.selected.duration))
+    source_index = [seg.name for seg in ctx.config.segments].index(
+        ctx.config.highlight.source_segment
+    )
+
+    prepend = ctx.config.highlight.position != "append"
+    offsets: list[float] = []
+    cursor = highlight_dur if prepend else 0.0
+    for start, end in spans:
+        offsets.append(cursor)
+        cursor += max(0.0, end - start)
+    final_duration = cursor + (0.0 if prepend else highlight_dur)
+    main_offset = offsets[source_index] if offsets else 0.0
+
+    def to_final(t: float) -> float:
+        """元動画の t を final.mp4 上の秒に直す。どの区間にも入らなければ最寄りに寄せる。"""
+        value = float(t)
+        for index, (start, end) in enumerate(spans):
+            if start <= value < end:
+                return offsets[index] + (value - start)
+        if spans and value < spans[0][0]:
+            return offsets[0]
+        if spans:
+            last_start, last_end = spans[-1]
+            return offsets[-1] + max(0.0, last_end - last_start)
+        return 0.0
+
+    return to_final, final_duration, main_offset
+
+
 def _resolve_total_duration(
     ctx: RunContext, transcript: Transcript, total_duration: float | None
 ) -> float:
@@ -723,7 +787,9 @@ def run(
     cut_a, cut_b, highlight_dur, main_dur, ending_dur = resolve_durations(
         ctx, cuts, highlight, total
     )
-    final_duration = highlight_dur + main_dur + ending_dur
+    # 書き出し順から組み立てる。segments が2本でない config や position="append" でも
+    # チャプターの時刻が合うようにするため（既定の構成なら SPEC 6-a の式と同じ値になる）。
+    to_final, final_duration, main_offset = build_final_timeline(ctx, cuts, highlight, total)
 
     logger.info(
         "final.mp4 の想定尺 %s（ハイライト %.3f秒 + 本編 %.3f秒 + エンディング %.3f秒）",
@@ -746,6 +812,7 @@ def run(
         cut_b=cut_b,
         highlight_dur=highlight_dur,
         main_dur=main_dur,
+        to_final=to_final,
     )
     if not windows:
         ctx.warn(
@@ -774,7 +841,8 @@ def run(
             transcript_text=transcript_text,
             hook_line=hook_line,
             final_duration=final_duration,
-            highlight_duration=highlight_dur,
+            highlight_duration=main_offset,
+            highlight_at_start=ctx.config.highlight.position != "append",
         )
     except LlmError as exc:
         _record_llm(ctx, STEP_NAME_METADATA, llm.model, ok=False, error=str(exc))

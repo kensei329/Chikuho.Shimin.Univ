@@ -18,7 +18,7 @@ from ..config import AnchorConfig
 from ..context import RunContext
 from ..errors import AnchorNotFoundError, AnchorOrderError, MissingArtifactError
 from ..logging_util import get_logger
-from ..models import AnchorCandidate, AnchorResult, Transcript, read_json, write_json
+from ..models import AnchorCandidate, AnchorResult, Transcript, Word, read_json, write_json
 from ..util.text_normalize import FlatText, build_flat, normalize_phrase
 from ..util.timeline import fmt_timestamp
 
@@ -318,6 +318,29 @@ def _must_follow_threshold(anchor: AnchorConfig) -> float:
     return float(must_follow.fuzzy_threshold) * 100.0
 
 
+def _remainder_of_last_word(flat: FlatText, candidate: AnchorCandidate) -> Word | None:
+    """一致箇所が末尾の単語の途中で終わっているとき、その単語の「残り」を返す。
+
+    ASR は読点をまたいで1トークンにすることがある。「ということで、木原」で1語だと、
+    末尾の単語を丸ごと飛ばした瞬間に must_follow の「木原」を見失い、
+    本物のアンカーBが落ちてパイプラインごと止まる。
+    """
+    last = int(candidate.word_end) - 1
+    words = flat.words
+    if not (0 <= last < len(words)):
+        return None
+    word = words[last]
+    _, raw_end = flat.raw_span_for_norm(candidate.norm_start, candidate.norm_end)
+    word_raw_start = sum(len(w.word) for w in words[:last])
+    cut = raw_end - word_raw_start
+    if cut <= 0 or cut >= len(word.word):
+        return None
+    remainder = word.word[cut:]
+    if not remainder:
+        return None
+    return Word(word=remainder, start=word.start, end=word.end)
+
+
 def _slice_after(
     flat: FlatText, candidate: AnchorCandidate, word_starts: Sequence[float], within_sec: float
 ) -> FlatText:
@@ -325,15 +348,22 @@ def _slice_after(
 
     元の単語列のスライスから `build_flat` し直すのが要点。flat 全体に対して
     位置で範囲を切ると、正規化で消えた文字のぶんだけ境界がずれるため。
-    下限は候補の末尾単語の次（`word_end`）にする。ASR のタイムスタンプは
-    まれに前後の単語と重なるので、時刻ではなく単語 index で切るほうが安定する。
+    ASR のタイムスタンプはまれに前後の単語と重なるので、
+    時刻ではなく単語 index で切るほうが安定する。
+
+    ただし末尾の単語は丸ごとは飛ばさない。一致箇所がその単語の途中で終わっていれば、
+    残りを先頭に足す（「ということで、木原」が1トークンのときに「木原」を拾うため）。
     """
     begin = max(0, int(candidate.word_end))
     limit_time = float(candidate.end_time) + float(within_sec)
     end = bisect_right(word_starts, limit_time)
     if end < begin:
         end = begin
-    return build_flat(flat.words[begin:end])
+    following = list(flat.words[begin:end])
+    remainder = _remainder_of_last_word(flat, candidate)
+    if remainder is not None:
+        following.insert(0, remainder)
+    return build_flat(following)
 
 
 def filter_candidates(
@@ -478,6 +508,26 @@ def _fallback_candidates(
     return out
 
 
+def _search_window_sample(anchor: AnchorConfig, flat: FlatText, *, width: int = 120) -> str:
+    """探索窓のあたりで実際に何と言っているかを抜き出す（エラーメッセージ用）。
+
+    候補が1件も作れなかったときの唯一の手がかり。正規化前の生テキストで出す。
+    """
+    words = flat.words
+    if not words:
+        return ""
+    window = anchor.search_window_sec
+    if window is None:
+        selected = words
+    else:
+        lo, hi = window
+        selected = [w for w in words if lo <= w.start <= hi] or list(words)
+    text = "".join(w.word for w in selected)
+    if len(text) <= width:
+        return text
+    return text[:width] + "…"
+
+
 def build_error_message(
     anchor: AnchorConfig, all_candidates: Sequence[AnchorCandidate], flat: FlatText
 ) -> str:
@@ -512,7 +562,12 @@ def build_error_message(
         )
 
     if not top:
-        lines.append("  スコア上位の候補: なし")
+        # 1文字も共通しないと候補が1件も作れない。それでも「実際は何と言っているか」を
+        # 見せないと、SPEC の言う「phrase を実際の発話に合わせて修正」ができない。
+        lines.append("  スコア上位の候補: なし（フレーズと共通する文字が1つもありません）")
+        sample = _search_window_sample(anchor, flat)
+        if sample:
+            lines.append(f"  探索範囲の文字起こし（先頭{len(sample)}文字）: {sample}")
     else:
         header = (
             f"  スコア上位{len(top)}件（しきい値未満も含む）:"

@@ -70,10 +70,17 @@ def pick_cut_time(
 ) -> tuple[float, bool, tuple[float, float] | None]:
     """raw より前にある最後の無音区間を選び、その終了時刻 - 50ms をカット点にする（SPEC Step 4）。
 
-    「raw より前」は `silence_end <= raw` で判定する（終わりがちょうど raw と同じ区間は採用する。
-    発話の立ち上がり直前で無音が閉じた、いちばん理想的なケースだから）。
-    見つからなければ (raw - 80ms, False, None) を返す。カット点は 0 未満にせず、
-    ミリ秒に丸めて返す（SPEC 11章。0.05 の減算で出る二進小数の端数をそのまま持ち回らない）。
+    「raw より前」は `silence_start <= raw` で判定する。ふつうは無音が閉じたところで
+    語が立ち上がるので `silence_end <= raw` になるが、ASR の時刻は数十ミリ秒ぶれるので、
+    語頭が無音区間の内側に落ちることがある。そこで無音を捨てて 80ms のフォールバックに
+    倒れると、無音を見つけているのに `silence_found: false` と記録され、
+    しかも谷でないところで切ることになる。
+
+    カット点は「無音の終わり」と raw の早いほうから 50ms 手前。
+    無音が raw より前で閉じている通常の場合は SPEC どおり `silence_end - 50ms` そのままで、
+    無音の内側に raw が落ちた場合だけ raw の 50ms 手前になる。どちらでも cut < raw は保たれる。
+    0 未満にはせず、ミリ秒に丸めて返す
+    （SPEC 11章。0.05 の減算で出る二進小数の端数をそのまま持ち回らない）。
     """
     raw_time = float(raw)
     chosen: tuple[float, float] | None = None
@@ -83,14 +90,15 @@ def pick_cut_time(
             # 壊れたログ由来の区間。採用すると尺が逆転するので捨てる。
             logger.debug("終了が開始より前の無音区間を無視しました（%.3f < %.3f）。", end, start)
             continue
-        if end > raw_time:
+        if start > raw_time:
             continue
         if chosen is None or (end, start) > (chosen[1], chosen[0]):
             chosen = (start, end)
 
     if chosen is None:
         return (r3(max(0.0, raw_time - NO_SILENCE_BACKOFF_SEC)), False, None)
-    return (r3(max(0.0, chosen[1] - SILENCE_BACKOFF_SEC)), True, chosen)
+    cut = min(chosen[1], raw_time) - SILENCE_BACKOFF_SEC
+    return (r3(max(0.0, cut)), True, chosen)
 
 
 def no_silence_warning(anchor_id: str) -> str:
