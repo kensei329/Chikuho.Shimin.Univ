@@ -42,10 +42,30 @@ def _require(d: dict[str, Any], key: str, where: str) -> Any:
 
 
 def _as_float(value: Any, where: str) -> float:
+    if isinstance(value, bool):
+        raise ConfigError(f"{where} は数値である必要があります（実際: {value!r}）。")
     try:
         return float(value)
     except (TypeError, ValueError) as exc:
         raise ConfigError(f"{where} は数値である必要があります（実際: {value!r}）。") from exc
+
+
+def _as_int(value: Any, where: str) -> int:
+    """整数として読む。設定ファイルの書き間違いは必ず ConfigError にする。
+
+    素の int() が投げる ValueError をそのまま上げると、CLI が
+    「設定のどこが悪いのか」を出せずにトレースバックで落ちる。
+    """
+    if isinstance(value, bool):
+        raise ConfigError(f"{where} は整数である必要があります（実際: {value!r}）。")
+    if isinstance(value, float):
+        if value != int(value):
+            raise ConfigError(f"{where} は整数である必要があります（実際: {value!r}）。")
+        return int(value)
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise ConfigError(f"{where} は整数である必要があります（実際: {value!r}）。") from exc
 
 
 # ---------------------------------------------------------------------------
@@ -95,7 +115,7 @@ class AnchorConfig:
         if occurrence == "nth":
             if nth is None:
                 raise ConfigError(f"{where}.occurrence が 'nth' のときは 'nth'（1始まり）が必要です。")
-            nth = int(nth)
+            nth = _as_int(nth, f"{where}.nth")
             if nth < 1:
                 raise ConfigError(f"{where}.nth は1以上にしてください（実際: {nth}）。")
         else:
@@ -124,14 +144,26 @@ class AnchorConfig:
         if mf_raw is not None:
             if not isinstance(mf_raw, dict):
                 raise ConfigError(f"{where}.must_follow はオブジェクトにしてください。")
-            mf_threshold = mf_raw.get("fuzzy_threshold")
-            must_follow = MustFollow(
-                phrase=str(_require(mf_raw, "phrase", f"{where}.must_follow")),
-                within_sec=_as_float(
-                    _require(mf_raw, "within_sec", f"{where}.must_follow"), f"{where}.must_follow.within_sec"
-                ),
-                fuzzy_threshold=(_as_float(mf_threshold, f"{where}.must_follow.fuzzy_threshold") if mf_threshold is not None else None),
+            mf_phrase = str(_require(mf_raw, "phrase", f"{where}.must_follow"))
+            if not mf_phrase.strip():
+                raise ConfigError(f"{where}.must_follow.phrase が空です。フィルタとして意味を成しません。")
+            mf_within = _as_float(
+                _require(mf_raw, "within_sec", f"{where}.must_follow"), f"{where}.must_follow.within_sec"
             )
+            if mf_within <= 0:
+                raise ConfigError(
+                    f"{where}.must_follow.within_sec は 0 より大きくしてください（実際: {mf_within}）。"
+                    "候補の終端から何秒以内に続くかを指す値です。"
+                )
+            mf_threshold = mf_raw.get("fuzzy_threshold")
+            if mf_threshold is not None:
+                mf_threshold = _as_float(mf_threshold, f"{where}.must_follow.fuzzy_threshold")
+                if not 0.0 < mf_threshold <= 1.0:
+                    raise ConfigError(
+                        f"{where}.must_follow.fuzzy_threshold は 0 より大きく 1 以下にしてください"
+                        f"（実際: {mf_threshold}）。"
+                    )
+            must_follow = MustFollow(phrase=mf_phrase, within_sec=mf_within, fuzzy_threshold=mf_threshold)
 
         return cls(
             id=anchor_id,
@@ -201,7 +233,7 @@ class HighlightConfig:
             max_duration_sec=hi,
             position=position,
             allow_multi_cut=bool(d.get("allow_multi_cut", False)),
-            num_candidates=int(d.get("num_candidates", 3)),
+            num_candidates=_as_int(d.get("num_candidates", 3), f"{where}.num_candidates"),
         )
 
 
@@ -227,7 +259,7 @@ class AsrConfig:
             initial_prompt=str(d.get("initial_prompt", "")),
             backend=str(d.get("backend", "auto")),
             compute_type=str(d.get("compute_type", "float16")),
-            beam_size=int(d.get("beam_size", 5)),
+            beam_size=_as_int(d.get("beam_size", 5), "asr.beam_size"),
         )
 
     def cache_key_payload(self) -> dict[str, Any]:
@@ -254,17 +286,17 @@ class LlmConfig:
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "LlmConfig":
-        retries = int(d.get("max_retries", 3))
+        retries = _as_int(d.get("max_retries", 3), "llm.max_retries")
         if retries < 1:
             raise ConfigError(f"llm.max_retries は1以上にしてください（実際: {retries}）。")
         return cls(
             provider=str(d.get("provider", "anthropic")),
             model=str(d.get("model", "claude-sonnet-4-6")),
             max_retries=retries,
-            max_tokens=int(d.get("max_tokens", 8000)),
-            temperature=float(d.get("temperature", 1.0)),
+            max_tokens=_as_int(d.get("max_tokens", 8000), "llm.max_tokens"),
+            temperature=_as_float(d.get("temperature", 1.0), "llm.temperature"),
             api_key_env=str(d.get("api_key_env", "ANTHROPIC_API_KEY")),
-            timeout_sec=float(d.get("timeout_sec", 300.0)),
+            timeout_sec=_as_float(d.get("timeout_sec", 300.0), "llm.timeout_sec"),
         )
 
 
@@ -294,7 +326,7 @@ class RenderConfig:
             audio_bitrate=str(d.get("audio_bitrate", "192k")),
             fallback_video_codec=str(d.get("fallback_video_codec", "libx264")),
             fallback_extra_args=extra_args,
-            duration_tolerance_sec=float(d.get("duration_tolerance_sec", 0.5)),
+            duration_tolerance_sec=_as_float(d.get("duration_tolerance_sec", 0.5), "render.duration_tolerance_sec"),
         )
 
 
@@ -399,6 +431,12 @@ class Config:
             raise ConfigError(
                 f"highlight.source_segment '{highlight.source_segment}' が segments にありません（{seg_names}）。"
             )
+        # 同じ out/ に書き出すので、名前がぶつかると片方が黙って消える。
+        if highlight.file in seg_files:
+            raise ConfigError(
+                f"highlight.file '{highlight.file}' が segments の出力ファイル名と重複しています。"
+                "同じディレクトリに書き出すため、どちらかが上書きされます。"
+            )
 
         return cls(
             channel=str(d.get("channel", "")),
@@ -420,8 +458,16 @@ def load_config(path: str | Path) -> Config:
     p = Path(path)
     if not p.exists():
         raise ConfigError(f"設定ファイルが見つかりません: {p}")
+    if p.is_dir():
+        raise ConfigError(f"設定ファイルではなくディレクトリが指定されています: {p}")
     try:
-        data = json.loads(p.read_text(encoding="utf-8"))
+        text = p.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ConfigError(f"設定ファイルを読めません: {p}\n{exc}") from exc
+    except UnicodeDecodeError as exc:
+        raise ConfigError(f"設定ファイルが UTF-8 として読めません: {p}\n{exc}") from exc
+    try:
+        data = json.loads(text)
     except json.JSONDecodeError as exc:
         raise ConfigError(f"設定ファイルの JSON が壊れています: {p}\n{exc}") from exc
     return Config.from_dict(data, path=p)

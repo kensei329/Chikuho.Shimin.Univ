@@ -129,30 +129,63 @@ def _scan_windows(flat: FlatText, norm_phrase: str, cutoff: float) -> list[tuple
     return out
 
 
+def _head_match_len(flat: FlatText | None, norm_phrase: str, start: int) -> int:
+    """窓の先頭が phrase の先頭と何文字そろっているか。
+
+    同点の候補を分けるための物差し。raw_cut_time は「一致箇所の先頭文字が属する単語の
+    start」なので、頭がそろっているかどうかがそのままカット位置の正しさになる。
+    """
+    if flat is None or not norm_phrase:
+        return 0
+    window = flat.norm[start : start + len(norm_phrase)]
+    count = 0
+    for left, right in zip(window, norm_phrase):
+        if left != right:
+            break
+        count += 1
+    return count
+
+
 def _merge_adjacent(
-    scored: Sequence[tuple[int, float]], merge_within: int
+    scored: Sequence[tuple[int, float]],
+    merge_within: int,
+    *,
+    flat: FlatText | None = None,
+    norm_phrase: str = "",
 ) -> list[tuple[int, float]]:
-    """開始位置が merge_within 文字以内で隣り合う候補を1グループにし、最高スコアだけ残す。
+    """開始位置が merge_within 文字以内で隣り合う候補を1グループにし、最良の1つだけ残す。
 
     一致箇所の周りでは窓が数個続けてしきい値を超えるので、まとめないと同じ場所が
     複数候補として数えられ、occurrence の `nth` がずれる。
+
+    同点のときは「頭がそろっているほう」を採る。config のフレーズが実際の発話と
+    1文字違うと（「このチャンネルは」に対して「このチャンネルわ」など）、
+    正しい位置の窓と、2文字手前から始まる窓が同点になる。手前を採ると
+    raw_cut_time が前の文の尻尾に飛び、02_main.mp4 の冒頭に「…います。」が混ざる。
     """
     if not scored:
         return []
     ordered = sorted(scored, key=lambda item: item[0])
     limit = max(0, int(merge_within))
 
+    def rank(start: int, score: float) -> tuple[float, int]:
+        return (score, _head_match_len(flat, norm_phrase, start))
+
     best: list[tuple[int, float]] = []
     group_best = ordered[0]
+    group_rank = rank(*ordered[0])
     prev_start = ordered[0][0]
     for start, score in ordered[1:]:
         if start - prev_start <= limit:
-            # 同スコアなら先に出たほう（語頭が欠けにくい）を残す。
-            if score > group_best[1]:
+            current = rank(start, score)
+            # 完全に同じ物差しなら先に出たほうを残す（並びを安定させるため）。
+            if current > group_rank:
                 group_best = (start, score)
+                group_rank = current
         else:
             best.append(group_best)
             group_best = (start, score)
+            group_rank = rank(start, score)
         prev_start = start
     best.append(group_best)
     return best
@@ -248,7 +281,7 @@ def find_candidates(
         return []
 
     scored = _scan_windows(flat, norm_phrase, float(threshold_score))
-    merged = _merge_adjacent(scored, merge_within)
+    merged = _merge_adjacent(scored, merge_within, flat=flat, norm_phrase=norm_phrase)
 
     candidates: list[AnchorCandidate] = []
     for start, score in merged:

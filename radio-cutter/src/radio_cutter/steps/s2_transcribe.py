@@ -59,7 +59,11 @@ BACKEND_ALIASES: dict[str, str] = {
 }
 
 #: backend="auto" のときに試す順（SPEC 6章 Step2 のフォールバック）
-AUTO_BACKEND_ORDER: tuple[str, ...] = ("whisperx", "mlx_whisper")
+#
+# mlx 系が主で、whisperx はフォールバック。設定の既定モデルが
+# "mlx-community/whisper-large-v3-mlx" という MLX 用のIDなので、
+# 順番を逆にすると、そのIDをそのまま whisperx に渡して落ちる。
+AUTO_BACKEND_ORDER: tuple[str, ...] = ("mlx_whisper", "whisperx")
 
 
 class _BackendUnavailable(TranscriptionError):
@@ -257,6 +261,38 @@ def _normalize_segment(raw: Any, index: int) -> Segment | None:
     return Segment(start=float(seg_start), end=float(seg_end), text=text, words=words)
 
 
+def _merge_overlapping(segments: list[Segment]) -> list[Segment]:
+    """時刻の重なるセグメントを1つにまとめ、単語列が必ず時刻順になるようにする。
+
+    ASR はまれに重なったセグメントを返す。そのまま連結すると words() が時刻順にならず、
+    Step 3 以降の二分探索が別の単語を指してカット位置がずれる。
+    文の切れ目は単語テキストの終端記号で見ているので、まとめても後段の判断は変わらない。
+    """
+    merged: list[Segment] = []
+    for seg in segments:
+        # セグメント内の並びは触らない。逆行した時刻は _normalize_segment が
+        # 単調になるよう均してあり、そこでの並びは発話順そのものだから。
+        words = seg.words
+        if merged and seg.start < merged[-1].end:
+            prev = merged[-1]
+            # どちらも時刻順なので、安定ソートは2列のマージと同じ働きになる。
+            # 各セグメント内の相対順は保たれたまま、全体が時刻順に揃う。
+            joined = sorted([*prev.words, *words], key=lambda w: (w.start, w.end))
+            merged[-1] = Segment(
+                start=min(prev.start, seg.start),
+                end=max(prev.end, seg.end),
+                text=f"{prev.text}{seg.text}",
+                words=joined,
+            )
+            logger.debug(
+                "重なったセグメントをまとめた: [%.3f, %.3f] と [%.3f, %.3f]",
+                prev.start, prev.end, seg.start, seg.end,
+            )
+        else:
+            merged.append(Segment(start=seg.start, end=seg.end, text=seg.text, words=words))
+    return merged
+
+
 def normalize_asr_result(raw: dict, duration: float, *, language: str = "ja") -> Transcript:
     """ASR バックエンドの生 dict を Transcript に揃える（whisperx / mlx-whisper 両対応）。
 
@@ -280,6 +316,7 @@ def normalize_asr_result(raw: dict, duration: float, *, language: str = "ja") ->
         if segment is not None:
             segments.append(segment)
     segments.sort(key=lambda s: (s.start, s.end))
+    segments = _merge_overlapping(segments)
 
     detected = raw.get("language")
     lang = str(detected) if isinstance(detected, str) and detected.strip() else str(language or "ja")
