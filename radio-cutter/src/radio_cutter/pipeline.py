@@ -320,14 +320,12 @@ class _Pipeline:
             self._highlight_failed = True
 
     def _step6(self) -> None:
-        if self._highlight_failed:
-            message = "Step 6（メタデータ生成）は Step 5 が失敗したため飛ばしました。"
-            self.ctx.warn(message)
-            logger.warning("%s", message)
-            return
         transcript = self.transcript()
         cuts = self.cuts()
-        highlight = self.highlight()
+        # 6-a（概要欄・チャプター）と 6-b（タイトル）は Step 5 とは別の呼び出しなので、
+        # ハイライトが取れなかった回でも作れる。ハイライト抜きの final.mp4 に合う
+        # 時刻で組み立てる。
+        highlight = None if self._highlight_failed else self.highlight()
         total = self.total_duration()
         llm = self.llm()
         self.result.metadata = self._timed(

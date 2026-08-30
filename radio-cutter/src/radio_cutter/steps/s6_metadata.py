@@ -457,8 +457,10 @@ def build_titles_markdown(titles: Sequence[TitleCandidate]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _hook_line(highlight: HighlightResult, transcript: Transcript) -> str:
+def _hook_line(highlight: HighlightResult | None, transcript: Transcript) -> str:
     """ハイライトの入りの一言。LLM が返していなければ文字起こしから作る。"""
+    if highlight is None:
+        return ""
     hook = str(highlight.selected.hook_line).strip()
     if hook:
         return hook
@@ -671,7 +673,7 @@ def write_titles(ctx: RunContext, titles: Sequence[TitleCandidate]) -> Path:
 def resolve_durations(
     ctx: RunContext,
     cuts: Mapping[str, CutPoint],
-    highlight: HighlightResult,
+    highlight: HighlightResult | None,
     total_duration: float,
 ) -> tuple[float, float, float, float, float]:
     """(cut_a, cut_b, Dh, Dm, De) を返す。
@@ -682,7 +684,7 @@ def resolve_durations(
     """
     source = ctx.config.segment(ctx.config.highlight.source_segment)
     cut_a, cut_b = resolve_segment_bounds(source, cuts, total_duration)
-    highlight_dur = max(0.0, float(highlight.selected.duration))
+    highlight_dur = 0.0 if highlight is None else max(0.0, float(highlight.selected.duration))
     main_dur = max(0.0, cut_b - cut_a)
     ending_dur = max(0.0, float(total_duration) - cut_b)
     return (cut_a, cut_b, highlight_dur, main_dur, ending_dur)
@@ -691,7 +693,7 @@ def resolve_durations(
 def build_final_timeline(
     ctx: RunContext,
     cuts: Mapping[str, CutPoint],
-    highlight: HighlightResult,
+    highlight: HighlightResult | None,
     total_duration: float,
 ) -> tuple[Callable[[float], float], float, float]:
     """元動画の時刻 → final.mp4 の時刻 に直す関数と、final の総尺・本編の開始位置を返す。
@@ -707,7 +709,7 @@ def build_final_timeline(
     spans: list[tuple[float, float]] = []
     for seg in ctx.config.segments:
         spans.append(resolve_segment_bounds(seg, cuts, total_duration))
-    highlight_dur = max(0.0, float(highlight.selected.duration))
+    highlight_dur = 0.0 if highlight is None else max(0.0, float(highlight.selected.duration))
     source_index = [seg.name for seg in ctx.config.segments].index(
         ctx.config.highlight.source_segment
     )
@@ -784,7 +786,7 @@ def run(
     ctx: RunContext,
     transcript: Transcript,
     cuts: Mapping[str, CutPoint],
-    highlight: HighlightResult,
+    highlight: HighlightResult | None,
     llm: LlmClient,
     total_duration: float | None = None,
 ) -> MetadataResult:
@@ -810,7 +812,9 @@ def run(
         main_dur,
         ending_dur,
     )
-    if highlight_dur <= 0:
+    if highlight is None:
+        logger.warning("ハイライトが無いので、概要欄は本編とエンディングだけで作ります。")
+    elif highlight_dur <= 0:
         ctx.warn("メタデータ: ハイライトの尺が0秒です。チャプターの時刻がずれる可能性があります。")
         logger.warning("ハイライトの尺が0秒です。0:00 のチャプターが実質的に空になります。")
 
@@ -855,7 +859,11 @@ def run(
             hook_line=hook_line,
             final_duration=final_duration,
             highlight_duration=main_offset,
-            highlight_at_start=ctx.config.highlight.position != "append",
+            # ハイライトが無い回は final.mp4 の先頭が本編なので、0:00 に
+            # ハイライトのラベルを置かない。
+            highlight_at_start=(
+                highlight is not None and ctx.config.highlight.position != "append"
+            ),
         )
     except LlmError as exc:
         _record_llm(ctx, STEP_NAME_METADATA, llm.model, ok=False, error=str(exc))

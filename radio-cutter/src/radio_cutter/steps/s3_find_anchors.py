@@ -318,7 +318,22 @@ def _must_follow_threshold(anchor: AnchorConfig) -> float:
     return float(must_follow.fuzzy_threshold) * 100.0
 
 
-def _remainder_of_last_word(flat: FlatText, candidate: AnchorCandidate) -> Word | None:
+def _word_raw_starts(flat: FlatText) -> list[int]:
+    """各単語が raw 上の何文字目から始まるかを1回だけ数える。
+
+    候補ごとに数え直すと、候補数 × 単語数 になって、単語10万個の回で30秒以上かかる。
+    """
+    starts: list[int] = []
+    cursor = 0
+    for word in flat.words:
+        starts.append(cursor)
+        cursor += len(word.word)
+    return starts
+
+
+def _remainder_of_last_word(
+    flat: FlatText, candidate: AnchorCandidate, word_raw_starts: Sequence[int] | None = None
+) -> Word | None:
     """一致箇所が末尾の単語の途中で終わっているとき、その単語の「残り」を返す。
 
     ASR は読点をまたいで1トークンにすることがある。「ということで、木原」で1語だと、
@@ -331,7 +346,10 @@ def _remainder_of_last_word(flat: FlatText, candidate: AnchorCandidate) -> Word 
         return None
     word = words[last]
     _, raw_end = flat.raw_span_for_norm(candidate.norm_start, candidate.norm_end)
-    word_raw_start = sum(len(w.word) for w in words[:last])
+    if word_raw_starts is not None and last < len(word_raw_starts):
+        word_raw_start = word_raw_starts[last]
+    else:
+        word_raw_start = sum(len(w.word) for w in words[:last])
     cut = raw_end - word_raw_start
     if cut <= 0 or cut >= len(word.word):
         return None
@@ -342,7 +360,11 @@ def _remainder_of_last_word(flat: FlatText, candidate: AnchorCandidate) -> Word 
 
 
 def _slice_after(
-    flat: FlatText, candidate: AnchorCandidate, word_starts: Sequence[float], within_sec: float
+    flat: FlatText,
+    candidate: AnchorCandidate,
+    word_starts: Sequence[float],
+    within_sec: float,
+    word_raw_starts: Sequence[int] | None = None,
 ) -> FlatText:
     """候補の直後 within_sec 以内に始まる単語だけで、小さな FlatText を作り直す。
 
@@ -360,7 +382,7 @@ def _slice_after(
     if end < begin:
         end = begin
     following = list(flat.words[begin:end])
-    remainder = _remainder_of_last_word(flat, candidate)
+    remainder = _remainder_of_last_word(flat, candidate, word_raw_starts)
     if remainder is not None:
         following.insert(0, remainder)
     return build_flat(following)
@@ -384,6 +406,7 @@ def filter_candidates(
         [float(w.start) for w in flat.words] if must_follow is not None else []
     )
     mf_threshold = _must_follow_threshold(anchor)
+    word_raw_starts = _word_raw_starts(flat) if must_follow is not None else None
 
     for candidate in candidates:
         # 1) 探索窓の外を除外
@@ -399,7 +422,9 @@ def filter_candidates(
 
         # 2) must_follow: 直後 within_sec 以内に指定フレーズが続くかを同じあいまい一致で確認
         if must_follow is not None:
-            tail = _slice_after(flat, candidate, word_starts, must_follow.within_sec)
+            tail = _slice_after(
+                flat, candidate, word_starts, must_follow.within_sec, word_raw_starts
+            )
             hits = find_candidates(tail, must_follow.phrase, mf_threshold)
             if not hits:
                 candidate.rejected_reason = (
