@@ -19,7 +19,7 @@ from typing import Any, Callable, Sequence, TypeVar
 
 from .context import RunContext
 from .decisions import build_decisions, decisions_path, now_iso, write_decisions
-from .errors import MissingArtifactError, RadioCutterError
+from .errors import LlmError, MissingArtifactError, RadioCutterError
 from .llm.client import LlmClient, build_client
 from .logging_util import fmt_duration, get_logger, step_timer
 from .models import (
@@ -187,6 +187,7 @@ class _Pipeline:
     def __init__(self, ctx: RunContext, *, llm: LlmClient | None = None) -> None:
         self.ctx = ctx
         self.result = PipelineResult(ctx=ctx)
+        self._highlight_failed = False
         self._llm = llm
         self._reached: list[int] = []
 
@@ -297,11 +298,32 @@ class _Pipeline:
         cuts = self.cuts()
         total = self.total_duration()
         llm = self.llm()
-        self.result.highlight = self._timed(
-            s5, lambda: s5.run(self.ctx, transcript, cuts, llm, total_duration=total)
-        )
+        try:
+            self.result.highlight = self._timed(
+                s5, lambda: s5.run(self.ctx, transcript, cuts, llm, total_duration=total)
+            )
+        except LlmError as exc:
+            # SPEC 9章: LLM が答えを返せなくても、そのステップだけ落として書き出しは続ける。
+            # 60分ぶんのエンコードを API の一時的な不調で捨てないため。
+            # 候補が全部本編の外だった場合（HighlightError）はここで拾わず、仕様どおり止まる。
+            message = (
+                f"Step 5（ハイライト選定）に失敗したため、ハイライト無しで続けます: {exc}"
+            )
+            self.ctx.warn(message)
+            logger.error("%s", message)
+            logger.warning(
+                "01_highlight.mp4 は作られず、final.mp4 は本編以降だけの連結になります。"
+                "あとから `--from-step 5` でやり直せます。"
+            )
+            self.result.highlight = None
+            self._highlight_failed = True
 
     def _step6(self) -> None:
+        if self._highlight_failed:
+            message = "Step 6（メタデータ生成）は Step 5 が失敗したため飛ばしました。"
+            self.ctx.warn(message)
+            logger.warning("%s", message)
+            return
         transcript = self.transcript()
         cuts = self.cuts()
         highlight = self.highlight()
@@ -313,7 +335,10 @@ class _Pipeline:
 
     def _step7(self) -> None:
         cuts = self.cuts()
-        highlight = self.highlight()
+        # Step 5 がこの実行で落ちたときだけハイライト無しで進む。
+        # 中間ファイルが最初から無い（--from-step 7 をいきなり叩いた）場合は、
+        # 黙って欠けたまま書き出さずに「先に Step 5 を回して」と言って止まる。
+        highlight = None if self._highlight_failed else self.highlight()
         media = self.media()
         self.result.render = self._timed(s7, lambda: s7.run(self.ctx, cuts, highlight, media))
 
@@ -356,7 +381,19 @@ class _Pipeline:
         highlight = (
             self.result.highlight if self.result.highlight is not None else self._load_optional(s5)
         )
-        render = self.result.render if self.result.render is not None else self._load_optional(s7)
+        # 書き出しを回していない実行では、前回の render.json を「実測」として載せない。
+        # カット点を変えて --dry-run し直した直後だと、前回の実尺は今回の anchors と
+        # 食い違う。decisions.json の中で辻褄の合わない数字が並ぶより、
+        # 今回のカット点から出した想定値を載せるほうが読み手を誤らせない。
+        render = self.result.render
+        if render is None and int(s7.STEP) in self.result.timings:
+            render = self._load_optional(s7)
+        if render is None and self._load_optional(s7) is not None:
+            logger.debug(
+                "前回の書き出し結果はありますが、今回 Step %s を回していないので"
+                "decisions.json の尺は想定値にします。",
+                s7.STEP,
+            )
 
         payload = build_decisions(
             self.ctx,

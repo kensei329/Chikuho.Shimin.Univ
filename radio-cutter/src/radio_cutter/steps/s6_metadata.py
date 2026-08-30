@@ -18,7 +18,7 @@ from typing import Callable, Mapping, Sequence
 
 from ..config import YoutubeConfig
 from ..context import RunContext
-from ..errors import LlmError, MissingArtifactError
+from ..errors import LlmError, MissingArtifactError, RadioCutterError
 from ..llm.client import LlmClient, load_prompt, render_prompt
 from ..llm.schemas import (
     METADATA_SCHEMA,
@@ -768,6 +768,18 @@ def _resolve_total_duration(
 # ---------------------------------------------------------------------------
 
 
+def _previous_metadata(ctx: RunContext) -> MetadataResult | None:
+    """前回の metadata.json を読む。無い・壊れていても例外は投げない。
+
+    LLM が落ちた回に空の内容で上書きすると、前回うまくいったときの
+    概要欄とタイトル30個がまるごと消える。それを避けるための控え。
+    """
+    try:
+        return load(ctx)
+    except (MissingArtifactError, RadioCutterError, OSError, ValueError):
+        return None
+
+
 def run(
     ctx: RunContext,
     transcript: Transcript,
@@ -832,6 +844,7 @@ def run(
         )
 
     result = MetadataResult()
+    previous = _previous_metadata(ctx)
 
     # ---- 6-a: チャプター＋概要欄 ----
     try:
@@ -849,6 +862,18 @@ def run(
         message = f"Step 6-a（概要欄・チャプター）に失敗したため description.txt は作れませんでした: {exc}"
         ctx.warn(message)
         logger.error("%s", message)
+        if previous is not None and (previous.summary_lead or previous.body):
+            # 前回ぶんを metadata.json から消さない。ただしチャプターだけは引き継がない。
+            # 時刻は今回のカット点に紐づくので、前回の値を残すと嘘の位置を指す。
+            result.summary_lead = previous.summary_lead
+            result.body = previous.body
+            result.keywords = list(previous.keywords)
+            note = (
+                "メタデータ: 概要欄の本文は前回の metadata.json のものを残しました"
+                "（チャプターは今回のカット点と合わないため引き継いでいません）。"
+            )
+            ctx.warn(note)
+            logger.warning("%s", note)
     else:
         write_description(ctx, result)
 
@@ -868,6 +893,12 @@ def run(
         message = f"Step 6-b（タイトル候補）に失敗したため titles.md は作れませんでした: {exc}"
         ctx.warn(message)
         logger.error("%s", message)
+        if previous is not None and previous.titles:
+            # タイトルはカット点に依存しないので、前回ぶんをそのまま残してよい。
+            result.titles = list(previous.titles)
+            note = f"メタデータ: タイトル候補は前回の {len(result.titles)} 件を残しました。"
+            ctx.warn(note)
+            logger.warning("%s", note)
     else:
         write_titles(ctx, result.titles)
 

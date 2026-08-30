@@ -276,6 +276,13 @@ class AsrConfig:
 
 @dataclass(frozen=True)
 class LlmConfig:
+    """LLM の呼び出し設定。
+
+    `max_retries` は「試行回数の上限」として扱う（3 なら API 呼び出しは最大3回、
+    つまり投げ直しは2回まで）。SPEC 9章の「3回までリトライ」はどちらとも読めるので、
+    呼び出し回数が読んだとおりになる側に寄せてある。
+    """
+
     provider: str = "anthropic"
     model: str = "claude-sonnet-4-6"
     max_retries: int = 3

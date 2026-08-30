@@ -100,10 +100,15 @@ def clamp_span(label: str, start: float, end: float, total_duration: float) -> t
 
 
 def concat_order(
-    position: str, highlight_file: Path, segment_files: Sequence[Path]
+    position: str, highlight_file: Path | None, segment_files: Sequence[Path]
 ) -> list[Path]:
-    """連結順を決める。`prepend` ならハイライトが先頭、`append` なら末尾（SPEC 5章 highlight.position）。"""
+    """連結順を決める。`prepend` ならハイライトが先頭、`append` なら末尾（SPEC 5章 highlight.position）。
+
+    `highlight_file` が None ならセグメントだけを順に並べる。
+    """
     files = list(segment_files)
+    if highlight_file is None:
+        return files
     if position == "append":
         return [*files, highlight_file]
     return [highlight_file, *files]
@@ -130,9 +135,11 @@ def duration_gap_warning(expected: float, actual: float, tolerance: float) -> st
 # ---------------------------------------------------------------------------
 
 
-def _duration_keys(ctx: RunContext) -> list[str]:
+def _duration_keys(ctx: RunContext, *, with_highlight: bool = True) -> list[str]:
     """想定合計を出すためのキー順（連結順と同じ並び）。"""
     names = [seg.name for seg in ctx.config.segments]
+    if not with_highlight:
+        return names
     if ctx.config.highlight.position == "append":
         return [*names, HIGHLIGHT_KEY]
     return [HIGHLIGHT_KEY, *names]
@@ -178,10 +185,17 @@ def _encode_one(
     *,
     use_fallback: bool,
     result: RenderResult,
+    requested_durations: dict[str, float] | None = None,
 ) -> Path:
-    """区間を1本書き出し、実尺を ffprobe で測って RenderResult に記録する。"""
+    """区間を1本書き出し、実尺を ffprobe で測って RenderResult に記録する。
+
+    `requested_durations` を渡すと「書き出しを指示した区間の長さ」も控える。
+    final.mp4 の検算はこちらと比べる（実測どうしを比べると検算にならない）。
+    """
     dst = ctx.out_path(out_name)
     requested = end - start
+    if requested_durations is not None:
+        requested_durations[key] = requested
     logger.info(
         "%sを書き出します: %s〜%s（%.3f〜%.3f秒 / %s）→ %s",
         label,
@@ -218,19 +232,18 @@ def _encode_one(
 def run(
     ctx: RunContext,
     cuts: Mapping[str, CutPoint],
-    highlight: HighlightResult,
+    highlight: HighlightResult | None,
     media: MediaInfo | None = None,
 ) -> RenderResult:
-    """ハイライトと各セグメントを書き出し、連結して final.mp4 を作る（SPEC Step 7）。"""
+    """ハイライトと各セグメントを書き出し、連結して final.mp4 を作る（SPEC Step 7）。
+
+    `highlight` が None のときはハイライトを飛ばし、セグメントだけを書き出して連結する。
+    LLM が落ちても動画の書き出しは続ける、という SPEC 9章の方針のため
+    （60分のエンコードを API の一時的な不調で捨てない）。
+    """
     ctx.ensure_dirs()
     require_binaries()
 
-    if highlight is None:
-        raise MissingArtifactError(
-            "ハイライトがありません。\n"
-            f"  先に `radio-cutter run {ctx.input_path} --only-step 5` で"
-            "Step 5（ハイライト選定）を実行してください。"
-        )
     if not cuts:
         raise MissingArtifactError(
             "カット点が1つもありません。\n"
@@ -261,20 +274,31 @@ def run(
     )
 
     result = RenderResult(used_fallback_codec=used_fallback)
+    requested_durations: dict[str, float] = {}
 
-    # 1) ハイライト
+    # 1) ハイライト（無ければ飛ばす）
     hl_cfg = ctx.config.highlight
-    hl_start, hl_end = _highlight_bounds(highlight, total_duration)
-    highlight_file = _encode_one(
-        ctx,
-        "ハイライト",
-        HIGHLIGHT_KEY,
-        hl_cfg.file,
-        hl_start,
-        hl_end,
-        use_fallback=used_fallback,
-        result=result,
-    )
+    highlight_file: Path | None = None
+    if highlight is None:
+        message = (
+            "ハイライトが無いため 01_highlight.mp4 を作らず、"
+            "final.mp4 は本編以降だけを連結します。"
+        )
+        ctx.warn(message)
+        logger.warning("%s", message)
+    else:
+        hl_start, hl_end = _highlight_bounds(highlight, total_duration)
+        highlight_file = _encode_one(
+            ctx,
+            "ハイライト",
+            HIGHLIGHT_KEY,
+            hl_cfg.file,
+            hl_start,
+            hl_end,
+            use_fallback=used_fallback,
+            result=result,
+            requested_durations=requested_durations,
+        )
 
     # 2) 各セグメント（config の順）
     segment_files: list[Path] = []
@@ -291,6 +315,7 @@ def run(
                 end,
                 use_fallback=used_fallback,
                 result=result,
+                requested_durations=requested_durations,
             )
         )
 
@@ -305,7 +330,10 @@ def run(
     final = concat_files(order, final_path(ctx), ctx.work_dir, list_name=CONCAT_LIST_NAME)
 
     # 4) 実尺の検算（SPEC Step 7）。ずれても止めず警告に残す。
-    expected_total = sum(result.durations[key] for key in _duration_keys(ctx))
+    # 比べる相手は「書き出しを指示した区間の合計」（＝ SPEC の Dh + Dm + De）。
+    # 出来上がった3本の実測を足したものと比べると、エンコーダ側のずれが
+    # 両辺に同じだけ乗るので、検算がほとんど素通りしてしまう。
+    expected_total = sum(requested_durations.get(key, 0.0) for key in _duration_keys(ctx, with_highlight=highlight is not None))
     actual_total = media_duration(final)
     result.files[FINAL_KEY] = str(final)
     result.durations[FINAL_KEY] = actual_total
