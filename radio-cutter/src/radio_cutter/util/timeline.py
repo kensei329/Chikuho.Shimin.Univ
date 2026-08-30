@@ -20,7 +20,11 @@ from ..models import Chapter, CutPoint, Word, r3
 logger = get_logger(__name__)
 
 #: 文末とみなす記号（SPEC Step 5 の後処理2「。？！ で判定」）
-SENTENCE_TERMINATORS = "。．.？?！!"
+#
+# 半角ピリオドは入れない。ASR が「3.5倍」のような小数をひとつの単語で返すため、
+# 入れると「要約の精度は3.5」で文が切れ、拡張後の文頭が「倍になりました。」になる。
+# 文頭が千切れるのは語尾が千切れるのと同じくらい視聴に耐えない。
+SENTENCE_TERMINATORS = "。．？！?!"
 
 #: 単語境界の指定に使えるキーワード
 VALID_KINDS = ("start", "end")
