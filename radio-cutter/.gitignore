@@ -1,0 +1,15 @@
+# 中間ファイルと成果物は追跡しない（SPEC 4章）
+work/
+out/
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/

@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "radio-cutter"
+version = "0.1.0"
+description = "「AI活用法実験ラジオ」の収録動画を決まり文句で自動分割し、YouTube 公開物一式を作るローカル CLI"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "rapidfuzz>=3.0",
+    "jsonschema>=4.0",
+]
+
+[project.optional-dependencies]
+# LLM（Step 5 / Step 6）
+llm = ["anthropic>=0.40"]
+# 文字起こし（Step 2）。Apple Silicon 向け。環境によって入るものが違うので任意扱い。
+asr = ["mlx-whisper>=0.4"]
+# 非 mac / フォールバック用
+asr-x = ["whisperx>=3.1"]
+dev = ["pytest>=8.0", "pytest-cov"]
+
+[project.scripts]
+radio-cutter = "radio_cutter.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"radio_cutter.llm" = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "ffmpeg: ffmpeg の実バイナリを使うテスト",
+    "slow: 数秒以上かかるテスト",
+]
