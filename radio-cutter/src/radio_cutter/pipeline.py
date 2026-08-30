@@ -395,18 +395,16 @@ class _Pipeline:
         highlight = (
             self.result.highlight if self.result.highlight is not None else self._load_optional(s5)
         )
-        # 書き出しを回していない実行では、前回の render.json を「実測」として載せない。
-        # カット点を変えて --dry-run し直した直後だと、前回の実尺は今回の anchors と
-        # 食い違う。decisions.json の中で辻褄の合わない数字が並ぶより、
+        # 書き出しを「この実行で成功させた」ときだけ、その実尺を載せる。
+        # 中間ファイルから読み直さないのは、カット点を変えて流し直した直後だと
+        # 前回の実尺が今回の anchors と食い違うため。辻褄の合わない数字が並ぶより、
         # 今回のカット点から出した想定値を載せるほうが読み手を誤らせない。
+        # 途中で Step 7 が落ちた回も同じ（result.render は成功時にしか入らない）。
         render = self.result.render
-        if render is None and int(s7.STEP) in self.result.timings:
-            render = self._load_optional(s7)
         if render is None and self._load_optional(s7) is not None:
             logger.debug(
-                "前回の書き出し結果はありますが、今回 Step %s を回していないので"
+                "前回の書き出し結果はありますが、今回この実行で書き出していないので"
                 "decisions.json の尺は想定値にします。",
-                s7.STEP,
             )
 
         payload = build_decisions(

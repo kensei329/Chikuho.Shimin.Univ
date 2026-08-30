@@ -819,3 +819,41 @@ def test_result_lists_the_files_it_produced(ready_ctx: RunContext, stub_llm) -> 
         "decisions.json",
     } <= names
     assert all(Path(p).exists() for p in result.artifacts)
+
+
+# ---------------------------------------------------------------------------
+# decisions.json の尺の出どころ
+# ---------------------------------------------------------------------------
+
+
+@requires_ffmpeg
+@pytest.mark.ffmpeg
+def test_step7が落ちた回は前回の実尺を実測として載せない(
+    video_ctx: RunContext, stub_llm, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """書き出しに失敗した回の decisions.json に、前回の実尺が「実測」として残らないこと。
+
+    カット点を変えて流し直した直後だと、前回の実尺は今回の anchors と食い違う。
+    「今回の書き出しの結果です」という顔で古い数字が載るのがいちばん困る。
+    """
+    fixtures.build_transcript().save(video_ctx.work_path("transcript.json"))
+    s1.run(video_ctx)
+
+    # 1回目: 通しで成功させ、render.json を残す
+    ok = run_pipeline(video_ctx, from_step=3, llm=stub_llm)
+    assert ok.render is not None
+    first = json.loads(video_ctx.out_path("decisions.json").read_text(encoding="utf-8"))
+    assert first["durations_source"] == "measured"
+
+    # 2回目: Step 7 だけ落とす
+    def boom(*args, **kwargs):
+        raise RenderError("書き出しに失敗しました（試験用）")
+
+    monkeypatch.setattr(s7, "run", boom)
+    with pytest.raises(RenderError):
+        run_pipeline(video_ctx, from_step=7, llm=stub_llm)
+
+    after = json.loads(video_ctx.out_path("decisions.json").read_text(encoding="utf-8"))
+    assert after["durations_source"] != "measured", (
+        "Step 7 が落ちた回なのに、前回の実尺が「実測」として載っている"
+    )
