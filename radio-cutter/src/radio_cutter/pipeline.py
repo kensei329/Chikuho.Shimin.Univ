@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -424,6 +425,26 @@ class _Pipeline:
         ]
         logger.info("所要時間: %s（合計 %s）", " / ".join(parts), fmt_duration(self.result.total_elapsed))
 
+    def _warn_missing_api_key(self, plan: Sequence[int]) -> None:
+        """LLM を使うステップが計画に入っているのに APIキーが無ければ、走り出す前に言う。
+
+        文字起こしに何十分もかけたあとで Step 5 が落ちるのが一番もったいないため。
+        """
+        if self._llm is not None:
+            return
+        llm_steps = [step for step in plan if step in LLM_STEPS]
+        if not llm_steps:
+            return
+        env_name = self.ctx.config.llm.api_key_env
+        if not env_name or os.environ.get(env_name):
+            return
+        logger.warning(
+            "環境変数 %s が未設定です。Step %s に入った時点で LLM 呼び出しに失敗します"
+            "（--stub-llm を使うか、APIキーを設定してください）。",
+            env_name,
+            "・".join(str(step) for step in llm_steps),
+        )
+
     # ----- 実行 -----
 
     def execute(self, steps: Sequence[int], *, dry_run: bool = False) -> PipelineResult:
@@ -445,6 +466,7 @@ class _Pipeline:
                 step_label(7),
                 step_label(8),
             )
+        self._warn_missing_api_key(plan)
 
         started = time.perf_counter()
         try:
