@@ -366,6 +366,10 @@ def has_encoder(name: str) -> bool:
     return name in _encoder_names()
 
 
+#: フォールバック警告を出したコーデックの組み合わせ（同じ警告を繰り返さないため）
+_codec_warned: set[tuple[str, str]] = set()
+
+
 def choose_video_codec(render: RenderConfig) -> tuple[str, tuple[str, ...], bool]:
     """使う映像コーデックと追加引数を決める。使えなければ CPU エンコードに落とす（SPEC Step 7）。
 
@@ -374,16 +378,21 @@ def choose_video_codec(render: RenderConfig) -> tuple[str, tuple[str, ...], bool
     if has_encoder(render.video_codec):
         return render.video_codec, ("-b:v", render.video_bitrate), False
 
-    logger.warning(
-        "映像コーデック %s がこの ffmpeg で使えません。%s にフォールバックします（CPU エンコードになります）。",
-        render.video_codec,
-        render.fallback_video_codec,
-    )
-    if not has_encoder(render.fallback_video_codec):
+    # 書き出しのたびに同じ警告を並べても読みにくいだけなので、組み合わせごとに1回だけ出す。
+    # 呼び出し側（Step 7）は返り値の第3要素を見て decisions.json 用の警告を別途記録する。
+    warn_key = (render.video_codec, render.fallback_video_codec)
+    if warn_key not in _codec_warned:
+        _codec_warned.add(warn_key)
         logger.warning(
-            "フォールバック先の %s も見つかりません。ffmpeg のビルドを確認してください。",
+            "映像コーデック %s がこの ffmpeg で使えません。%s にフォールバックします（CPU エンコードになります）。",
+            render.video_codec,
             render.fallback_video_codec,
         )
+        if not has_encoder(render.fallback_video_codec):
+            logger.warning(
+                "フォールバック先の %s も見つかりません。ffmpeg のビルドを確認してください。",
+                render.fallback_video_codec,
+            )
     return render.fallback_video_codec, tuple(render.fallback_extra_args), True
 
 
