@@ -278,13 +278,20 @@ class AsrConfig:
 class LlmConfig:
     """LLM の呼び出し設定。
 
-    `max_retries` は「試行回数の上限」として扱う（3 なら API 呼び出しは最大3回、
+    `provider` の既定は `claude_agent_sdk`。このパソコンに入っている Claude Code を
+    そのまま呼ぶので、APIキーも課金の設定も要らない（Claude Code のログインを使う）。
+    Anthropic API を直接叩きたいときだけ `anthropic` にする。
+
+    `model` は provider によって書き方が変わる。
+    claude_agent_sdk なら "opus" / "sonnet" / "haiku"、anthropic なら "claude-opus-5" のような ID。
+
+    `max_retries` は「試行回数の上限」として扱う（3 なら呼び出しは最大3回、
     つまり投げ直しは2回まで）。SPEC 9章の「3回までリトライ」はどちらとも読めるので、
     呼び出し回数が読んだとおりになる側に寄せてある。
     """
 
-    provider: str = "anthropic"
-    model: str = "claude-sonnet-4-6"
+    provider: str = "claude_agent_sdk"
+    model: str = "opus"
     max_retries: int = 3
     max_tokens: int = 8000
     temperature: float = 1.0
@@ -297,8 +304,8 @@ class LlmConfig:
         if retries < 1:
             raise ConfigError(f"llm.max_retries は1以上にしてください（実際: {retries}）。")
         return cls(
-            provider=str(d.get("provider", "anthropic")),
-            model=str(d.get("model", "claude-sonnet-4-6")),
+            provider=str(d.get("provider", "claude_agent_sdk")),
+            model=str(d.get("model", "opus")),
             max_retries=retries,
             max_tokens=_as_int(d.get("max_tokens", 8000), "llm.max_tokens"),
             temperature=_as_float(d.get("temperature", 1.0), "llm.temperature"),

@@ -138,8 +138,8 @@ class TestBundledConfig:
             assert phrase in config.asr.initial_prompt
 
     def test_LLM設定(self, config: Config) -> None:
-        assert config.llm.provider == "anthropic"
-        assert config.llm.model == "claude-sonnet-4-6"
+        assert config.llm.provider == "claude_agent_sdk"
+        assert config.llm.model == "opus"
         assert config.llm.max_retries == 3
 
     def test_レンダリング設定(self, config: Config) -> None:
@@ -546,7 +546,7 @@ class TestLlmConfig:
     def test_llm節が無くても既定値で読める(self) -> None:
         cfg = build(lambda d: d.pop("llm"))
         assert cfg.llm.max_retries == 3
-        assert cfg.llm.provider == "anthropic"
+        assert cfg.llm.provider == "claude_agent_sdk"
 
     def test_APIキーは環境変数名で持つ(self, config: Config) -> None:
         """SPEC 2章「LLM APIキー（環境変数）」。キー本体を config に書かせない。"""

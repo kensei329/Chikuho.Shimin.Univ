@@ -8,9 +8,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
+import threading
 import time
 from copy import deepcopy
 from dataclasses import dataclass
@@ -49,6 +51,29 @@ TOOL_DESCRIPTION = (
 
 #: HTTP ステータスのうちリトライしても直らないもの（設定ミス・リクエスト不正）
 FATAL_STATUS_CODES = (400, 401, 403, 404, 413)
+
+#: config の llm.provider に書ける別名 → 実際のプロバイダ名
+PROVIDER_ALIASES = {
+    "claude_agent_sdk": "claude_agent_sdk",
+    "claude-agent-sdk": "claude_agent_sdk",
+    "claude_code": "claude_agent_sdk",
+    "claude-code": "claude_agent_sdk",
+    "local": "claude_agent_sdk",
+    "sdk": "claude_agent_sdk",
+    "anthropic": "anthropic",
+    "anthropic_api": "anthropic",
+    "api": "anthropic",
+}
+
+#: Claude Agent SDK に渡す既定のモデル名（"opus" / "sonnet" / "haiku" の別名が使える）
+DEFAULT_SDK_MODEL = "opus"
+
+#: Claude Agent SDK に「JSON だけ返せ」と言うための前置き
+SDK_SYSTEM_HEADER = (
+    "あなたは JSON だけを返します。前置き・説明文・コードフェンス・"
+    "「はい」などの返事を一切書かないでください。"
+    "返すのは次の JSON Schema にちょうど合うオブジェクト1つだけです。"
+)
 
 _PLACEHOLDER_RE = re.compile(r"\{\{\s*([A-Za-z0-9_][A-Za-z0-9_.\-]*)\s*\}\}")
 _FENCE_RE = re.compile(r"```(?:json|JSON)?[ \t]*\r?\n(.*?)```", re.DOTALL)
@@ -186,6 +211,34 @@ def _as_int(value: Any) -> int:
         return int(value)
     except (TypeError, ValueError):
         return 0
+
+
+def _run_async(coro: Any) -> Any:
+    """非同期の呼び出しを同期のコードから使う。
+
+    パイプラインは同期なので普段は `asyncio.run` で足りるが、
+    すでにイベントループが回っている場所（ノートブック等）から呼ばれても
+    落ちないよう、その場合は別スレッドで新しいループを回す。
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro)
+
+    result: dict[str, Any] = {}
+
+    def worker() -> None:
+        try:
+            result["value"] = asyncio.run(coro)
+        except BaseException as exc:  # noqa: BLE001 - 呼び出し元に投げ直す
+            result["error"] = exc
+
+    thread = threading.Thread(target=worker, daemon=True)
+    thread.start()
+    thread.join()
+    if "error" in result:
+        raise result["error"]
+    return result.get("value")
 
 
 # ---------------------------------------------------------------------------
@@ -393,6 +446,171 @@ class AnthropicClient(LlmClient):
         return extract_json(joined)
 
 
+class ClaudeAgentSdkClient(LlmClient):
+    """このパソコンに入っている Claude Code を呼ぶ（APIキー不要）。
+
+    Claude Agent SDK は Claude Code 本体を部品として呼び出す作りなので、
+    認証は Claude Code のログイン（サブスクリプション）をそのまま使う。
+    `ANTHROPIC_API_KEY` は要らないし、見ない。
+
+    API 版と違って「ツール呼び出しで JSON を強制する」口が無いので、
+    プロンプトと system で JSON だけを書かせ、返ってきた本文から
+    `extract_json` で取り出して `validate_payload` にかける。
+    形が合わなければ理由を添えて投げ直す（回数は API 版と同じ）。
+    """
+
+    def __init__(self, cfg: LlmConfig) -> None:
+        self.cfg = cfg
+        self.model = cfg.model or DEFAULT_SDK_MODEL
+
+    # ----- 呼び出し -----
+
+    def complete_json(
+        self,
+        *,
+        step: str,
+        prompt: str,
+        schema: dict,
+        system: str | None = None,
+        tool_name: str = "emit_result",
+        max_tokens: int | None = None,
+    ) -> LlmResponse:
+        attempts = max(1, int(self.cfg.max_retries))
+        current = prompt
+        last_error = "不明なエラー"
+        usage: dict[str, Any] = {}
+
+        for attempt in range(attempts):
+            if attempt > 0:
+                _sleep(RETRY_BACKOFF_BASE_SEC * (2 ** (attempt - 1)))
+                current = self._retry_prompt(prompt, last_error)
+                logger.warning(
+                    "LLM（%s）を投げ直します（%d/%d回目）: %s",
+                    step, attempt + 1, attempts, last_error[:200],
+                )
+            logger.info(
+                "Claude Code に問い合わせます step=%s model=%s prompt=%d文字（%d/%d回目）",
+                step, self.model, len(current), attempt + 1, attempts,
+            )
+            try:
+                text, usage = self._ask(current, system=system, schema=schema)
+                payload = extract_json(text)
+                validate_payload(payload, schema, where=f"{step} / {attempt + 1}回目")
+            except LlmError as exc:
+                last_error = str(exc)
+                continue
+
+            return LlmResponse(
+                data=payload,
+                input_tokens=_as_int(usage.get("input_tokens")),
+                output_tokens=_as_int(usage.get("output_tokens")),
+                retries=attempt,
+            )
+
+        raise LlmError(
+            f"LLM（{step}）が {attempts} 回の試行すべてで受理できる JSON を返しませんでした。\n"
+            f"最後のエラー: {last_error}"
+        )
+
+    # ----- 内部 -----
+
+    @staticmethod
+    def _retry_prompt(prompt: str, last_error: str) -> str:
+        """前回の失敗理由を足したプロンプトを作る。同じ失敗を繰り返させないため。"""
+        detail = (last_error or "不明なエラー")[:MAX_RETRY_ERROR_CHARS]
+        return (
+            f"{prompt}\n\n"
+            "---\n"
+            f"{RETRY_HEADER}\n{detail}\n\n"
+            "スキーマちょうどの JSON オブジェクトだけを返してください。"
+            "前置きも説明文もコードフェンスも書かないでください。"
+        )
+
+    def _system_prompt(self, schema: dict, system: str | None) -> str:
+        """JSON だけを書かせるための system。スキーマ本体も渡す。"""
+        parts = [SDK_SYSTEM_HEADER, json.dumps(schema, ensure_ascii=False, indent=2)]
+        if system:
+            parts.append(system)
+        return "\n\n".join(parts)
+
+    def _options(self, schema: dict, system: str | None) -> Any:
+        """Claude Agent SDK に渡す設定。道具は一切使わせない。
+
+        `setting_sources=[]` にしているのは、使う人の CLAUDE.md や設定を読み込むと
+        同じ入力でも出力が変わってしまうため。ここは純粋な文章生成として使う。
+        """
+        sdk = self._import_sdk()
+        return sdk.ClaudeAgentOptions(
+            system_prompt=self._system_prompt(schema, system),
+            model=self.model,
+            max_turns=1,
+            allowed_tools=[],
+            setting_sources=[],
+            permission_mode="dontAsk",
+        )
+
+    @staticmethod
+    def _import_sdk() -> Any:
+        """遅延 import。入っていなければ次の一手を書いて止める。"""
+        try:
+            import claude_agent_sdk
+        except ImportError as exc:
+            raise LlmError(
+                "claude-agent-sdk が見つかりません。\n"
+                "  pip install 'radio-cutter[llm]' を実行してください。\n"
+                "  あわせて Claude Code 本体（https://claude.com/claude-code）を入れ、"
+                "`claude` コマンドでログインしておく必要があります。"
+            ) from exc
+        return claude_agent_sdk
+
+    def _ask(self, prompt: str, *, system: str | None, schema: dict) -> tuple[str, dict]:
+        """Claude Code に1回投げて、本文と usage を返す。"""
+        sdk = self._import_sdk()
+        options = self._options(schema, system)
+
+        async def run() -> tuple[str, dict]:
+            chunks: list[str] = []
+            usage: dict[str, Any] = {}
+            async for message in sdk.query(prompt=prompt, options=options):
+                if isinstance(message, sdk.AssistantMessage):
+                    for block in message.content:
+                        if isinstance(block, sdk.TextBlock):
+                            chunks.append(block.text)
+                elif isinstance(message, sdk.ResultMessage):
+                    raw = getattr(message, "usage", None)
+                    if isinstance(raw, dict):
+                        usage = raw
+                    if getattr(message, "is_error", False):
+                        detail = getattr(message, "result", None) or getattr(message, "errors", "")
+                        raise LlmError(f"Claude Code がエラーを返しました: {detail}")
+            return ("".join(chunks), usage)
+
+        try:
+            return _run_async(run())
+        except LlmError:
+            raise
+        except Exception as exc:  # SDK 側の例外はここで日本語にして返す
+            raise LlmError(self._friendly_error(sdk, exc)) from exc
+
+    @staticmethod
+    def _friendly_error(sdk: Any, exc: Exception) -> str:
+        """SDK の例外を、次に何をすればいいか分かる文言にする。"""
+        not_found = getattr(sdk, "CLINotFoundError", None)
+        if not_found is not None and isinstance(exc, not_found):
+            return (
+                "Claude Code（`claude` コマンド）が見つかりません。\n"
+                "  https://claude.com/claude-code から入れて、一度 `claude` を起動して"
+                "ログインしてください。"
+            )
+        connection = getattr(sdk, "CLIConnectionError", None)
+        if connection is not None and isinstance(exc, connection):
+            return (
+                f"Claude Code に接続できませんでした: {exc}\n"
+                "  ターミナルで `claude` が起動するか、ログイン済みかを確認してください。"
+            )
+        return f"Claude Code の呼び出しに失敗しました: {type(exc).__name__}: {exc}"
+
+
 class StubLlmClient(LlmClient):
     """テストと `--stub-llm` 用。step 名で決め打ちの JSON を返す。
 
@@ -446,12 +664,18 @@ def build_client(cfg: LlmConfig, *, stub_responses: dict | None = None) -> LlmCl
     """設定から LLM クライアントを作る。stub_responses があればスタブを優先する。"""
     if stub_responses is not None:
         return StubLlmClient(stub_responses, model=f"stub:{cfg.model}")
-    provider = (cfg.provider or "").strip().lower()
+    raw = (cfg.provider or "").strip().lower()
+    provider = PROVIDER_ALIASES.get(raw)
+    if provider == "claude_agent_sdk":
+        return ClaudeAgentSdkClient(cfg)
     if provider == "anthropic":
         return AnthropicClient(cfg)
+    known = sorted(set(PROVIDER_ALIASES.values()))
     raise LlmError(
         f"未対応の LLM プロバイダです: {cfg.provider!r}"
-        "（対応しているのは 'anthropic' のみ。config の llm.provider を直してください）。"
+        f"（対応しているのは {known}。config の llm.provider を直してください）。\n"
+        "  'claude_agent_sdk' … このパソコンの Claude Code を使う（APIキー不要・既定）\n"
+        "  'anthropic'        … Anthropic API を使う（APIキーが要る）"
     )
 
 

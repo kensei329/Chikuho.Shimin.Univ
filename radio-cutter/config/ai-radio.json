@@ -37,8 +37,8 @@
     "initial_prompt": "AI活用法実験ラジオ。このチャンネルは。ということで、木原さん。"
   },
   "llm": {
-    "provider": "anthropic",
-    "model": "claude-sonnet-4-6",
+    "provider": "claude_agent_sdk",
+    "model": "opus",
     "max_retries": 3
   },
   "render": {

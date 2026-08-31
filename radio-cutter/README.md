@@ -32,7 +32,10 @@ YouTube 公開に必要な成果物一式まで作るローカル CLI です。
 - 文字起こしのバックエンド（どちらか）
   - `mlx-whisper` — Apple Silicon 向け。こちらが主
   - `whisperx` — それ以外・フォールバック
-- LLM の APIキー（ハイライト選定と概要欄・タイトル生成に使う）
+- Claude Code（ハイライト選定と概要欄・タイトル生成に使う）
+  既定ではこのパソコンに入っている Claude Code をそのまま呼ぶので、**APIキーは要りません**。
+  `curl -fsSL https://claude.ai/install.sh | bash` で入れ、一度 `claude` を起動して
+  ログインしておいてください。
 
 ## 入れる
 
@@ -40,8 +43,12 @@ YouTube 公開に必要な成果物一式まで作るローカル CLI です。
 cd radio-cutter
 python3 -m pip install -e '.[llm,asr]'      # Apple Silicon
 python3 -m pip install -e '.[llm,asr-x]'    # それ以外
-export ANTHROPIC_API_KEY=sk-ant-...
+claude          # 一度起動してログイン（APIキーは要りません）
 ```
+
+Anthropic API を直接叩きたい場合だけ、`config/ai-radio.json` の `llm.provider` を
+`"anthropic"`、`llm.model` を `"claude-opus-5"` などにして
+`pip install -e '.[api]'` と `export ANTHROPIC_API_KEY=...` を足してください。
 
 入ったかどうかは `doctor` が全部見ます。
 

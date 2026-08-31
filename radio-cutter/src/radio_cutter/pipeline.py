@@ -21,7 +21,7 @@ from typing import Any, Callable, Sequence, TypeVar
 from .context import RunContext
 from .decisions import DECISIONS_FILE, build_decisions, decisions_path, now_iso, write_decisions
 from .errors import LlmError, MissingArtifactError, RadioCutterError
-from .llm.client import LlmClient, build_client
+from .llm.client import PROVIDER_ALIASES, LlmClient, build_client
 from .logging_util import fmt_duration, get_logger, step_timer
 from .models import (
     AnchorResult,
@@ -479,8 +479,12 @@ class _Pipeline:
         """LLM を使うステップが計画に入っているのに APIキーが無ければ、走り出す前に言う。
 
         文字起こしに何十分もかけたあとで Step 5 が落ちるのが一番もったいないため。
+        既定の claude_agent_sdk（このパソコンの Claude Code を呼ぶ）は APIキーを使わないので、
+        その場合はここで何も言わない。
         """
         if self._llm is not None:
+            return
+        if PROVIDER_ALIASES.get((self.ctx.config.llm.provider or "").strip().lower()) != "anthropic":
             return
         llm_steps = [step for step in plan if step in LLM_STEPS]
         if not llm_steps:

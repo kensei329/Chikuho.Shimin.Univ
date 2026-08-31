@@ -206,11 +206,49 @@ def test_doctor_checks_videotoolbox_and_announces_cpu_fallback(capsys):
 
 @requires_ffmpeg
 @pytest.mark.ffmpeg
-def test_doctor_warns_when_api_key_is_missing(monkeypatch, capsys):
-    """APIキーが無いのは「警告」であって「NG」ではない（Step 1〜4 と --stub-llm は動く）。"""
+def test_doctor_looks_at_claude_code_not_the_api_key(monkeypatch, capsys):
+    """既定は APIキーではなく、このパソコンの Claude Code を見ること。
+
+    キーが無くても、Claude Code さえ入っていれば Step 5・6 は動く。
+    """
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setattr(cli.shutil, "which", lambda name: "/usr/local/bin/claude" if name == "claude" else "/usr/bin/" + name)
 
     code = main(["doctor"])
+    out = capsys.readouterr().out
+
+    assert code == EXIT_OK
+    assert "Claude Code" in out
+    assert "APIキーは要りません" in out
+
+
+def test_doctor_warns_when_claude_code_is_missing(monkeypatch, capsys):
+    """Claude Code が無いのは「警告」であって「NG」ではない（Step 1〜4 と --stub-llm は動く）。"""
+    real_which = cli.shutil.which
+    monkeypatch.setattr(
+        cli.shutil, "which", lambda name: None if name == "claude" else real_which(name)
+    )
+
+    code = main(["doctor"])
+    out = capsys.readouterr().out
+
+    assert code == EXIT_OK
+    assert "claude" in out.lower()
+    assert "ログイン" in out
+
+
+def test_doctor_still_checks_the_api_key_for_the_anthropic_provider(
+    tmp_path: Path, monkeypatch, capsys
+):
+    """`llm.provider` を anthropic にしたときだけ、環境変数を見に行くこと。"""
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    raw["llm"]["provider"] = "anthropic"
+    raw["llm"]["model"] = "claude-opus-5"
+    config = tmp_path / "api.json"
+    config.write_text(json.dumps(raw, ensure_ascii=False), encoding="utf-8")
+
+    code = main(["doctor", "--config", str(config)])
     out = capsys.readouterr().out
 
     assert code == EXIT_OK
@@ -916,13 +954,23 @@ def test_titles_reports_failure_when_generation_fails(env: CliEnv, capsys):
     _no_traceback(captured.err)
 
 
-def test_titles_without_an_llm_backend_returns_1(env: CliEnv, monkeypatch, capsys):
-    """LLM が使えない環境（SDK もキーも無い）でも、トレースバックではなく案内で落ちる。"""
+def test_titles_without_an_llm_backend_returns_1(env: CliEnv, tmp_path: Path, monkeypatch, capsys):
+    """LLM が使えないとき、トレースバックではなく案内で落ちること。
+
+    provider を anthropic にしたうえでキーを外し、確実に「使えない」状態を作る
+    （既定の claude_agent_sdk はこのパソコンの Claude Code を使うので、
+     入っている環境では成功してしまい、この筋道を確かめられない）。
+    """
     import importlib.util
 
     if importlib.util.find_spec("anthropic") is not None:
         pytest.skip("anthropic SDK が入っている環境です")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    raw["llm"]["provider"] = "anthropic"
+    raw["llm"]["model"] = "claude-opus-5"
+    config = tmp_path / "api.json"
+    config.write_text(json.dumps(raw, ensure_ascii=False), encoding="utf-8")
     _seed_metadata_and_highlight(env)
 
     code = main(
@@ -930,7 +978,7 @@ def test_titles_without_an_llm_backend_returns_1(env: CliEnv, monkeypatch, capsy
             "titles",
             env.episode_id,
             "--config",
-            str(CONFIG_PATH),
+            str(config),
             "--work",
             str(env.work),
             "--out",

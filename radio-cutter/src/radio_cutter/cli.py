@@ -70,7 +70,8 @@ MIN_PYTHON = (3, 11)
 CHECKED_MODULES: tuple[tuple[str, str, bool, str], ...] = (
     ("rapidfuzz", "rapidfuzz", True, "Step 3 のあいまい一致"),
     ("jsonschema", "jsonschema", True, "LLM 応答のスキーマ検証"),
-    ("anthropic", "anthropic", False, "Step 5・6 の LLM 呼び出し"),
+    ("claude_agent_sdk", "claude-agent-sdk", False, "Step 5・6（このパソコンの Claude Code を呼ぶ）"),
+    ("anthropic", "anthropic", False, "Step 5・6（Anthropic API を直接叩く場合）"),
     ("whisperx", "whisperx", False, "Step 2 の文字起こし（faster-whisper 系）"),
     ("mlx_whisper", "mlx-whisper", False, "Step 2 の文字起こし（Apple Silicon 向け）"),
 )
@@ -533,16 +534,47 @@ def _check_modules(report: _Report) -> None:
         )
 
 
-def _check_api_key(report: _Report, config: Config | None) -> None:
-    """LLM APIキー環境変数の有無。無くても Step 1〜4 と --stub-llm は動く。"""
-    env_name = config.llm.api_key_env if config is not None else "ANTHROPIC_API_KEY"
-    if os.environ.get(env_name):
-        report.add(STATUS_OK, f"環境変数 {env_name} は設定されています。")
+def _check_llm(report: _Report, config: Config | None) -> None:
+    """LLM を呼ぶ準備ができているか。無くても Step 1〜4 と --stub-llm は動く。
+
+    既定の claude_agent_sdk は APIキーではなく Claude Code のログインを使うので、
+    見るところが違う。設定に書かれたプロバイダに応じて確認先を変える。
+    """
+    from .llm.client import PROVIDER_ALIASES
+
+    llm = config.llm if config is not None else None
+    raw = (llm.provider if llm is not None else "claude_agent_sdk") or ""
+    provider = PROVIDER_ALIASES.get(raw.strip().lower())
+
+    if provider == "anthropic":
+        env_name = llm.api_key_env if llm is not None else "ANTHROPIC_API_KEY"
+        if os.environ.get(env_name):
+            report.add(STATUS_OK, f"環境変数 {env_name} は設定されています。")
+        else:
+            report.add(
+                STATUS_WARN,
+                f"環境変数 {env_name} が未設定です。Step 5・6（LLM）が実行できません"
+                "（--stub-llm を使うなら不要）。",
+            )
+        return
+
+    if provider != "claude_agent_sdk":
+        report.add(
+            STATUS_NG,
+            f"config の llm.provider が未対応です: {raw!r}"
+            "（'claude_agent_sdk' か 'anthropic' にしてください）。",
+        )
+        return
+
+    claude = shutil.which("claude")
+    if claude:
+        report.add(STATUS_OK, f"Claude Code が見つかりました（{claude}）。APIキーは要りません。")
     else:
         report.add(
             STATUS_WARN,
-            f"環境変数 {env_name} が未設定です。Step 5・6（LLM）が実行できません"
-            "（--stub-llm を使うなら不要）。",
+            "Claude Code（`claude` コマンド）が見つかりません。Step 5・6（LLM）が実行できません。"
+            "https://claude.com/claude-code から入れて、一度 `claude` を起動して"
+            "ログインしてください（--stub-llm を使うなら不要）。",
         )
 
 
@@ -561,7 +593,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         report.add(STATUS_WARN, "ffmpeg が無いため、エンコーダの確認は飛ばしました。")
 
     _check_modules(report)
-    _check_api_key(report, config)
+    _check_llm(report, config)
 
     print(f"— OK {report.ok} 件 / 警告 {report.warned} 件 / NG {report.failed} 件")
     if report.failed:

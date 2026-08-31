@@ -26,6 +26,7 @@ from radio_cutter.config import LlmConfig
 from radio_cutter.errors import LlmError, RadioCutterError
 from radio_cutter.llm import client as client_mod
 from radio_cutter.llm.client import (
+    ClaudeAgentSdkClient,
     AnthropicClient,
     LlmResponse,
     StubLlmClient,
@@ -837,8 +838,26 @@ class TestBuildClient:
         assert "openai" in str(ei.value)
 
     def test_configのllm設定からそのまま作れる(self, config) -> None:
-        """同梱 config/ai-radio.json の llm 設定で作れること。"""
-        assert isinstance(build_client(config.llm), AnthropicClient)
+        """同梱 config/ai-radio.json の llm 設定で作れること。
+
+        既定はこのパソコンの Claude Code を呼ぶ側（APIキー不要）。
+        """
+        assert isinstance(build_client(config.llm), ClaudeAgentSdkClient)
+
+    @pytest.mark.parametrize(
+        "provider", ["claude_agent_sdk", "claude-agent-sdk", "claude_code", "claude-code", "local", "sdk"]
+    )
+    def test_ローカルのClaudeを指す別名(self, provider: str) -> None:
+        """設定ファイルの書き方が揺れても、同じものを指す。"""
+        assert isinstance(build_client(LlmConfig(provider=provider)), ClaudeAgentSdkClient)
+
+    def test_未知のプロバイダは両方の選択肢を案内する(self) -> None:
+        """どちらに直せばいいかがメッセージで分かること。"""
+        with pytest.raises(LlmError) as ei:
+            build_client(LlmConfig(provider="gemini"))
+        message = str(ei.value)
+        assert "claude_agent_sdk" in message
+        assert "anthropic" in message
 
 
 # ===========================================================================
